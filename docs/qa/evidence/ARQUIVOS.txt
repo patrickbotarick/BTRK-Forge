@@ -59,4 +59,4 @@ A	tools/feasibility/windows/tauri.conf.json
 A	tsconfig.json
 A	vite.config.ts
 A	vitest.config.ts
-A`t docs/qa/evidence/ARQUIVOS.txt
+A	docs/qa/evidence/ARQUIVOS.txt
