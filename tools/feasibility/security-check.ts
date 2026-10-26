@@ -13,9 +13,13 @@ for (const path of files) {
 }
 const studio = JSON.parse(await readFile('apps/studio/src-tauri/tauri.conf.json', 'utf8'));
 const counter = JSON.parse(await readFile('tools/feasibility/windows/tauri.conf.json', 'utf8'));
-for (const [name, config] of [['studio', studio], ['counter', counter]] as const) {
-  if (config.app.security.capabilities.length || config.app.withGlobalTauri) findings.push(`Permissões inesperadas: ${name}`);
-}
+if (JSON.stringify(studio.app.security.capabilities) !== JSON.stringify(['project-workspace']) || studio.app.withGlobalTauri) findings.push('Permissões inesperadas: Studio');
+if (counter.app.security.capabilities.length || counter.app.withGlobalTauri) findings.push('Permissões inesperadas: aplicativo exportado');
+const capability = JSON.parse(await readFile('apps/studio/src-tauri/capabilities/project.json', 'utf8'));
+const expectedPermissions = ['allow-project-create','allow-project-open','allow-project-save','allow-project-save-as','allow-project-reload','allow-project-restore','allow-project-close','allow-project-exit','core:event:allow-listen','core:event:allow-unlisten'].sort();
+if (capability.remote || capability.webviews || !capability.local || JSON.stringify(capability.windows) !== '["main"]' || JSON.stringify([...capability.permissions].sort()) !== JSON.stringify(expectedPermissions)) findings.push('Escopo de projetos ampliado além da janela local main');
+const buildScript = await readFile('apps/studio/src-tauri/build.rs', 'utf8');
+if (!buildScript.includes('AppManifest::new().commands')) findings.push('Comandos de projeto não inscritos na ACL Tauri');
 const script = previewDocument.match(/<script>([\s\S]+)<\/script>/)![1];
 const hash = createHash('sha256').update(script).digest('base64');
 if (!studio.app.security.csp.includes(`'sha256-${hash}'`)) findings.push('Hash CSP do preview desatualizado');

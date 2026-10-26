@@ -23,7 +23,7 @@
     ],
     "security": {
       "csp": "default-src 'self'; script-src 'self' 'sha256-62SGmRnRWzfxWoy9ZFTnPNa9uE4+tFhopKIJ695Uxc8='; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' about:; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'none'",
-      "capabilities": []
+      "capabilities": ["project-workspace"]
     }
   },
   "bundle": {

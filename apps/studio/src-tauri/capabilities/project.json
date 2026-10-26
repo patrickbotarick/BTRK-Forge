@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "project-workspace",
+  "description": "Somente a janela local principal pode solicitar operações de projeto com seleção nativa de workspace.",
+  "local": true,
+  "windows": ["main"],
+  "permissions": [
+    "allow-project-create", "allow-project-open", "allow-project-save", "allow-project-save-as",
+    "allow-project-reload", "allow-project-restore", "allow-project-close", "allow-project-exit",
+    "core:event:allow-listen", "core:event:allow-unlisten"
+  ]
+}
