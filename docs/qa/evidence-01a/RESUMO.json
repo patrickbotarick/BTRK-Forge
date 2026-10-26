@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-26",
+  "timezone": "America/Sao_Paulo",
+  "sourceCommit": "918e625a3c8cf87ee1badf0da32c71573226ef88",
+  "baseMain": "baa3654703c06cd6d17095347311e70e518ed6b7",
+  "platform": "Windows x64 build 10.0.26300 / NTFS / WebView2 155.0.4283.62",
+  "unit": {
+    "failed": 0,
+    "passed": 24
+  },
+  "rust": {
+    "persistencePassed": 19,
+    "hostPassed": 1,
+    "failed": 0
+  },
+  "browser": {
+    "productionPassed": 2,
+    "phase0Passed": 4,
+    "nativeRustPassed": 5,
+    "failed": 0
+  },
+  "nativeSmoke": {
+    "created": true,
+    "saved": true,
+    "reopened": true,
+    "nativeCloseSaved": true,
+    "reopenedAfterProcessExit": true,
+    "nodeCount": 9
+  },
+  "nativeSmokeScope": "WebView2 real; seletores assistidos pelo usuário. Ajustes finais de validação/escopo cobertos por testes Rust e novo build.",
+  "savedProjectEvidence": {
+    "buttonText": "Salvo ao fechar a janela",
+    "idPreservedInBackup": true,
+    "backupAvailable": true,
+    "connections": 8,
+    "nodes": 9
+  },
+  "checks": {
+    "webBuild": "passed",
+    "testDriverAbsentFromProduction": true,
+    "secretPermissionScanner": "no findings in scope",
+    "cargoCheck": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "windowsBuild": "passed",
+    "cargoFmt": "passed"
+  },
+  "npmAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "physicalPowerFailureTested": false,
+  "cleanMachineInstallationTested": false,
+  "artifacts": [
+    {
+      "path": "apps/studio/src-tauri/target/release/btrk-forge.exe",
+      "bytes": 16587776,
+      "sha256": "117ae4e8dbd7303ef6ff31581804616021dd0672a0fb8e83ec4deab2334d1945"
+    },
+    {
+      "path": "apps/studio/src-tauri/target/release/bundle/nsis/BTRK Forge_0.0.1_x64-setup.exe",
+      "bytes": 4162211,
+      "sha256": "04b4355ce161d36c3c0c27f3fdaceacecef1bd720474d0438318e877b633c2bd"
+    },
+    {
+      "path": "tools/feasibility/windows/target/release/bundle/nsis/BTRK Contador_0.1.0_x64-setup.exe",
+      "bytes": 1897871,
+      "sha256": "cd4fcd246e754760cf9ac78c9549fa811f4e9936fbc64d4646f10d81dc284d90"
+    }
+  ]
+}

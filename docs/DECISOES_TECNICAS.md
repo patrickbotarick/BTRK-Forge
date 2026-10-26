@@ -1,5 +1,17 @@
 # Decisões técnicas — Fase 0
 
+## Adendo Fase 1A — decisões de persistência
+
+- Biblioteca Rust separada, JSON Schema gerado de Zod e semântica validada também no backend. Sem novo banco como fonte de verdade.
+- Manifesto único `project.btrk.json`; JSONs da Fase 0 continuam compatíveis por abertura/importação, preservando IDs. Metadados novos são opcionais para legado.
+- Capabilities explícitas com comandos inscritos em AppManifest; diálogos nativos concedem a pasta, operações posteriores usam sessão opaca. Nenhuma API genérica de arquivos foi exposta.
+- Temporário exclusivo no mesmo diretório, `sync_all`, APIs Windows de troca, validação pós-gravação e backup apenas de bytes válidos. Não há fallback delete+rename nem promessa de durabilidade física universal.
+- SHA-256 para conflitos, lock entre instâncias e proteção por handles/reparse points. A corrida estreita com escritor externo é detectada após a troca e preservada em snapshot, com limite documentado, sem alegar CAS de kernel.
+- Confirmações explícitas para descarte e recuperação, sem merge automático. Snapshot órfão/deslocado é preservado; não há sistema complexo de histórico.
+- Comparação entre controles simulados e reais registrada no QA: filesystem Rust real, permissões reais e smoke WebView2 com seleção assistida pelo usuário. Não se considera teste de runner vazio como teste de persistência.
+
+Detalhamento: [arquitetura v0.2](ARQUITETURA_V0_2.md), [formato](FORMATO_PROJETO_V1.md) e [relatório 1A](phases/RELATORIO_FASE_01A.md). As decisões históricas abaixo descrevem o estado anterior e permanecem para rastreabilidade.
+
 Data: 26/10/2026. Status: arquitetura aprovada como prova de viabilidade, **Go com ressalvas**, após revisão da Fase 0. Decisões e limitações técnicas preservadas; a Fase 1 não foi iniciada. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md).
 
 | Decisão | Evidência / justificativa | Revisitar quando |

@@ -2,7 +2,13 @@
 
 ## Fase 0 — concluída e aprovada para evolução
 
-Fundação modular, modelo próprio, interpreter, editor Rete, preview, exportação controlada web/Windows, QA, contratos e relatório. A revisão aprovou a prova de viabilidade com arquitetura **Go com ressalvas**. As limitações permanecem abertas; a Fase 1 não foi iniciada. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md).
+Fundação modular, modelo próprio, interpreter, editor Rete, preview, exportação controlada web/Windows, QA, contratos e relatório. A revisão aprovou a prova de viabilidade com arquitetura **Go com ressalvas**. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md). A Fase 1A foi posteriormente autorizada e implementada em branch própria.
+
+## Fase 1A — implementada, candidata à revisão
+
+Novo/Abrir/Salvar/Salvar como/Fechar projeto, workspace autorizado por seleção nativa, persistência Rust, backup/recuperação, conflito externo, indicador de alterações e proteção ao fechar. Formato e fixtures versionados; testes Rust reais, regressões e smoke WebView2. [Relatório](phases/RELATORIO_FASE_01A.md) e [validação](qa/VALIDACAO_FASE_01A.md).
+
+Permanecem para revisão/evolução: limites de concorrência com escritores externos, durabilidade frente a falha física, matriz de filesystems/máquinas limpas, auditoria adicional e política de retenção de snapshots. A implementação não significa aprovação automática. A `main` permanece na entrega da Fase 0; a Fase 1B não foi iniciada.
 
 ## Fase 1 proposta — primeira fatia funcional
 

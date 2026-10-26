@@ -1,5 +1,7 @@
 # Arquitetura v0.1 — BTRK Forge
 
+Documento histórico da Fase 0 preservado. A persistência nativa da Fase 1A e suas permissões estão definidas na [revisão v0.2](ARQUITETURA_V0_2.md), que substitui os trechos de persistência e host sem comandos para a versão atual do Studio.
+
 ## Recomendação
 
 Tauri 2 + Rust no host Windows, React/TypeScript na interface, Rete 2 como adaptador de apresentação, Zod na fronteira do modelo, executor TypeScript determinístico e preview sem acesso nativo. Esta recomendação está apoiada por builds Windows e testes de navegador e WebView2. Electron permanece alternativa documental, sem benchmark ou protótipo executado.
