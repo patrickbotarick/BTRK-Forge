@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-26",
+  "timezone": "America/Sao_Paulo",
+  "sourceCommit": "b7eb09e58d4e4fb934ac7f0a600e6dd026f1ce29",
+  "environment": {
+    "os": "Microsoft Windows 10.0.26300",
+    "architecture": "X64",
+    "node": "v24.11.1",
+    "npm": "11.6.2",
+    "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "git": "git version 2.54.0.windows.1",
+    "toolchain": "stable-x86_64-pc-windows-msvc (default)",
+    "webview2": [
+      {
+        "name": "Microsoft Edge WebView2 Runtime",
+        "pv": "155.0.4283.62"
+      }
+    ],
+    "cpp": "17.14.37710.0"
+  },
+  "unit": {
+    "failed": 0,
+    "passed": 19
+  },
+  "e2e": {
+    "failed": 0,
+    "passed": 4
+  },
+  "production": {
+    "failed": 0,
+    "passed": 2
+  },
+  "npmAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "rust": {
+    "unitTestCases": 0,
+    "format": "passed",
+    "compilation": "passed"
+  },
+  "nativeSmoke": {
+    "studio": "opened, blueprint rendered, preview 0->1, closed",
+    "scope": "WebView2 GUI observed in session; NSIS installation not executed",
+    "exportedApp": "opened with Studio closed, counter 0->1, closed"
+  },
+  "artifacts": [
+    {
+      "path": "apps/studio/src-tauri/target/release/btrk-forge.exe",
+      "bytes": 9438208,
+      "sha256": "b27dbb2fa4326a33d1433dcc4c53be6dfd193624d58255be141a310335247f60"
+    },
+    {
+      "path": "apps/studio/src-tauri/target/release/bundle/nsis/BTRK Forge_0.0.1_x64-setup.exe",
+      "bytes": 2704257,
+      "sha256": "7d57f66b3358bf989b90b7f2df92a6bf9ad540b91a908535776597304168dd71"
+    },
+    {
+      "path": "tools/feasibility/windows/target/release/btrk-counter.exe",
+      "bytes": 8639488,
+      "sha256": "1c25cb6087588422f48cd98bb90deab899362ff92f540467325a9c6a6aac06f1"
+    },
+    {
+      "path": "tools/feasibility/windows/target/release/bundle/nsis/BTRK Contador_0.1.0_x64-setup.exe",
+      "bytes": 1895338,
+      "sha256": "88a5484dd4ea9da9157cdc74fd4df66dbfad6179f69a7a7dff52743302600d1c"
+    },
+    {
+      "path": "dist/export-web/index.html",
+      "bytes": 607,
+      "sha256": "908945512d339f2fbf0c8e2d35c6b03f1f9bf7e17b336dd207ccba429c397e74"
+    }
+  ]
+}
