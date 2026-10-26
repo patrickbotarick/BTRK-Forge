@@ -93,4 +93,6 @@ git log --oneline main..HEAD
 
 Inventário: README/.gitignore/.gitattributes; configurações npm/TS/Vite/lint/test; módulos `packages`; Studio e host Rust; ferramentas/helper/exportador e host Windows independente; testes; sete documentos obrigatórios, segurança e evidências. A lista por caminho está em [arquivos alterados em relação à main](../qa/evidence/ARQUIVOS.txt). Dependências instaladas, builds, caches, schemas regeneráveis e dados pessoais não são arquivos de entrega.
 
-Publicação da branch é a etapa final autorizada pelo complemento. O SHA final e a correspondência local/remota constam na entrega da sessão e são verificáveis no GitHub; não se grava um SHA autorreferente dentro do próprio commit. [Plano detalhado da Fase 1](../ROADMAP.md).
+Publicação concluída na branch autorizada, com igualdade de SHA local/remoto verificada por `git rev-parse HEAD` e `git ls-remote`. A `main` remota contém somente o bootstrap `377bb2e`; a implementação não foi integrada. Como o GitHub tornou automaticamente a primeira branch publicada a padrão do repositório vazio, a `main` foi estabelecida com o bootstrap e configurada como padrão pela API oficial; `git ls-remote --symref origin HEAD` confirmou `refs/heads/main`. Nenhuma alteração de permissões ou reescrita de histórico foi necessária.
+
+O SHA final e a correspondência local/remota constam na entrega da sessão e são verificáveis no GitHub; não se grava um SHA autorreferente dentro do próprio commit. [Plano detalhado da Fase 1](../ROADMAP.md).
