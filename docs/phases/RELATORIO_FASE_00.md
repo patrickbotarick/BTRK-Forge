@@ -1,6 +1,6 @@
 # Relatório de engenharia — Fase 0
 
-Data: 26/10/2026, America/Sao_Paulo. Produto: BTRK Forge / BTRK Studio. Status: entregue para revisão técnica, **Go com ressalvas**; não constitui aprovação da fase nem autorização da Fase 1.
+Data: 26/10/2026, America/Sao_Paulo. Produto: BTRK Forge / BTRK Studio. Status oficial após revisão: **Fase 0 concluída e aprovada para evolução**, arquitetura **Go com ressalvas**. Fase 1 não iniciada. O [registro de encerramento](ENCERRAMENTO_FASE_00.md) documenta a revalidação e a integração autorizada. Os procedimentos e evidências originais abaixo foram preservados; a situação anterior de isolamento da `main` é histórica e foi substituída pelo encerramento autorizado.
 
 ## Resumo executivo
 

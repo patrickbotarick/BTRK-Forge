@@ -1,6 +1,6 @@
 # Decisões técnicas — Fase 0
 
-Data: 26/10/2026. Status: recomendações para revisão; Fase 1 não autorizada.
+Data: 26/10/2026. Status: arquitetura aprovada como prova de viabilidade, **Go com ressalvas**, após revisão da Fase 0. Decisões e limitações técnicas preservadas; a Fase 1 não foi iniciada. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md).
 
 | Decisão | Evidência / justificativa | Revisitar quando |
 |---|---|---|

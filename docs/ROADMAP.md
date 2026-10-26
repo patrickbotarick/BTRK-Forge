@@ -1,8 +1,8 @@
 # Roadmap e plano de Fase 1
 
-## Fase 0 — entregue para revisão
+## Fase 0 — concluída e aprovada para evolução
 
-Fundação modular, modelo próprio, interpreter, editor Rete, preview, exportação controlada web/Windows, QA, contratos e relatório. Recomendação: **Go com ressalvas**. Nenhuma aprovação de produto ou início automático da Fase 1.
+Fundação modular, modelo próprio, interpreter, editor Rete, preview, exportação controlada web/Windows, QA, contratos e relatório. A revisão aprovou a prova de viabilidade com arquitetura **Go com ressalvas**. As limitações permanecem abertas; a Fase 1 não foi iniciada. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md).
 
 ## Fase 1 proposta — primeira fatia funcional
 

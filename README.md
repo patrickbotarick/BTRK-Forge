@@ -2,11 +2,11 @@
 
 **BTRK Studio · Da ideia ao aplicativo.**
 
-Studio de desenvolvimento visual híbrido para web e Windows. Produto em desenvolvimento, em Fase 0 de viabilidade técnica. Interface em português brasileiro, projetos locais e funcionamento essencial sem IA.
+Studio de desenvolvimento visual híbrido para web e Windows. Produto em desenvolvimento, com Fase 0 concluída e aprovada como prova de viabilidade. Interface em português brasileiro, projetos locais e funcionamento essencial sem IA.
 
 Tecnologias em avaliação: Tauri 2/Rust, React/TypeScript, Rete.js 2, Monaco, Vite e persistência estruturada versionada. Nenhuma licença de distribuição foi definida.
 
-Fase 0 implementada para revisão: modelo próprio versionado, Blueprint Core, editor Rete, preview isolado e exportação controlada web/Windows. Recomendação de engenharia: **Go com ressalvas**. Não é uma IDE completa; a Fase 1 depende de aprovação.
+Fase 0 concluída e aprovada para evolução: modelo próprio versionado, Blueprint Core, editor Rete, preview isolado e exportação controlada web/Windows. Arquitetura: **Go com ressalvas**. Não é uma IDE completa; a Fase 1 não foi iniciada. O [registro de encerramento](docs/phases/ENCERRAMENTO_FASE_00.md) preserva os resultados e as pendências.
 
 ## Executar
 
@@ -80,4 +80,4 @@ Módulos compartilham o lockfile npm da raiz; não são pacotes publicados. Nenh
 - [Validação e limitações](docs/qa/VALIDACAO_FASE_00.md)
 - [Roadmap / plano detalhado de Fase 1](docs/ROADMAP.md)
 
-A Fase 1 proposta prioriza persistência atômica, editor mínimo utilizável, sandbox de build e exportação de projetos reais. IA, plugins e atualizações permanecem desabilitados. `main` não recebe merge automático; nenhuma tag de release é criada. Marca e licença comercial ainda dependem de definição jurídica.
+A Fase 1 proposta prioriza persistência atômica, editor mínimo utilizável, sandbox de build e exportação de projetos reais. IA, plugins e atualizações permanecem desabilitados. A integração da Fase 0 à `main` foi autorizada após revisão; a branch de desenvolvimento foi preservada. Nenhuma release ou tag de produto foi criada. Marca e licença comercial ainda dependem de definição jurídica.
