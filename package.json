@@ -1,0 +1,31 @@
+{
+  "name": "btrk-forge", "version": "0.0.1", "private": true, "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:production": "playwright test --config playwright.production.config.ts",
+    "sync:csp": "tsx tools/feasibility/sync-csp.ts",
+    "lint": "eslint .",
+    "desktop:dev": "cd apps/studio && tauri dev",
+    "desktop:build": "cd apps/studio && tauri build",
+    "export:web": "tsx tools/feasibility/export-web.ts",
+    "export:windows": "npm run export:web && cd tools/feasibility/windows && tauri build",
+    "audit:environment": "pwsh -NoProfile -File tools/feasibility/audit.ps1"
+  },
+  "dependencies": {
+    "react": "19.3.1", "react-dom": "19.3.1", "rete": "2.0.6",
+    "rete-area-plugin": "2.3.2", "rete-connection-plugin": "2.0.5", "rete-react-plugin": "2.1.2",
+    "monaco-editor": "0.56.0", "zod": "4.6.7"
+  },
+  "overrides": { "dompurify": "3.4.17" },
+  "devDependencies": {
+    "typescript": "6.0.3", "vite": "8.3.5", "@vitejs/plugin-react": "6.1.2",
+    "vitest": "5.0.5", "@playwright/test": "1.64.1", "@tauri-apps/cli": "2.12.4",
+    "@types/react": "^19.0.0", "@types/react-dom": "^19.0.0", "@types/node": "^24.0.0",
+    "tsx": "^4.0.0", "eslint": "10.13.0", "typescript-eslint": "^8.0.0"
+  }
+}
