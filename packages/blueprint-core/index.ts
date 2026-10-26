@@ -18,7 +18,7 @@ export function ports(node: GraphNode, project: Project): Ports {
     case 'set': return { inputs: { in: 'exec', value: variableType() }, outputs: { next: 'exec' } };
   }
 }
-export function validateProject(input: unknown): Project {
+export function validateProject(input: unknown, options: { allowIncomplete?: boolean } = {}): Project {
   const project = parseProject(input);
   const ids = new Set<string>();
   const unique = (value: string) => { if (ids.has(value)) throw new Error(`ID duplicado: ${value}`); ids.add(value); };
@@ -51,7 +51,7 @@ export function validateProject(input: unknown): Project {
   }
   for (const [nodeId, definition] of definitions) {
     for (const socket of Object.keys(definition.inputs)) {
-      if (!occupied.has(`${nodeId}:${socket}`)) throw new Error(`Entrada obrigatória ausente: ${nodeId}:${socket}`);
+      if (!options.allowIncomplete && !occupied.has(`${nodeId}:${socket}`)) throw new Error(`Entrada obrigatória ausente: ${nodeId}:${socket}`);
     }
   }
   const visiting = new Set<string>(); const visited = new Set<string>();

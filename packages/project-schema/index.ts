@@ -21,7 +21,9 @@ export const projectSchema = z.object({
   graph: z.object({ nodes: z.array(nodeSchema).max(200), connections: z.array(z.object({ id, source: id, output: z.string().max(40), target: id, input: z.string().max(40) }).strict()).max(500) }).strict(),
   functions: z.array(z.never()).max(0), resources: z.array(z.never()).max(0), dependencies: z.array(z.never()).max(0),
   permissions: z.object({ web: z.array(z.never()).max(0), windows: z.array(z.never()).max(0) }).strict(),
-  distribution: z.object({ appId: z.string().regex(/^[a-z][a-z0-9.]+$/), version: z.string().regex(/^\d+\.\d+\.\d+$/), channel: z.enum(['stable', 'beta']) }).strict()
+  distribution: z.object({ appId: z.string().regex(/^[a-z][a-z0-9.]+$/), version: z.string().regex(/^\d+\.\d+\.\d+$/), channel: z.enum(['stable', 'beta']) }).strict(),
+  metadata: z.object({ documentVersion: z.literal(1), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), savedBy: z.literal('BTRK Forge') }).strict().optional(),
+  compatibility: z.object({ format: z.literal('btrk-project'), minimumStudio: z.literal('0.0.1'), requiredFeatures: z.tuple([z.literal('project-persistence-v1')]), platforms: z.tuple([z.literal('web'), z.literal('windows')]) }).strict().optional()
 }).strict();
 export type Project = z.infer<typeof projectSchema>;
 export type GraphNode = Project['graph']['nodes'][number];
