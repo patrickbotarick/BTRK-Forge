@@ -10,15 +10,17 @@ import './style.css';
 const Code = lazy(() => import('./Code').then(m => ({ default: m.Code })));
 const storageKey = 'btrk-forge:phase0:project';
 function loadInitial() {
-  try { const text = localStorage.getItem(storageKey); return text ? deserialize(text) : exampleProject(); }
-  catch { return exampleProject(); }
+  try { const text = localStorage.getItem(storageKey); return { project: text ? deserialize(text) : exampleProject(), recoveryError: null as string | null }; }
+  catch { return { project: exampleProject(), recoveryError: 'Rascunho ilegível: original preservado. Abra um JSON válido ou restaure o exemplo para continuar.' }; }
 }
 function App() {
-  const [project, setProject] = useState(loadInitial);
+  const [initial] = useState(loadInitial);
+  const [project, setProject] = useState(initial.project);
+  const storageBlocked = useRef(initial.recoveryError !== null);
   const [tab, setTab] = useState<'graph' | 'preview' | 'code'>('graph');
   const [generation, setGeneration] = useState(0);
   const [state, setState] = useState<Record<string, Scalar>>({});
-  const [status, setStatus] = useState(t('ready') as string);
+  const [status, setStatus] = useState(initial.recoveryError ?? t('ready') as string);
   const [trace, setTrace] = useState<string[]>([]);
   const worker = useRef<Worker | null>(null); const pending = useRef(false); const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const file = useRef<HTMLInputElement>(null);
@@ -34,9 +36,10 @@ function App() {
     return () => { instance.terminate(); if (timer.current) clearTimeout(timer.current); };
   }, [generation]);
   useEffect(() => {
+    if (storageBlocked.current) return;
     try { localStorage.setItem(storageKey, serialize(project)); } catch { setStatus('Não foi possível salvar rascunho local'); }
   }, [project]);
-  function replace(next: Project) { setProject(next); setState({}); setTrace([]); pending.current = false; setGeneration(v => v + 1); }
+  function replace(next: Project) { storageBlocked.current = false; setProject(next); setState({}); setTrace([]); pending.current = false; setGeneration(v => v + 1); }
   function apply(text: string) {
     try { replace(validateProject(deserialize(text))); setStatus('Projeto validado e carregado'); } catch (e) { setStatus(`Erro: ${String(e)}`); }
   }

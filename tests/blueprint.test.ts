@@ -78,4 +78,27 @@ describe('Modelo independente e runtime', () => {
     for (const n of q.graph.nodes) if ('variableId' in n) n.variableId = 'constructor';
     expect(execute(q, {}).state.constructor).toBe(1);
   });
+  it.each([{ type: 'string' as const, initial: '', value: 'Forge' }, { type: 'boolean' as const, initial: false, value: true }])('transfere e atribui valores $type sem coerção', ({ type, initial, value }) => {
+    const p = exampleProject(); p.variables = [{ id: 'result', name: 'Resultado', type, initial }];
+    p.graph.nodes = [
+      { id: 'event', kind: 'event', event: 'button.click', position: { x: 0, y: 0 } },
+      { id: 'literal', kind: 'constant', value, position: { x: 0, y: 100 } },
+      { id: 'write', kind: 'set', variableId: 'result', position: { x: 200, y: 0 } }
+    ];
+    p.graph.connections = [
+      { id: 'flow', source: 'event', output: 'next', target: 'write', input: 'in' },
+      { id: 'data', source: 'literal', output: 'value', target: 'write', input: 'value' }
+    ];
+    expect(execute(p).state.result).toBe(value);
+  });
+  it('interrompe DAG válido com custo excessivo de avaliação', () => {
+    const p = exampleProject(); let source = 'sum';
+    for (let i = 0; i < 15; i++) {
+      const nodeId = `double-${i}`; p.graph.nodes.push({ id: nodeId, kind: 'add', position: { x: i * 20, y: 100 } });
+      p.graph.connections.push({ id: `double-a-${i}`, source, output: 'value', target: nodeId, input: 'a' }, { id: `double-b-${i}`, source, output: 'value', target: nodeId, input: 'b' });
+      source = nodeId;
+    }
+    p.graph.connections.find(c => c.target === 'positive' && c.input === 'a')!.source = source;
+    expect(() => execute(p)).toThrow(/Limite de execução/);
+  });
 });

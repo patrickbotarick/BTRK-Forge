@@ -79,3 +79,12 @@ test('JSON inválido não substitui modelo, salvamento e abertura', async ({ pag
   await expect(page.locator('.monaco-editor').first()).toBeVisible();
   expect(errors).toEqual([]);
 });
+test('rascunho corrompido é preservado até recuperação explícita', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => localStorage.setItem('btrk-forge:phase0:project', '{corrompido'));
+  await page.reload();
+  await expect(page.getByRole('status')).toContainText('original preservado');
+  expect(await page.evaluate(() => localStorage.getItem('btrk-forge:phase0:project'))).toBe('{corrompido');
+  await page.getByRole('button', { name: 'Restaurar exemplo' }).click();
+  await expect.poll(async () => await page.evaluate(() => JSON.parse(localStorage.getItem('btrk-forge:phase0:project')!).schemaVersion)).toBe(1);
+});

@@ -9,6 +9,7 @@
     "test:e2e": "playwright test",
     "test:production": "playwright test --config playwright.production.config.ts",
     "sync:csp": "tsx tools/feasibility/sync-csp.ts",
+    "check:security": "tsx tools/feasibility/security-check.ts",
     "lint": "eslint .",
     "desktop:dev": "cd apps/studio && tauri dev",
     "desktop:build": "cd apps/studio && tauri build",
