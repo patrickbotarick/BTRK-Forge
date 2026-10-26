@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "BTRK Forge",
+  "version": "0.0.1",
+  "identifier": "studio.btrk.forge",
+  "build": {
+    "beforeDevCommand": "npm --prefix ../.. run dev",
+    "beforeBuildCommand": "npm --prefix ../.. run build",
+    "devUrl": "http://127.0.0.1:1420",
+    "frontendDist": "../../../dist/studio"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "BTRK Forge — BTRK Studio",
+        "width": 1440,
+        "height": 920,
+        "minWidth": 1000,
+        "minHeight": 700
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'sha256-62SGmRnRWzfxWoy9ZFTnPNa9uE4+tFhopKIJ695Uxc8='; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' about:; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'none'",
+      "capabilities": []
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [],
+    "shortDescription": "Laboratório de viabilidade BTRK Forge",
+    "category": "DeveloperTool"
+  }
+}

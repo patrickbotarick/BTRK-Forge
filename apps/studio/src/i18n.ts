@@ -1,0 +1,11 @@
+const ptBR = {
+  brand: 'BTRK Forge', tagline: 'Da ideia ao aplicativo.',
+  graph: 'Blueprint', preview: 'Preview', code: 'Modelo JSON',
+  save: 'Salvar JSON', load: 'Abrir JSON', reset: 'Restaurar exemplo',
+  run: 'Executar evento', properties: 'Propriedades',
+  ready: 'Pronto · núcleo local', phase: 'FASE 0 / LABORATÓRIO',
+  offline: 'Sem IA · operação local',
+} as const;
+export type Locale = 'pt-BR';
+const dictionaries: Record<Locale, typeof ptBR> = { 'pt-BR': ptBR };
+export const t = (key: keyof typeof ptBR, locale: Locale = 'pt-BR') => dictionaries[locale][key];

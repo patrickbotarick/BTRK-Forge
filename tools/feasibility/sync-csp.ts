@@ -1,0 +1,10 @@
+import { createHash } from 'node:crypto';
+import { readFile, writeFile } from 'node:fs/promises';
+import { previewDocument } from '../../packages/preview-runtime/document';
+const script = previewDocument.match(/<script>([\s\S]+)<\/script>/)![1];
+const hash = createHash('sha256').update(script).digest('base64');
+const path = 'apps/studio/src-tauri/tauri.conf.json';
+const config = JSON.parse(await readFile(path, 'utf8'));
+config.app.security.csp = `default-src 'self'; script-src 'self' 'sha256-${hash}'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' about:; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'none'`;
+await writeFile(path, `${JSON.stringify(config, null, 2)}\n`);
+console.log(`CSP: script estático do preview sha256-${hash}`);
