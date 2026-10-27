@@ -1,24 +1,11 @@
 import { z } from 'zod';
 import { validateProject,ports } from './index';
 import type { Project, GraphNode, Scalar } from '../project-schema';
-const id=z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/);
-const scalar=z.union([z.number().finite(),z.string().max(1000),z.boolean()]);
-export const runtimeStateSchema=z.object({variables:z.record(id,scalar),properties:z.record(id,z.string().max(1000))}).strict();
-export type RuntimeState=z.infer<typeof runtimeStateSchema>;
-export const runtimeEventSchema=z.discriminatedUnion('type',[
-  z.object({type:z.literal('button.click'),componentId:id}).strict(),
-  z.object({type:z.literal('input.change'),componentId:id,value:z.string().max(1000)}).strict()
-]);
-export type RuntimeEvent=z.infer<typeof runtimeEventSchema>;
-const requestSchema=z.object({requestId:z.number().int().min(0),project:z.unknown(),runtime:runtimeStateSchema.optional(),event:runtimeEventSchema}).strict();
-export const runtimeReplySchema=z.discriminatedUnion('ok',[
-  z.object({ok:z.literal(true),requestId:z.number().int().min(0),runtime:runtimeStateSchema,event:runtimeEventSchema,trace:z.array(id).max(200),executedNodes:z.array(id).max(200),values:z.record(id,scalar)}).strict(),
-  z.object({ok:z.literal(false),requestId:z.number().int().min(0),error:z.string().max(2000),nodeId:id.nullable(),runtime:runtimeStateSchema.nullable(),trace:z.array(id).max(200)}).strict()
-]);
-export class RuntimeFault extends Error {
-  runtime:RuntimeState|null=null;trace:string[]=[];
-  constructor(message:string,public nodeId:string|null=null){super(message);this.name='RuntimeFault';}
-}
+import { RuntimeFault, VisitBudget, checkScalar } from '../semantic-runtime/primitives';
+export { RuntimeFault } from '../semantic-runtime/primitives';
+import { runtimeStateSchema, runtimeEventSchema, runtimeReplySchema, runtimeRequestSchema as requestSchema, type RuntimeState } from '../semantic-runtime/protocol';
+export { runtimeStateSchema, runtimeEventSchema, runtimeReplySchema } from '../semantic-runtime/protocol';
+export type { RuntimeState, RuntimeEvent } from '../semantic-runtime/protocol';
 export function initialRuntime(project:Project):RuntimeState {
   const variables=Object.fromEntries(project.variables.map(v=>[v.id,v.initial]));
   const properties=Object.fromEntries(project.screens[0].components.flatMap(c=>c.type==='Input'?[[c.id,c.props.binding?String(variables[c.props.binding]):c.props.initialValue]]:c.type==='Text'?[[c.id,c.props.text]]:[]));
@@ -37,9 +24,9 @@ function checkedRuntime(project:Project,previous?:RuntimeState):RuntimeState {
 function syncBindings(project:Project,runtime:RuntimeState){for(const c of project.screens[0].components)if(c.type==='Input'&&c.props.binding)runtime.properties[c.id]=String(runtime.variables[c.props.binding]);}
 function runGraph(project:Project,base:RuntimeState,eventId:string){
   const runtime=structuredClone(base);const trace:string[]=[];const executed=new Set<string>();const values:Record<string,Scalar>={};
-  const nodes=new Map(project.graph.nodes.map(n=>[n.id,n]));let budget=10000;
+  const nodes=new Map(project.graph.nodes.map(n=>[n.id,n]));const budget=new VisitBudget(executed);
   const fail=(message:string,nodeId:string):never=>{throw new RuntimeFault(message,nodeId);};
-  const consume=(node:GraphNode)=>{executed.add(node.id);if(--budget<0)fail('Limite de execução excedido',node.id);};
+  const consume=(node:GraphNode)=>{budget.visit(node.id);};
   function read(node:GraphNode,socket:string):Scalar{const edge=project.graph.connections.find(c=>c.target===node.id&&c.input===socket);if(!edge)return fail(`Entrada obrigatória ausente: ${socket}`,node.id);return evaluate(nodes.get(edge.source)!);}
   function evaluate(node:GraphNode):Scalar {
     consume(node);let value:Scalar;
@@ -53,8 +40,7 @@ function runGraph(project:Project,base:RuntimeState,eventId:string){
       case 'concat':value=String(read(node,'a'))+String(read(node,'b'));break;
       default:return fail('Node não fornece dados',node.id);
     }
-    if(typeof value==='number'&&!Number.isFinite(value))fail('Resultado numérico não finito',node.id);
-    if(typeof value==='string'&&value.length>1000)fail('Texto runtime excede 1000 caracteres',node.id);
+    checkScalar(value,node.id);
     values[node.id]=value;return value;
   }
   try{
