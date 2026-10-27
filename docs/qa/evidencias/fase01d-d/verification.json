@@ -1,0 +1,98 @@
+{
+  "base": "36b3458bf04205d818dbc3e7aa13396a85be476b",
+  "branch": "codex/phase-01d-d-debugging-validation",
+  "status": "candidate for review; no main merge; no closure of phase 1D",
+  "tests": {
+    "typescript": 136,
+    "rust_persistence": 26,
+    "rust_host": 1,
+    "e2e": 25,
+    "native_ui_rust": 11,
+    "production_csp": 5,
+    "total": 204,
+    "final_failures": 0,
+    "skipped": 0
+  },
+  "additional_repetitions_not_added_to_unique_total": {
+    "debug_e2e": 4,
+    "native_debug_demo": 1,
+    "production_debug": 1
+  },
+  "debug_protocol": {
+    "version": 1,
+    "entries_per_event": 200,
+    "trace_serialized_utf16_units": 64000,
+    "history_events": 20,
+    "history_serialized_utf16_units": 512000,
+    "legacy_runtime_reply_unchanged": true,
+    "semantic_visits": 10000,
+    "watchdog_ms": 2000,
+    "queued_events": 32
+  },
+  "manual_windows": {
+    "new_executable_opened": true,
+    "full_debug_demo_observed": false,
+    "full_1dc_recipe_completed": false,
+    "observed_project": "Forge Code Demo, 8 nodes, from phase 1D-C",
+    "full_debug_demo_ui_rust_automated": true,
+    "limitation": "Native file dialog unavailable to controller. User-assisted selections did not yield observation of the 21-node Debug Demo. No complete manual Tauri validation claimed."
+  },
+  "screenshots_sha256": {
+    "debug-1366.png": "f8da53e5303d0d954be3e73f6685563cc971cf0303a5ca7b9c7343d8d4164bcf",
+    "debug-fullhd.png": "e05d30cfeba96a159394846ec3b4f4ae69d34e106cc0e0a072ba1486b2c9c9e9",
+    "debug-trace.png": "02241aa82a113447cc5d7bd6de02056bad9fec02dca14623b2e0e8c53d1767fb",
+    "debug-rollback.png": "c93c75a098ee9a145c35e6e8b098c0483e67fbd643fb512d9c49a580bcb1b54d",
+    "debug-native-driver.png": "0bc9dc56a678496d40f0bf5d2dc3d90ebb63dff5a01717f768962d2bc34b98d3",
+    "debug-production.png": "39d91fd0c0b3467f126b68961ea349e5af26b08ad78aa183ced87a0e0a034c8c"
+  },
+  "local_logs_sha256": {
+    "debug-evidence-final.log": "b77e91c4ccf9d1c7059f117c6ece84010b59f0c8adaaad41edfefad72ed29165",
+    "debug-initial.log": "d971b00081698d953be5dfa35fab46348280eb138f319d57732da9b2b6acf5d7",
+    "debug-second.log": "c604c4f10cb1247a3091495d33bc682ba7f8384f51edcc66048cc16cdcc83a09",
+    "debug-text-final.log": "cbb243f0fc7b927c5602658206685e41f42f1f38350108d0a0ec45437a08e221",
+    "desktop-build-final.log": "56c641d9f816dfbab6f0b6aa4b92197d4e39ae2cde1e0712208f8282290072eb",
+    "desktop-build-text-final.log": "954b262de00fa1ccb9f5932672751b7abd93c1bfea1d8726e8ebfb4a509130d9",
+    "desktop-build.log": "9fbbe9a13ee2aa48feb018aac74a370bbcc36ad295b8162db01a18b71307ef1f",
+    "e2e-final.log": "e705781fb2cbdaf8447ae05d7979a5dc6e9d7c1b9b2855619dad74c238e815d7",
+    "e2e.log": "da521393813a11e6fb95ad9bed507f21e2a3cec81404d54fcb8c3bea9f045666",
+    "export-web.log": "835f15fac60dcd42468933e0908ae4a1489193cef01996c31ad1f5e02f1365b3",
+    "git-fsck.log": "3b890f81a32517545244efd7e25383be89fbe512abaf55e5db14d7c5d3ebc4df",
+    "lint.log": "08ac35c728a61f2720ab05e4506d74e7095b81b3db65da290cd19696d658bb18",
+    "native-demo-text-final.log": "24f151ef0d6125d56dd0d2bd0f0ff7576e14d2bc5b016b9afd2f2b34afb7f64a",
+    "native-evidence-final.log": "14e898bb9d94e7d9bf05d0d104c5d6e7dac7c49f29f53c03fbd7e52f177352f4",
+    "native-final.log": "55c49c7e583635de3b6524f181481994786be35e43f35d81a60ab0d7335ec062",
+    "native-initial.log": "ba9c0fb1534dd345b016ddc6c843d328758ab0d01b0ba702a33a09d05442c520",
+    "production-debug-text-final.log": "22f9e8a6b21d66dd0cafc6a7fcab96685ef2279c31a740f7f9ba8ad8e362bd42",
+    "production.log": "009ce23b904591dceeac95041e27accceb20b61102f4e5cdebb67b04886d4e34",
+    "rust-host-check.log": "2471280be5ed6c7533367c1ddc7817aca85875f1eabaac786ce438a95fe6d1fb",
+    "rust-host-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rust-host-test.log": "749ccf666cbec9fa653d16e229aa543a9f09af893366644f87d9cc917c717bf6",
+    "rust-persistence-check.log": "65bba1b73fa889199915f21a0c23ad215b808bde713de9faff6a5a5612fe72d1",
+    "rust-persistence-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rust-persistence-test.log": "413b0ccc6c0287aa3df535cfb75b17b56010b6f6aec62cf46a9de9bb8da3254c",
+    "security.log": "25525cea2ae7888f16ce9e6392bb93506d8759873e18ae8da25adaa1fbecd5ee",
+    "typecheck.log": "208cfe22d56fc315ad72e68905e8d2bc2990797b786086b4acbb6fbcbf8e3ed0",
+    "unit-final.log": "7acff6449ed061bc8d228a2a18bad04094181bc2d2aa4abcf0c17decaabeda28",
+    "unit.log": "2afa9af12a094307d729e5708d6a4d94fe833a97a64f670431dda754c1d1c1ad"
+  },
+  "windows_build_sha256": {
+    "executable": "61cf00b496f5a5636a3bf7e5a1633cf067b46820c033fd78c1d359fa9729f6d8",
+    "nsis": "d69c9b4994afea5ddecce6cdf769154acf5ca58281cd85c1eb527f698a771f77"
+  },
+  "npm_audit_vulnerabilities": 0,
+  "security_known_pattern_findings": 0,
+  "open_caveats": [
+    "Power-loss physical durability",
+    "External race without kernel CAS",
+    "RustSec",
+    "Clean installation/uninstallation",
+    "Historical WebView2 shutdown message",
+    "Full manual Tauri validation"
+  ],
+  "environment": {
+    "node": "24.11.1",
+    "npm": "11.6.2",
+    "rustc": "1.99.0",
+    "cargo": "1.99.0"
+  }
+}

@@ -32,6 +32,10 @@ O responsável aprovou o commit d838bad2f44bc554b26185eb2aafc4f5107d1116 e autor
 
 O responsável aprovou o commit `4cc38c5231ee0aedeb052b4bdb75ebe1d0a31e4e` e autorizou o encerramento documental e integração por fast-forward à main, preservando a branch `codex/phase-01d-c-monaco-integration`. Monaco TypeScript somente leitura, JSON preservado, geração real em Worker, revisões e navegação node ↔ trechos/canvas foram aceitos no escopo demonstrado. O encerramento repetiu 183 testes aprovados, zero falhas finais e zero ignorados, sem alteração funcional. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01D_C.md), [relatório de implementação](phases/RELATORIO_FASE_01D_C.md), [QA histórico](qa/VALIDACAO_FASE_01D_C.md) e [contrato](MONACO_CODE_INTEGRATION.md). Evidências Windows reais parciais e Demo automatizado UI/Rust permanecem separados. Homologação manual integral e as cinco ressalvas herdadas continuam abertas. Não há aceite de distribuição comercial. A 1D-D não foi iniciada; Preview continua declarativo, sem edição bidirecional, exportação geral ou diagnóstico avançado.
 
+## Fase 1D-D — implementada, candidata à revisão com GO COM RESSALVAS
+
+Branch `codex/phase-01d-d-debugging-validation`, baseada na main `36b3458bf04205d818dbc3e7aa13396a85be476b`. Histórico de eventos limitado e transitório, inspeção de variáveis/propriedades, sequência real, ramos, ações/rollback e navegação Blueprint/TypeScript. Revalidação com 204 testes aprovados, builds web/Windows e CSP preservada. [Contrato](RUNTIME_DEBUGGING.md), [relatório](phases/RELATORIO_FASE_01D_D.md) e [QA com lacuna Windows](qa/VALIDACAO_FASE_01D_D.md). A homologação manual integral, inclusive a pendência da 1D-C, continua aberta. As cinco ressalvas herdadas não foram resolvidas. Sem encerramento da Fase 1D, integração automática à main, distribuição comercial ou início de outra fase.
+
 ## Fase 1 proposta — primeira fatia funcional
 
 Ordem por dependência, sem estimativas artificiais de prazo. Cada etapa deve gerar demonstração, testes e decisão de aceite.
