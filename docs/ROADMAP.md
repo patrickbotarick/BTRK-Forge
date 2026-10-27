@@ -43,7 +43,9 @@ O responsável aprovou o commit `2d851682c0c24bd48eac33ba3dc77b79b340b50d` e aut
 | 1D-C | Concluída e integrada, com homologação manual restante |
 | 1D-D | Concluída e integrada, com homologação manual restante |
 
-**A Fase 1D completa permanece aguardando revisão e homologação consolidada.** A validação futura dedicada deverá identificar e verificar visualmente o Forge Debug Demo completo na janela Tauri real, incluindo código, navegação, depuração, ramos/onChange, rollback, persistência, IDs/conexões/binding e reabertura. Confirmações de diálogo, UI automatizada e driver Rust não substituem essa observação. Nenhuma outra fase começou.
+## Fase 1D — encerrada em escopo restrito com GO COM RESSALVAS
+
+O responsável autorizou o [encerramento geral restrito](phases/ENCERRAMENTO_FASE_01D.md) em modo econômico, sem alterações funcionais ou repetição dos 204 testes anteriormente aprovados. IR, codegen/equivalência testada, Monaco/navegação e depuração ficam consolidados. **Homologação Windows integral permanece pendência obrigatória**, separada da evidência UI/Rust. As cinco ressalvas históricas e os limites de sandbox, exportação, edição bidirecional e escala continuam abertos. Não há autorização comercial nem início de outra fase. A validação futura dedicada deverá identificar e verificar visualmente o Forge Debug Demo completo na janela Tauri real, incluindo código, navegação, depuração, ramos/onChange, rollback, persistência, IDs/conexões/binding e reabertura. Confirmações de diálogo, UI automatizada e driver Rust não substituem essa observação. Nenhuma outra fase começou.
 
 ## Fase 1 proposta — primeira fatia funcional
 
