@@ -1,0 +1,81 @@
+{
+  "base": "78b856fad0ff556aa205481f7dd46c239bbf8e8a",
+  "branch": "codex/phase-01d-c-monaco-integration",
+  "status": "candidate; not closed; main preserved; phase 1D-D not started",
+  "tests": {
+    "typescript": 122,
+    "rust_persistence": 26,
+    "rust_host": 1,
+    "web_e2e": 20,
+    "native_ui_rust_driver": 10,
+    "production": 4,
+    "total": 183,
+    "final_failures": 0,
+    "skipped": 0
+  },
+  "navigation_repeat_unique_tests": false,
+  "navigation_repeat_passes": 3,
+  "npm_audit_vulnerabilities": 0,
+  "scanner_findings": 0,
+  "manual_windows": {
+    "real_app_launched": true,
+    "project_created_and_saved": true,
+    "typescript_generated": true,
+    "node_definition_highlighted": true,
+    "code_call_to_canvas": true,
+    "navigation_kept_saved": true,
+    "full_demo_homologated": false,
+    "limitation": "Full binding/Preview/edit/undo/reopen recipe not repeated in real Tauri. Native folder dialog required user selection."
+  },
+  "browser_performance": {
+    "ticks": 33,
+    "maxGap": 268.7000000476837,
+    "started": 689.6000000238419,
+    "totalMs": 960.0999999046326
+  },
+  "screenshots_sha256": {
+    "code-windows-real.png": "3e46579d65bb5cdd953c1bdbc98d36cac186e3168ecc00f29bfe4b6d27c25750",
+    "blueprint-windows-real.png": "ad49551d17de5a2d6e51d517769f3f25c3a5178e6dec541cd834d8c7f0a44983",
+    "code-navigation.png": "856696bed54a9ce77fcdec265987a4789edc0c831758067fb168b6a61a39d13a",
+    "code-1366.png": "88fd0fe5b0cc97a79e3d05f082fad64aa80d177c4a4650fd8603b0937d0f5fda",
+    "code-native-driver.png": "acad494b7e3fc0249f2df6f6a0ffba73ed0248db859325af6d5f0f3987eb38b7",
+    "code-production.png": "8336ee12f51aadb0add2b7ccfbce25692eb31166b783aeecb93edb5bc7f31121"
+  },
+  "local_logs_sha256": {
+    "build-web-initial.log": "79d76a8ba1b44d0fff33f9e6275b9fe3bebba4d90d7b2df27df3b1aca0168ffb",
+    "build-web.log": "1b6e9b0dce46bc215dcb6ad4045abe20672e9751bef787f5e98a4c0f0e2770a1",
+    "code-e2e-initial.log": "eb8aaf6e2a4c4e06fb01be61e4f36403e2311caec2c9db529b596817dbe07dd9",
+    "code-e2e-second.log": "9a59a1ba45f6d283a23cbe4cb65a42420266fdbe9a7c77245fbe527e5f54e3d2",
+    "desktop-build-final.log": "7344a51edc549229b2933caf697060b4d2c1f76dedbb12d50425fd39b5453691",
+    "desktop-build.log": "91fb5de5be0138f4ce4f2c5a3e062365072aa48d3d89fcfd0955125c743973da",
+    "e2e.log": "fba47b893279c7e8a95905daf16743a83455a4cfa568664fc803390a2ed3a802",
+    "export-web.log": "0cbbbbb0ddcf423fb7ef4e2e251b83f90c52f4569122b760c35720dee29802fc",
+    "git-fsck.log": "87da6c3409bb8e4892951a22cbb740daa8977cfc0f867b3f61d4cdb06e938145",
+    "lint.log": "08ac35c728a61f2720ab05e4506d74e7095b81b3db65da290cd19696d658bb18",
+    "native.log": "db5332e208f8c5d61cb5617b03f700273c4e3db84606d1e39f518bfec1ef0515",
+    "navigation-check.log": "92782c8cd63a02ef99c283d93721908740f4e3e6218396341c9c436f9bc7b7c3",
+    "navigation-debug.log": "2a46cb2c5dd0e69412a4616ad7fefacfb11e4a0e93800c0df79aa29ae9095fe5",
+    "navigation-stability.log": "de8c16ea376279bdd2ea95195b2309c58a2ed1a643867ce1a0f6729c6d73ba4b",
+    "production.log": "d7f0647917023eeb64af4769a26ec34c9b4cd7f06383039f44b9ecffff29ade4",
+    "rust-host-check.log": "e44fa73a7f5894fd739455bf13e494856aae8408f4c1907c93205b18f8cdc5cc",
+    "rust-host-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rust-host-test.log": "341b77da46fdbcc85a3fb1483758ee70f5aecdba62f24ec00b41389c48739395",
+    "rust-persistence-check.log": "63776f181c5577a340aaaceb62d51513bcacd10a831297ce72a6108240d366a6",
+    "rust-persistence-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rust-persistence-test.log": "1abbbfd7f09d685cf71f871de16cc8e16c00cd120451f5d62c3a5915e84d95e9",
+    "security.log": "646d62701c1d21b2f166944754b411b8ebf80e61f2e498d099f594dcc1730185",
+    "typecheck.log": "208cfe22d56fc315ad72e68905e8d2bc2990797b786086b4acbb6fbcbf8e3ed0",
+    "unit.log": "6c5753a179a71cc6d7d65645ed3cff259b7aaea44ae07ef1d5004db48317787c"
+  },
+  "windows_build_sha256": {
+    "executable": "11cf7a453c01c51cf39b3e22efcb2920f934c6b91353745e577d722dc2d4a6bd",
+    "nsis": "507b696edafde874ad0cf74356398e1049bd18d8fb1b25df0d9f87cb87b9b471"
+  },
+  "inherited_open_caveats": [
+    "Physical durability under power loss",
+    "External race without kernel CAS",
+    "RustSec audit",
+    "Clean installation/uninstallation",
+    "Historical WebView2 shutdown message"
+  ]
+}
