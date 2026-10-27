@@ -4,18 +4,22 @@
 
 Fundação modular, modelo próprio, interpreter, editor Rete, preview, exportação controlada web/Windows, QA, contratos e relatório. A revisão aprovou a prova de viabilidade com arquitetura **Go com ressalvas**. Ver [encerramento oficial](phases/ENCERRAMENTO_FASE_00.md). A Fase 1A foi posteriormente autorizada e implementada em branch própria.
 
-## Fase 1A — implementada, candidata à revisão
+## Fase 1A — concluída e homologada com GO COM RESSALVAS
 
-Novo/Abrir/Salvar/Salvar como/Fechar projeto, workspace autorizado por seleção nativa, persistência Rust, backup/recuperação, conflito externo, indicador de alterações e proteção ao fechar. Formato e fixtures versionados; testes Rust reais, regressões e smoke WebView2. [Relatório](phases/RELATORIO_FASE_01A.md) e [validação](qa/VALIDACAO_FASE_01A.md).
+Novo/Abrir/Salvar/Salvar como/Fechar projeto, workspace autorizado por seleção nativa, persistência Rust, backup/recuperação, conflito externo, indicador de alterações e proteção ao fechar. Formato e fixtures versionados; testes Rust reais, regressões e smoke WebView2. Homologação em duas máquinas Windows, com 55 testes aprovados no computador atual e persistência conferida após encerrar/reabrir o processo. [Relatório original](phases/RELATORIO_FASE_01A.md), [validação original](qa/VALIDACAO_FASE_01A.md) e [encerramento oficial](phases/ENCERRAMENTO_FASE_01A.md).
 
-Permanecem para revisão/evolução: limites de concorrência com escritores externos, durabilidade frente a falha física, matriz de filesystems/máquinas limpas, auditoria adicional e política de retenção de snapshots. A implementação não significa aprovação automática. A `main` permanece na entrega da Fase 0; a Fase 1B não foi iniciada.
+O responsável aprovou o encerramento e a integração à `main`, preservando a branch de desenvolvimento. Permanecem abertas: durabilidade física sob falha de energia, janela residual de corrida externa, auditoria RustSec, instalação em máquina limpa e mensagem WebView2 no encerramento. Matriz de filesystems/DPI e política de retenção de snapshots também exigem evolução. A decisão é GO COM RESSALVAS dentro das garantias documentadas, sem aceite de distribuição comercial.
+
+## Fase 1B — planejamento autorizado, não iniciado nesta entrega
+
+O encerramento autoriza planejar a próxima subfase, com revisão explícita das pendências transferidas. Não define novo escopo implementado, cronograma, autorização de publicação ou resolução automática dos riscos. Nenhuma atividade de planejamento ou implementação da Fase 1B foi iniciada nesta execução.
 
 ## Fase 1 proposta — primeira fatia funcional
 
 Ordem por dependência, sem estimativas artificiais de prazo. Cada etapa deve gerar demonstração, testes e decisão de aceite.
 
-1. **Revisão e contrato do formato.** Aprovar escopo de uma aplicação local pequena; formalizar schema v1 público, fixtures históricas, IDs/referências e política de versões. Aceite: abrir, migrar e salvar projetos reais sem perda, rejeitar versão futura e preservar original em falha.
-2. **Persistência nativa confiável.** Broker Rust limitado ao workspace selecionado, save atômico, backups, journal/recuperação e conflitos externos. Testar queda durante gravação, corrupção, disco cheio, nomes/caminhos Unicode, traversal e junctions. SQLite apenas se necessário para índice reconstruível. Aceite: recuperar última versão válida sem acesso fora do escopo.
+1. **Revisão e contrato do formato — entregue no escopo 1A.** Schema v1, fixtures históricas, IDs/referências e migração conhecida foram implementados e testados. Formatos futuros são recusados; a compatibilidade permanece limitada aos contratos documentados.
+2. **Persistência nativa confiável — entregue no escopo 1A, com ressalvas.** Broker Rust limitado ao workspace selecionado, escrita por temporário/troca no mesmo volume, backup validado, recuperação explícita e conflitos externos. Foram exercitados Unicode, traversal, junctions, hard links, ACL e falhas de gravação injetadas. Durabilidade física, disco cheio real, matriz de filesystems e seleção cronológica de snapshots não são garantias homologadas; não há transação única de manifesto e backup nem CAS de kernel. SQLite não foi necessário nesta subfase.
 3. **Editor de tela e Blueprint utilizável.** Catálogo mínimo (texto, botão, campo, container), árvore, propriedades, seleção de nodes, adição dos tipos suportados, remoção, desfazer/refazer, erros localizados, sockets visuais por tipo e acessibilidade. Aceite: construir exemplo sem editar JSON; salvar/reabrir posições/conexões; nenhum botão fictício.
 4. **Semântica e correspondência com código.** Definir estado/eventos/funções; gerar TypeScript legível com mapa node↔trecho. Código gerado será inicialmente leitura/áreas controladas. Definir antes qualquer edição livre e round trip, com rejeição explícita de código sem representação. Aceite: testes equivalentes no interpretador e no aplicativo exportado, ramos e erros mapeados.
 5. **Execução/build com isolamento.** Broker de tarefas allowlisted, diretório de trabalho temporário, versão de ferramentas fixada, Job Objects, cancelamento e coleta de logs limitada. Rede/arquivos por concessão explícita. Testar subprocessos órfãos, excesso de saída, timeouts e acesso negado. Aceite: nenhum projeto ou plugin pode escolher executável/argumentos de shell arbitrários.
@@ -27,7 +31,7 @@ IA/atualizações podem receber implementações somente depois dessas bases: ar
 ## Riscos que bloqueiam a liberação funcional
 
 - Processo separado não basta para executar código de terceiros: sandbox de SO e testes adversariais são obrigatórios.
-- localStorage não é persistência de projeto profissional; escrita atômica e recuperação são gates.
+- A persistência nativa da Fase 1A substitui o rascunho localStorage no Studio Windows; durabilidade física, corrida externa residual e política de recuperação continuam condicionando suas garantias. O laboratório web mantém o rascunho local.
 - Instalação em máquina limpa e pacote assinado ainda não verificados.
 - Regras para edição de código livre e representação visual precisam ser aprovadas antes de prometer round trip.
 - Escala de grafo, consumo, acessibilidade e versões mínimas suportadas de Windows/WebView2 ainda precisam de matriz formal.

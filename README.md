@@ -6,13 +6,13 @@ Studio de desenvolvimento visual híbrido para web e Windows. Produto em desenvo
 
 Tecnologias em avaliação: Tauri 2/Rust, React/TypeScript, Rete.js 2, Monaco, Vite e persistência estruturada versionada. Nenhuma licença de distribuição foi definida.
 
-Fase 0 concluída e aprovada para evolução; a **Fase 1A está implementada e candidata à revisão**, com projetos locais e persistência nativa Rust. Arquitetura: **Go com ressalvas**. Não é uma IDE completa. O [encerramento da Fase 0](docs/phases/ENCERRAMENTO_FASE_00.md) permanece preservado; a Fase 1B não foi iniciada.
+Fase 0 concluída e aprovada para evolução; a **Fase 1A está concluída e homologada tecnicamente com GO COM RESSALVAS**, com projetos locais e persistência nativa Rust. O [encerramento oficial da Fase 1A](docs/phases/ENCERRAMENTO_FASE_01A.md) registra a aprovação e os limites das duas máquinas Windows. Não é uma IDE completa. O [encerramento da Fase 0](docs/phases/ENCERRAMENTO_FASE_00.md) permanece preservado; somente o planejamento da Fase 1B está autorizado, sem início nesta entrega.
 
 No Studio Windows, use **Novo projeto** para informar nome e escolher uma pasta; **Abrir projeto** seleciona `project.btrk.json`. Salvar, Salvar como, Fechar projeto, aviso de alterações pendentes e recuperação de backup estão operacionais. O principal e o backup são validados no backend; conflitos preservam o conteúdo em memória e oferecem recarga/cópia/cancelamento. Veja [garantias e limites Windows](docs/ARQUITETURA_V0_2.md) e o [formato oficial](docs/FORMATO_PROJETO_V1.md).
 
 ## Executar
 
-Pré-requisitos verificados: Node 24.11.1/npm 11.6.2. Para Windows: Rust/Cargo 1.99.0 MSVC, Visual Studio C++ Build Tools e WebView2. Dependências são locais, sem instalação global necessária.
+Ambientes verificados: Node 24.11.1/npm 11.6.2 e Node 24.16.0/npm 12.0.2. Para Windows: Rust/Cargo 1.99.0 ou 1.99.1 MSVC, Visual Studio C++ Build Tools e WebView2; a homologação no segundo computador usou MSVC v143 e Windows SDK 26100. Essas são versões exercitadas, não uma matriz exaustiva de versões mínimas. Dependências do projeto são locais; as ferramentas nativas são pré-requisitos de sistema.
 
 ```powershell
 npm ci
@@ -87,6 +87,7 @@ Módulos compartilham o lockfile npm da raiz; não são pacotes publicados. Nenh
 - [Validação e limitações](docs/qa/VALIDACAO_FASE_00.md)
 - [Relatório da Fase 1A](docs/phases/RELATORIO_FASE_01A.md)
 - [Validação da Fase 1A](docs/qa/VALIDACAO_FASE_01A.md)
+- [Encerramento oficial e homologação nas duas máquinas — Fase 1A](docs/phases/ENCERRAMENTO_FASE_01A.md)
 - [Roadmap / plano detalhado de Fase 1](docs/ROADMAP.md)
 
-A persistência da Fase 1A solicita sincronização e troca de arquivos no mesmo volume, mantendo backup válido e tratando resultados incertos. Não é uma garantia contra queda de energia, todos os filesystems ou qualquer corrida com editor externo. Continuam pendentes sandbox de código arbitrário, exportação generalizada, máquina limpa, assinatura, atualizações e auditorias adicionais. IA, plugins e atualizações permanecem desabilitados. A Fase 1A fica na branch `codex/phase-01a-project-persistence`, sem merge na `main`, release ou tag de produto. Marca e licença comercial ainda dependem de definição jurídica.
+A persistência da Fase 1A solicita sincronização e troca de arquivos no mesmo volume, mantendo backup válido e tratando resultados incertos. Permanecem abertas a durabilidade física sob falha de energia, a janela residual de corrida externa, a auditoria RustSec, a instalação em máquina limpa e a mensagem WebView2 observada no encerramento. Sandbox de código arbitrário, exportação generalizada, assinatura e atualizações também continuam pendentes. IA, plugins e atualizações permanecem desabilitados. O encerramento integra a Fase 1A à `main` e preserva a branch `codex/phase-01a-project-persistence`, sem release ou tag de produto. Marca e licença comercial ainda dependem de definição jurídica.
