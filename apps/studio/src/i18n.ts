@@ -3,7 +3,7 @@ const ptBR = {
   design: 'Design', graph: 'Blueprint', preview: 'Preview', code: 'Código',
   save: 'Salvar JSON', load: 'Abrir JSON', reset: 'Restaurar exemplo',
   run: 'Executar evento', properties: 'Propriedades',
-  ready: 'Pronto · núcleo local', phase: 'FASE 1D-C / LABORATÓRIO WEB',
+  ready: 'Pronto · núcleo local', phase: 'FASE 1D-D / LABORATÓRIO WEB',
   offline: 'Sem IA · operação local',
 } as const;
 export type Locale = 'pt-BR';

@@ -64,7 +64,7 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
   ready = true;
   await AreaExtensions.zoomAt(area, editor.getNodes());
   return {
-    mark(selected:string|null,executed:string[],invalid:string[]){for(const [id,view] of area.nodeViews){view.element.dataset.graphNodeId=id;view.element.style.outline=invalid.includes(id)?'2px solid #FF6868':selected===id?'2px solid #FF934F':executed.includes(id)?'2px solid #49C9B5':'';}},
+    mark(selected:string|null,executed:string[],invalid:string[]){for(const [id,view] of area.nodeViews){view.element.dataset.graphNodeId=id;view.element.dataset.executionState=invalid.includes(id)?'ERRO / INVÁLIDO':executed.includes(id)?'EXECUTADO':'';view.element.dataset.selected=String(selected===id);view.element.style.outline=invalid.includes(id)?'2px solid #FF6868':selected===id?'2px solid #FF934F':executed.includes(id)?'2px solid #49C9B5':'';}},
     async addConstant() {
       const node: GraphNode = { id: `node-${crypto.randomUUID()}`, kind: 'constant', value: 1, position: { x: 500, y: 650 } };
       project.graph.nodes.push(node); await editor.addNode(visual(node)); await area.translate(node.id, node.position); publish();

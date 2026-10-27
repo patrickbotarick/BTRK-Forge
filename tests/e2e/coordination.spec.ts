@@ -49,6 +49,7 @@ test('coordenação: FIFO de 32 aguardando, estado encadeado e resposta atrasada
   const requests = await page.evaluate(() => (window as TestWindow).forgeWorkers[0].requests);
   expect(requests.map(r => r.requestId)).toEqual(Array.from({ length: 33 }, (_, i) => i + 1));
   expect(requests.map(r => r.runtime.variables.count)).toEqual(Array.from({ length: 33 }, (_, i) => i));
+  await page.getByRole('button',{name:'Depuração',exact:true}).click();await expect(page.getByLabel('Histórico de eventos').getByRole('button')).toHaveCount(20);await expect(page.getByLabel('Histórico de eventos').getByRole('button').first()).toContainText('#14');await expect(page.getByLabel('Histórico de eventos').getByRole('button').last()).toContainText('#33');
 });
 
 test('coordenação: eventos Input distintos mantêm ordem e recebem o estado anterior', async ({ page }) => {
@@ -79,4 +80,15 @@ test('coordenação: reinício termina Worker e ignora resposta da sessão anter
   expect(await page.evaluate(() => (window as TestWindow).forgeWorkers[1].requests[0].requestId)).toBe(2);
   await page.evaluate(() => (window as TestWindow).forgeWorkers[1].complete());
   await expect(page.getByLabel('Variáveis runtime')).toContainText('Contador: 1');
+  await page.getByRole('button',{name:'Depuração',exact:true}).click();await expect(page.getByLabel('Histórico de eventos').getByRole('button')).toHaveCount(1);await expect(page.getByLabel('Histórico de eventos')).toContainText('#2');
+});
+test('diagnóstico recusa envelope de outra sessão mesmo com pedido e formato válidos', async ({ page }) => {
+  await controlled(page, exampleProject()); await page.getByRole('button', { name: '▶ Executar evento', exact: true }).click();
+  await page.evaluate(() => {
+    const worker = (window as TestWindow).forgeWorkers[0] as ControlledWorker & { onmessage: (message: { data: unknown }) => void };
+    const request = worker.requests[0]; const runtime = structuredClone(request.runtime); runtime.variables.count = 999;
+    worker.onmessage({ data: { version: 1, session: '00000000-0000-4000-8000-000000000001', reply: { ok: true, requestId: request.requestId, runtime, event: request.event, trace: [], executedNodes: [], values: {} }, debug: { entries: [], truncated: false, dropped: 0, outcome: 'commit' } } });
+  });
+  await expect(page.getByRole('button', { name: 'Interromper execução', exact: true })).toBeEnabled(); await expect(page.getByLabel('Variáveis runtime')).toContainText('Contador: 0');
+  await page.evaluate(() => (window as TestWindow).forgeWorkers[0].complete()); await page.getByRole('button', { name: 'Depuração', exact: true }).click(); await expect(page.getByLabel('Histórico de eventos').getByRole('button')).toHaveCount(1); await expect(page.getByLabel('Inspeção de variáveis')).not.toContainText('999');
 });
