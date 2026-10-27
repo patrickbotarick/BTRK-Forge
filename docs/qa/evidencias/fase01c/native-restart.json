@@ -1,0 +1,48 @@
+{
+  "newProcess": 39908,
+  "previousProcess": 41292,
+  "documentEqualsBefore": true,
+  "components": 5,
+  "nodes": 21,
+  "connections": 21,
+  "events": [
+    {
+      "event": "button.click",
+      "id": "click",
+      "kind": "event",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "componentId": "component-1439d51b-6e7a-441c-b7e1-b7b0cc6f6ae9",
+      "event": "button.click",
+      "id": "node-6ffd8dfb-86ab-4ed9-860f-5c6a0d81d76b",
+      "kind": "event",
+      "position": {
+        "x": 0,
+        "y": 480
+      }
+    },
+    {
+      "componentId": "component-859c995d-f8a7-47f5-9853-84c918af8bde",
+      "event": "input.change",
+      "id": "node-a08747e6-0e5e-4c99-bc40-3028f6a02149",
+      "kind": "event",
+      "position": {
+        "x": 300,
+        "y": 480
+      }
+    }
+  ],
+  "initialName": "",
+  "trace": "node-6ffd8dfb-86ab-4ed9-860f-5c6a0d81d76b → node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43 → node-1d83e456-c6ab-4810-8490-b066c6dc5ded",
+  "runtime": "Contador: 0\nNome: Ana",
+  "tests": [
+    "empty -> Digite seu nome",
+    "onChange Ana -> Ana",
+    "click Ana -> Olá, Ana!"
+  ],
+  "status": "PASS"
+}

@@ -1,5 +1,7 @@
 # Matriz de componentes e edição — Fase 1B
 
+> Documento histórico da Fase 1B. O contrato corrente está no [formato v3](FORMATO_PROJETO_V3.md), [Blueprint Engine](BLUEPRINT_ENGINE.md) e [limites 1C](LIMITACOES_FASE_01C.md); esta fase histórica permanece preservada.
+
 | Tipo | Propriedades implementadas | Filhos / comportamento |
 |---|---|---|
 | Text | Texto literal até 1000 caracteres; estilo comum | Sem filhos; conteúdo por textContent |

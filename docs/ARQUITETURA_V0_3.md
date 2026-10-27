@@ -1,5 +1,7 @@
 # Arquitetura v0.3 — Visual Designer
 
+> Documento histórico da Fase 1B. O contrato corrente está no [formato v3](FORMATO_PROJETO_V3.md), [Blueprint Engine](BLUEPRINT_ENGINE.md) e [limites 1C](LIMITACOES_FASE_01C.md); esta fase histórica permanece preservada.
+
 Mantém a [persistência v0.2](ARQUITETURA_V0_2.md). Não introduz novos comandos IPC, plugins, permissões nativas ou dependências de terceiros.
 
 ```mermaid

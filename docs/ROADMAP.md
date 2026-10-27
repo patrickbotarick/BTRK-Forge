@@ -16,9 +16,13 @@ Após autorização específica, foram implementados Design, catálogo Text/Butt
 
 O aceite é restrito ao Visual Designer demonstrado. Continuam os limites de uma tela, Input sem binding de variáveis, quatro tipos de componentes, ausência de seleção múltipla, layout por containers, ausência de edição livre bidirecional código/Blueprint e de exportação generalizada de projetos visuais. As cinco ressalvas herdadas — energia, corrida externa residual, RustSec, máquina limpa e mensagem WebView2 — permanecem abertas, sem serem consideradas resolvidas pelo encerramento.
 
-## Fase 1C — não iniciada
+## Fase 1C — implementada, candidata a GO COM RESSALVAS
 
-A main consolidada fica pronta para planejamento posterior sob orientação do responsável. Este encerramento documental não define nem inicia o escopo da Fase 1C.
+Blueprint Engine entregue em `codex/phase-01c-blueprint-engine`, a partir da main aprovada. Catálogo funcional, portas tipadas, eventos por ID, binding string de Input, leitura/escrita de Text, histórico integrado, Worker com fila/limites e depuração inicial. Schema v3 migra v0/v1/v2; Forge Logic Demo montado visualmente e reaberto em processo Windows novo. [Relatório](phases/RELATORIO_FASE_01C.md), [QA](qa/VALIDACAO_FASE_01C.md), [contrato](BLUEPRINT_ENGINE.md) e [limitações atuais](LIMITACOES_FASE_01C.md). Não há integração automática à main ou aceite comercial.
+
+## Fase 1D — não iniciada
+
+Recomendações para planejamento: geração TypeScript fiel com equivalência, exportador geral separado do Preview, acessibilidade/escala, RustSec e instalação limpa. Exigem autorização e escopo próprios.
 
 ## Fase 1 proposta — primeira fatia funcional
 

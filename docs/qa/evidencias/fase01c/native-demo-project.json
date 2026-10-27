@@ -1,0 +1,513 @@
+{
+  "compatibility": {
+    "format": "btrk-project",
+    "minimumStudio": "0.0.1",
+    "platforms": [
+      "web",
+      "windows"
+    ],
+    "requiredFeatures": [
+      "project-persistence-v1"
+    ]
+  },
+  "dependencies": [],
+  "distribution": {
+    "appId": "studio.btrk.appec0ca0e26cec4a949bbc7d9295bab687",
+    "channel": "beta",
+    "version": "0.1.0"
+  },
+  "functions": [],
+  "graph": {
+    "connections": [
+      {
+        "id": "edge-1",
+        "input": "in",
+        "output": "next",
+        "source": "click",
+        "target": "branch"
+      },
+      {
+        "id": "edge-2",
+        "input": "a",
+        "output": "value",
+        "source": "counter",
+        "target": "sum"
+      },
+      {
+        "id": "edge-3",
+        "input": "b",
+        "output": "value",
+        "source": "one",
+        "target": "sum"
+      },
+      {
+        "id": "edge-4",
+        "input": "a",
+        "output": "value",
+        "source": "sum",
+        "target": "positive"
+      },
+      {
+        "id": "edge-5",
+        "input": "b",
+        "output": "value",
+        "source": "zero",
+        "target": "positive"
+      },
+      {
+        "id": "edge-6",
+        "input": "test",
+        "output": "value",
+        "source": "positive",
+        "target": "branch"
+      },
+      {
+        "id": "edge-7",
+        "input": "in",
+        "output": "yes",
+        "source": "branch",
+        "target": "assign"
+      },
+      {
+        "id": "edge-8",
+        "input": "value",
+        "output": "value",
+        "source": "sum",
+        "target": "assign"
+      },
+      {
+        "id": "edge-b1fbc94b-1b4e-4bd9-8f1d-87fb395d2430",
+        "input": "in",
+        "output": "next",
+        "source": "node-6ffd8dfb-86ab-4ed9-860f-5c6a0d81d76b",
+        "target": "node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43"
+      },
+      {
+        "id": "edge-2d820d10-f821-442b-be61-1fa852e5de8f",
+        "input": "value",
+        "output": "value",
+        "source": "node-5418b9b6-1691-40e5-ae6c-3184931a72d3",
+        "target": "node-2d6cc5fa-376e-4f82-a320-e692a223e8a6"
+      },
+      {
+        "id": "edge-0fc516ec-2d1e-4974-9499-d9af87854bf5",
+        "input": "test",
+        "output": "value",
+        "source": "node-2d6cc5fa-376e-4f82-a320-e692a223e8a6",
+        "target": "node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43"
+      },
+      {
+        "id": "edge-b80db4a1-88d1-4fb7-b5a7-2a6e9cc5d95f",
+        "input": "in",
+        "output": "yes",
+        "source": "node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43",
+        "target": "node-b8fa5b42-3e96-4612-bfe3-89e5714bc34f"
+      },
+      {
+        "id": "edge-804a283e-8c98-4cf2-87ca-27af3323cdbe",
+        "input": "in",
+        "output": "no",
+        "source": "node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43",
+        "target": "node-1d83e456-c6ab-4810-8490-b066c6dc5ded"
+      },
+      {
+        "id": "edge-3e5a328e-e8cf-42dc-ae42-de0be0e4beff",
+        "input": "value",
+        "output": "value",
+        "source": "node-a6145bb1-8c64-4d29-af82-7f190d45b8e5",
+        "target": "node-b8fa5b42-3e96-4612-bfe3-89e5714bc34f"
+      },
+      {
+        "id": "edge-61b23d6d-07ce-4340-be56-a0f4f23631fb",
+        "input": "a",
+        "output": "value",
+        "source": "node-1e00b5e1-7190-4607-bc78-461e1699f63b",
+        "target": "node-0aee4cb1-8b76-4ea3-8769-2fe161e627c7"
+      },
+      {
+        "id": "edge-cce744a7-8c96-4c20-99d4-e17cd1731e64",
+        "input": "b",
+        "output": "value",
+        "source": "node-5418b9b6-1691-40e5-ae6c-3184931a72d3",
+        "target": "node-0aee4cb1-8b76-4ea3-8769-2fe161e627c7"
+      },
+      {
+        "id": "edge-24a451a0-d78b-41d7-966e-b08dcab860a2",
+        "input": "a",
+        "output": "value",
+        "source": "node-0aee4cb1-8b76-4ea3-8769-2fe161e627c7",
+        "target": "node-79ff9597-e506-422e-b115-6483893efe1d"
+      },
+      {
+        "id": "edge-04c7eafe-bfbb-4f03-ae26-7db2fb277d0a",
+        "input": "b",
+        "output": "value",
+        "source": "node-44f3d15f-b493-4ac9-9511-144de4da2af6",
+        "target": "node-79ff9597-e506-422e-b115-6483893efe1d"
+      },
+      {
+        "id": "edge-0fed9496-bcee-49dd-8b89-ebccc7c24ac5",
+        "input": "value",
+        "output": "value",
+        "source": "node-79ff9597-e506-422e-b115-6483893efe1d",
+        "target": "node-1d83e456-c6ab-4810-8490-b066c6dc5ded"
+      },
+      {
+        "id": "edge-c8cc4b62-9829-4355-a91f-d31b0d159c9b",
+        "input": "in",
+        "output": "next",
+        "source": "node-a08747e6-0e5e-4c99-bc40-3028f6a02149",
+        "target": "node-bdf8a281-55df-4d96-bbac-bbc650725dcb"
+      },
+      {
+        "id": "edge-d7449f96-ce4c-4d23-a5b7-53cf5f9adb30",
+        "input": "value",
+        "output": "value",
+        "source": "node-5418b9b6-1691-40e5-ae6c-3184931a72d3",
+        "target": "node-bdf8a281-55df-4d96-bbac-bbc650725dcb"
+      }
+    ],
+    "nodes": [
+      {
+        "event": "button.click",
+        "id": "click",
+        "kind": "event",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "counter",
+        "kind": "variable",
+        "position": {
+          "x": 0,
+          "y": 200
+        },
+        "variableId": "count"
+      },
+      {
+        "id": "one",
+        "kind": "constant",
+        "position": {
+          "x": 0,
+          "y": 400
+        },
+        "value": 1
+      },
+      {
+        "id": "sum",
+        "kind": "add",
+        "position": {
+          "x": 300,
+          "y": 200
+        }
+      },
+      {
+        "id": "zero",
+        "kind": "constant",
+        "position": {
+          "x": 300,
+          "y": 440
+        },
+        "value": 0
+      },
+      {
+        "id": "positive",
+        "kind": "greater",
+        "position": {
+          "x": 600,
+          "y": 240
+        }
+      },
+      {
+        "id": "branch",
+        "kind": "condition",
+        "position": {
+          "x": 900,
+          "y": 0
+        }
+      },
+      {
+        "id": "assign",
+        "kind": "set",
+        "position": {
+          "x": 1200,
+          "y": 0
+        },
+        "variableId": "count"
+      },
+      {
+        "componentId": "component-1439d51b-6e7a-441c-b7e1-b7b0cc6f6ae9",
+        "event": "button.click",
+        "id": "node-6ffd8dfb-86ab-4ed9-860f-5c6a0d81d76b",
+        "kind": "event",
+        "position": {
+          "x": 0,
+          "y": 480
+        }
+      },
+      {
+        "componentId": "component-859c995d-f8a7-47f5-9853-84c918af8bde",
+        "event": "input.change",
+        "id": "node-a08747e6-0e5e-4c99-bc40-3028f6a02149",
+        "kind": "event",
+        "position": {
+          "x": 300,
+          "y": 480
+        }
+      },
+      {
+        "componentId": "component-859c995d-f8a7-47f5-9853-84c918af8bde",
+        "id": "node-5418b9b6-1691-40e5-ae6c-3184931a72d3",
+        "kind": "component-value",
+        "position": {
+          "x": 600,
+          "y": 480
+        },
+        "property": "value"
+      },
+      {
+        "id": "node-2d6cc5fa-376e-4f82-a320-e692a223e8a6",
+        "kind": "empty",
+        "position": {
+          "x": 900,
+          "y": 480
+        }
+      },
+      {
+        "id": "node-2eb1cf8e-7529-4f86-a038-fc4e2472ec43",
+        "kind": "condition",
+        "position": {
+          "x": 0,
+          "y": 720
+        }
+      },
+      {
+        "id": "node-a6145bb1-8c64-4d29-af82-7f190d45b8e5",
+        "kind": "constant",
+        "position": {
+          "x": 300,
+          "y": 720
+        },
+        "value": "Digite seu nome"
+      },
+      {
+        "id": "node-1e00b5e1-7190-4607-bc78-461e1699f63b",
+        "kind": "constant",
+        "position": {
+          "x": 600,
+          "y": 720
+        },
+        "value": "Olá, "
+      },
+      {
+        "id": "node-44f3d15f-b493-4ac9-9511-144de4da2af6",
+        "kind": "constant",
+        "position": {
+          "x": 900,
+          "y": 720
+        },
+        "value": "!"
+      },
+      {
+        "id": "node-0aee4cb1-8b76-4ea3-8769-2fe161e627c7",
+        "kind": "concat",
+        "position": {
+          "x": 0,
+          "y": 960
+        }
+      },
+      {
+        "id": "node-79ff9597-e506-422e-b115-6483893efe1d",
+        "kind": "concat",
+        "position": {
+          "x": 300,
+          "y": 960
+        }
+      },
+      {
+        "componentId": "component-415a1e75-49dd-46b4-b857-17c01eb244bf",
+        "id": "node-b8fa5b42-3e96-4612-bfe3-89e5714bc34f",
+        "kind": "set-text",
+        "position": {
+          "x": 600,
+          "y": 960
+        }
+      },
+      {
+        "componentId": "component-415a1e75-49dd-46b4-b857-17c01eb244bf",
+        "id": "node-1d83e456-c6ab-4810-8490-b066c6dc5ded",
+        "kind": "set-text",
+        "position": {
+          "x": 900,
+          "y": 960
+        }
+      },
+      {
+        "componentId": "component-415a1e75-49dd-46b4-b857-17c01eb244bf",
+        "id": "node-bdf8a281-55df-4d96-bbac-bbc650725dcb",
+        "kind": "set-text",
+        "position": {
+          "x": 0,
+          "y": 1200
+        }
+      }
+    ]
+  },
+  "id": "project-ec0ca0e2-6cec-4a94-9bbc-7d9295bab687",
+  "metadata": {
+    "createdAt": "2026-10-27T01:44:11.038Z",
+    "documentVersion": 1,
+    "savedBy": "BTRK Forge",
+    "updatedAt": "2026-10-27T01:46:00.080Z"
+  },
+  "name": "Forge Logic Demo",
+  "permissions": {
+    "web": [],
+    "windows": []
+  },
+  "resources": [],
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "components": [
+        {
+          "events": {},
+          "id": "component-7509fa74-d92b-4f33-b117-c721a39feeb4",
+          "parentId": null,
+          "props": {
+            "align": "stretch",
+            "direction": "column",
+            "gap": 16,
+            "justify": "flex-start",
+            "padding": 24
+          },
+          "style": {
+            "background": "#1E2933",
+            "borderColor": "#344454",
+            "borderRadius": 4,
+            "borderWidth": 0,
+            "color": "#F0F4F6",
+            "fontSize": 16,
+            "fontWeight": "400",
+            "height": "auto",
+            "textAlign": "left",
+            "width": "fill"
+          },
+          "type": "Container"
+        },
+        {
+          "events": {},
+          "id": "component-010fa3b9-cb0a-4406-974a-0549af2a45c7",
+          "parentId": "component-7509fa74-d92b-4f33-b117-c721a39feeb4",
+          "props": {
+            "text": "Forge Logic Demo"
+          },
+          "style": {
+            "background": "transparent",
+            "borderColor": "#344454",
+            "borderRadius": 4,
+            "borderWidth": 0,
+            "color": "#F0F4F6",
+            "fontSize": 16,
+            "fontWeight": "400",
+            "height": "auto",
+            "textAlign": "left",
+            "width": "auto"
+          },
+          "type": "Text"
+        },
+        {
+          "events": {
+            "change": "node-a08747e6-0e5e-4c99-bc40-3028f6a02149"
+          },
+          "id": "component-859c995d-f8a7-47f5-9853-84c918af8bde",
+          "parentId": "component-7509fa74-d92b-4f33-b117-c721a39feeb4",
+          "props": {
+            "binding": "variable-fea44bbd-dda3-4e6e-9957-929c22593727",
+            "disabled": false,
+            "initialValue": "",
+            "inputType": "text",
+            "placeholder": "Seu nome"
+          },
+          "style": {
+            "background": "#111820",
+            "borderColor": "#344454",
+            "borderRadius": 4,
+            "borderWidth": 1,
+            "color": "#F0F4F6",
+            "fontSize": 16,
+            "fontWeight": "400",
+            "height": "auto",
+            "textAlign": "left",
+            "width": "auto"
+          },
+          "type": "Input"
+        },
+        {
+          "events": {
+            "click": "node-6ffd8dfb-86ab-4ed9-860f-5c6a0d81d76b"
+          },
+          "id": "component-1439d51b-6e7a-441c-b7e1-b7b0cc6f6ae9",
+          "parentId": "component-7509fa74-d92b-4f33-b117-c721a39feeb4",
+          "props": {
+            "disabled": false,
+            "text": "Confirmar"
+          },
+          "style": {
+            "background": "#FF934F",
+            "borderColor": "#344454",
+            "borderRadius": 4,
+            "borderWidth": 0,
+            "color": "#111820",
+            "fontSize": 16,
+            "fontWeight": "400",
+            "height": "auto",
+            "textAlign": "left",
+            "width": "auto"
+          },
+          "type": "Button"
+        },
+        {
+          "events": {},
+          "id": "component-415a1e75-49dd-46b4-b857-17c01eb244bf",
+          "parentId": "component-7509fa74-d92b-4f33-b117-c721a39feeb4",
+          "props": {
+            "text": "Resultado"
+          },
+          "style": {
+            "background": "transparent",
+            "borderColor": "#344454",
+            "borderRadius": 4,
+            "borderWidth": 0,
+            "color": "#F0F4F6",
+            "fontSize": 16,
+            "fontWeight": "400",
+            "height": "auto",
+            "textAlign": "left",
+            "width": "auto"
+          },
+          "type": "Text"
+        }
+      ],
+      "id": "screen-main",
+      "title": "Da ideia ao aplicativo."
+    }
+  ],
+  "variables": [
+    {
+      "id": "count",
+      "initial": 0,
+      "name": "Contador",
+      "type": "number"
+    },
+    {
+      "id": "variable-fea44bbd-dda3-4e6e-9957-929c22593727",
+      "initial": "",
+      "name": "Nome",
+      "type": "string"
+    }
+  ],
+  "version": "0.1.0"
+}

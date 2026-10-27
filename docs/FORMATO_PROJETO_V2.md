@@ -1,5 +1,7 @@
 # Formato de projeto BTRK v2 — componentes visuais
 
+> Documento histórico da Fase 1B. O contrato corrente está no [formato v3](FORMATO_PROJETO_V3.md), [Blueprint Engine](BLUEPRINT_ENGINE.md) e [limites 1C](LIMITACOES_FASE_01C.md); esta fase histórica permanece preservada.
+
 O schemaVersion 2 generaliza a representação visual da Fase 1A. Substitui `screens[0].button` por `screens[0].components`; não mantém uma cópia concorrente do botão. A tela continua única, com ID e título próprio (cabeçalho da tela). O título da tela é independente dos componentes Text adicionados pelo usuário.
 
 O manifesto canônico continua `project.btrk.json`. Graph, variáveis, funções reservadas, distribuição, permissões e envelope metadata.documentVersion 1 mantêm seus contratos. A versão estrutural identifica o novo formato; não é uma release comercial nem uma mudança da versão do envelope.

@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-26",
+  "implementation": "467b7ff7a94d7869d58f29c866375c178990d6b8",
+  "base": "175036e819a6b1aecccf88af8c6b9b4a34b07330",
+  "branch": "codex/phase-01c-blueprint-engine",
+  "tests": {
+    "typescript": 45,
+    "rustPersistence": 26,
+    "rustHost": 1,
+    "web": 11,
+    "nativeIntegration": 9,
+    "production": 3,
+    "total": 95,
+    "failed": 0
+  },
+  "checks": [
+    "typecheck",
+    "lint",
+    "cargo check persistence + host",
+    "cargo fmt persistence + host",
+    "web build",
+    "export web legacy",
+    "Windows exe + NSIS",
+    "git diff --check",
+    "git fsck --full"
+  ],
+  "npmAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "securityScanner": {
+    "checkedFiles": 139,
+    "findings": [],
+    "scope": "Padrões conhecidos de segredos e configuração estática de permissões; não é auditoria exaustiva."
+  },
+  "artifacts": {
+    "exe": {
+      "path": "apps/studio/src-tauri/target/release/btrk-forge.exe",
+      "sha256": "0bc8c0047369b04347b104c12f09a28cc613ee41df6f8453f132e3b49bde2b50"
+    },
+    "nsis": {
+      "path": "apps/studio/src-tauri/target/release/bundle/nsis/BTRK Forge_0.0.1_x64-setup.exe",
+      "sha256": "8cc7efc8b2dbe5252e0fe7331f412291b1372d9459e526a129dab1d203db7d6b"
+    },
+    "nativeManifest": {
+      "path": "artifacts/phase01c/native-smoke/projects/Forge Logic Demo/project.btrk.json",
+      "sha256": "08d75311f15dbb22394f1577797b7b437f0bffe8d02d461b3cf83c4df7bacc16"
+    }
+  },
+  "notExecuted": [
+    "RustSec",
+    "physical power loss",
+    "clean machine installation",
+    "general visual export",
+    "generated TypeScript equivalence",
+    "comprehensive accessibility/DPI/filesystems"
+  ],
+  "recommendation": "GO COM RESSALVAS",
+  "mainModified": false,
+  "phase1dStarted": false
+}

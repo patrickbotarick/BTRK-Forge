@@ -1,0 +1,10 @@
+{
+  "process": 48352,
+  "method": "Executável release final; importação em memória do manifesto temporário já homologado; sem edição JSON e sem gravação adicional",
+  "results": [
+    "empty -> Digite seu nome",
+    "onChange Ana -> Ana",
+    "click Ana -> Olá, Ana!"
+  ],
+  "status": "PASS"
+}
