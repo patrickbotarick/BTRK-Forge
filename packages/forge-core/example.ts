@@ -1,6 +1,6 @@
-import type { Project } from '../project-schema';
+import { parseProject, type Project } from '../project-schema';
 export function exampleProject(): Project {
-  return {
+  return parseProject({
     id: 'counter-project', name: 'Contador da fundição', version: '0.1.0', schemaVersion: 1,
     screens: [{ id: 'screen-main', title: 'Da ideia ao aplicativo.', button: { id: 'button-count', text: 'Forjar +1', color: '#FF934F', event: 'button.click' } }],
     variables: [{ id: 'count', name: 'Contador', type: 'number', initial: 0 }],
@@ -28,5 +28,5 @@ export function exampleProject(): Project {
     },
     functions: [], resources: [], dependencies: [], permissions: { web: [], windows: [] },
     distribution: { appId: 'studio.btrk.counter', version: '0.1.0', channel: 'beta' }
-  };
+  });
 }

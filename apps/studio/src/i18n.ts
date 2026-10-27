@@ -1,9 +1,9 @@
 const ptBR = {
   brand: 'BTRK Forge', tagline: 'Da ideia ao aplicativo.',
-  graph: 'Blueprint', preview: 'Preview', code: 'Modelo JSON',
+  design: 'Design', graph: 'Blueprint', preview: 'Preview', code: 'Modelo JSON',
   save: 'Salvar JSON', load: 'Abrir JSON', reset: 'Restaurar exemplo',
   run: 'Executar evento', properties: 'Propriedades',
-  ready: 'Pronto · núcleo local', phase: 'FASE 0 / LABORATÓRIO',
+  ready: 'Pronto · núcleo local', phase: 'FASE 1B / LABORATÓRIO WEB',
   offline: 'Sem IA · operação local',
 } as const;
 export type Locale = 'pt-BR';

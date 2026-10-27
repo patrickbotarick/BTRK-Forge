@@ -24,7 +24,8 @@
     "desktop:build": "cd apps/studio && tauri build",
     "export:web": "tsx tools/feasibility/export-web.ts",
     "export:windows": "npm run export:web && cd tools/feasibility/windows && tauri build",
-    "audit:environment": "pwsh -NoProfile -File tools/feasibility/audit.ps1"
+    "audit:environment": "pwsh -NoProfile -File tools/feasibility/audit.ps1",
+    "renderer:generate": "tsx tools/feasibility/generate-renderer.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "2.12.4",

@@ -1,4 +1,5 @@
 import { parseProject, type Project, type GraphNode, type Scalar, type Connection } from '../project-schema';
+import { validateComponents } from '../designer-core/tree';
 
 export type PortType = 'exec' | 'number' | 'string' | 'boolean';
 export type Ports = { inputs: Record<string, PortType>; outputs: Record<string, PortType> };
@@ -23,7 +24,7 @@ export function validateProject(input: unknown, options: { allowIncomplete?: boo
   const ids = new Set<string>();
   const unique = (value: string) => { if (ids.has(value)) throw new Error(`ID duplicado: ${value}`); ids.add(value); };
   unique(project.id);
-  for (const screen of project.screens) { unique(screen.id); unique(screen.button.id); }
+  for (const screen of project.screens) { unique(screen.id); validateComponents(screen.components, project.graph.nodes, unique); }
   for (const variable of project.variables) { unique(variable.id); if (typeof variable.initial !== variable.type) throw new Error(`Tipo inicial inválido: ${variable.id}`); }
   const nodes = new Map(project.graph.nodes.map(node => { unique(node.id); return [node.id, node]; }));
   if (project.graph.nodes.filter(n => n.kind === 'event').length !== 1) throw new Error('Exatamente um evento é necessário');

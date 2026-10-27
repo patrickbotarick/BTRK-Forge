@@ -1,13 +1,7 @@
 import { z } from 'zod';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { projectSchema } from '../../packages/project-schema';
 import { exampleProject } from '../../packages/forge-core/example';
 await writeFile('packages/project-schema/project.schema.json', JSON.stringify(z.toJSONSchema(projectSchema), null, 2) + '\n');
-await mkdir('tests/fixtures/projects', { recursive: true });
-const legacy = exampleProject();
-await writeFile('tests/fixtures/projects/phase0-v1.json', JSON.stringify(legacy, null, 2) + '\n');
-const v0 = { ...legacy, schemaVersion: 0, functions: undefined };
-await writeFile('tests/fixtures/projects/phase0-v0.json', JSON.stringify(v0, null, 2) + '\n');
-await writeFile('tests/fixtures/projects/future.json', JSON.stringify({ ...legacy, schemaVersion: 99 }, null, 2) + '\n');
-const badRef = structuredClone(legacy); badRef.graph.connections[0].target = 'missing';
-await writeFile('tests/fixtures/projects/invalid-reference.json', JSON.stringify(badRef, null, 2) + '\n');
+// Historical fixtures and the frozen v1 schema must never be regenerated from the new model.
+await writeFile('tests/fixtures/projects/visual-v2.json', JSON.stringify(exampleProject(), null, 2) + '\n');

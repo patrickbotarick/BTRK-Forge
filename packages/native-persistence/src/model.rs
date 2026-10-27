@@ -12,6 +12,15 @@ static SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
         .build(&schema)
         .expect("JSON Schema válido")
 });
+static LEGACY_SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
+    let schema: Value =
+        serde_json::from_str(include_str!("../../project-schema/project-v1.schema.json"))
+            .expect("schema legado");
+    jsonschema::options()
+        .should_validate_formats(true)
+        .build(&schema)
+        .expect("schema legado válido")
+});
 
 pub fn parse(bytes: &[u8]) -> Result<Value> {
     if bytes.len() > MAX_BYTES {
@@ -32,7 +41,7 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
             document["functions"] = Value::Array(vec![]);
         }
     }
-    if document["schemaVersion"].as_f64().is_some_and(|v| v > 1.0)
+    if document["schemaVersion"].as_f64().is_some_and(|v| v > 2.0)
         || document["metadata"]["documentVersion"]
             .as_f64()
             .is_some_and(|v| v > 1.0)
@@ -41,6 +50,28 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
             "future_schema",
             "Este projeto usa uma versão futura do schema. Atualize o Studio antes de abri-lo.",
         ));
+    }
+    if document["schemaVersion"] == 1 {
+        LEGACY_SCHEMA
+            .validate(&document)
+            .map_err(|_| err("invalid_schema", "Documento legado inválido."))?;
+        let event_id = document["graph"]["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|n| n["kind"] == "event")
+            .map(|n| n["id"].clone())
+            .unwrap_or(Value::Null);
+        for screen in document["screens"].as_array_mut().unwrap() {
+            let button = screen["button"].clone();
+            screen.as_object_mut().unwrap().remove("button");
+            screen["components"] = serde_json::json!([{
+                "id":button["id"],"parentId":null,"type":"Button",
+                "props":{"text":button["text"],"disabled":false},"events":{"click":event_id},
+                "style":{"width":"auto","height":"auto","background":button["color"],"color":"#111820","borderColor":"#344454","borderWidth":0,"borderRadius":4,"fontSize":16,"fontWeight":"400","textAlign":"left"}
+            }]);
+        }
+        document["schemaVersion"] = 2.into();
     }
     SCHEMA.validate(&document).map_err(|_| {
         err(
@@ -121,7 +152,44 @@ fn validate_graph(p: &Value) -> Result<()> {
     unique(p["id"].as_str().unwrap())?;
     for screen in p["screens"].as_array().unwrap() {
         unique(screen["id"].as_str().unwrap())?;
-        unique(screen["button"]["id"].as_str().unwrap())?;
+        let components = screen["components"].as_array().unwrap();
+        for c in components {
+            let id = c["id"].as_str().unwrap();
+            unique(id)?;
+            let mut visited = HashSet::from([id]);
+            let mut parent = c["parentId"].as_str();
+            let mut depth = 1;
+            while let Some(parent_id) = parent {
+                if !visited.insert(parent_id) {
+                    return Err(err("cycle", "Ciclo na hierarquia de componentes."));
+                }
+                let container = components
+                    .iter()
+                    .find(|v| v["id"] == parent_id)
+                    .ok_or_else(|| err("invalid_reference", "Pai de componente ausente."))?;
+                if container["type"] != "Container" {
+                    return Err(err("invalid_reference", "Somente Container admite filhos."));
+                }
+                depth += 1;
+                if depth > 12 {
+                    return Err(err(
+                        "limit",
+                        "Profundidade máxima de 12 componentes excedida.",
+                    ));
+                }
+                parent = container["parentId"].as_str();
+            }
+            if c["type"] == "Button"
+                && !c["events"]["click"].is_null()
+                && !p["graph"]["nodes"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|n| n["id"] == c["events"]["click"] && n["kind"] == "event")
+            {
+                return Err(err("invalid_reference", "Referência de evento inválida."));
+            }
+        }
     }
     let mut variables = HashMap::new();
     for v in p["variables"].as_array().unwrap() {

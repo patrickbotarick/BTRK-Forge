@@ -17,7 +17,7 @@
     },
     "schemaVersion": {
       "type": "number",
-      "const": 1
+      "const": 2
     },
     "screens": {
       "minItems": 1,
@@ -34,39 +34,767 @@
             "type": "string",
             "maxLength": 100
           },
-          "button": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
-              },
-              "text": {
-                "type": "string",
-                "maxLength": 100
-              },
-              "color": {
-                "type": "string",
-                "pattern": "^#[0-9a-fA-F]{6}$"
-              },
-              "event": {
-                "type": "string",
-                "const": "button.click"
-              }
-            },
-            "required": [
-              "id",
-              "text",
-              "color",
-              "event"
-            ],
-            "additionalProperties": false
+          "components": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                    },
+                    "parentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "style": {
+                      "type": "object",
+                      "properties": {
+                        "width": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "height": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "background": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "color": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderColor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderWidth": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 12
+                        },
+                        "borderRadius": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 64
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 10,
+                          "maximum": 96
+                        },
+                        "fontWeight": {
+                          "type": "string",
+                          "enum": [
+                            "400",
+                            "500",
+                            "600",
+                            "700"
+                          ]
+                        },
+                        "textAlign": {
+                          "type": "string",
+                          "enum": [
+                            "left",
+                            "center",
+                            "right"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "width",
+                        "height",
+                        "background",
+                        "color",
+                        "borderColor",
+                        "borderWidth",
+                        "borderRadius",
+                        "fontSize",
+                        "fontWeight",
+                        "textAlign"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "type": {
+                      "type": "string",
+                      "const": "Text"
+                    },
+                    "props": {
+                      "type": "object",
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "maxLength": 1000
+                        }
+                      },
+                      "required": [
+                        "text"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "events": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "parentId",
+                    "style",
+                    "type",
+                    "props",
+                    "events"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                    },
+                    "parentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "style": {
+                      "type": "object",
+                      "properties": {
+                        "width": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "height": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "background": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "color": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderColor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderWidth": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 12
+                        },
+                        "borderRadius": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 64
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 10,
+                          "maximum": 96
+                        },
+                        "fontWeight": {
+                          "type": "string",
+                          "enum": [
+                            "400",
+                            "500",
+                            "600",
+                            "700"
+                          ]
+                        },
+                        "textAlign": {
+                          "type": "string",
+                          "enum": [
+                            "left",
+                            "center",
+                            "right"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "width",
+                        "height",
+                        "background",
+                        "color",
+                        "borderColor",
+                        "borderWidth",
+                        "borderRadius",
+                        "fontSize",
+                        "fontWeight",
+                        "textAlign"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "type": {
+                      "type": "string",
+                      "const": "Button"
+                    },
+                    "props": {
+                      "type": "object",
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "maxLength": 100
+                        },
+                        "disabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "text",
+                        "disabled"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "events": {
+                      "type": "object",
+                      "properties": {
+                        "click": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "click"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "parentId",
+                    "style",
+                    "type",
+                    "props",
+                    "events"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                    },
+                    "parentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "style": {
+                      "type": "object",
+                      "properties": {
+                        "width": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "height": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "background": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "color": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderColor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderWidth": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 12
+                        },
+                        "borderRadius": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 64
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 10,
+                          "maximum": 96
+                        },
+                        "fontWeight": {
+                          "type": "string",
+                          "enum": [
+                            "400",
+                            "500",
+                            "600",
+                            "700"
+                          ]
+                        },
+                        "textAlign": {
+                          "type": "string",
+                          "enum": [
+                            "left",
+                            "center",
+                            "right"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "width",
+                        "height",
+                        "background",
+                        "color",
+                        "borderColor",
+                        "borderWidth",
+                        "borderRadius",
+                        "fontSize",
+                        "fontWeight",
+                        "textAlign"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "type": {
+                      "type": "string",
+                      "const": "Input"
+                    },
+                    "props": {
+                      "type": "object",
+                      "properties": {
+                        "placeholder": {
+                          "type": "string",
+                          "maxLength": 100
+                        },
+                        "initialValue": {
+                          "type": "string",
+                          "maxLength": 1000
+                        },
+                        "inputType": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "email",
+                            "number"
+                          ]
+                        },
+                        "disabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "placeholder",
+                        "initialValue",
+                        "inputType",
+                        "disabled"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "events": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "parentId",
+                    "style",
+                    "type",
+                    "props",
+                    "events"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                    },
+                    "parentId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "style": {
+                      "type": "object",
+                      "properties": {
+                        "width": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "height": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2000
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "fill"
+                              ]
+                            }
+                          ]
+                        },
+                        "background": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "color": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderColor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^#[0-9a-fA-F]{6}$"
+                            },
+                            {
+                              "type": "string",
+                              "const": "transparent"
+                            }
+                          ]
+                        },
+                        "borderWidth": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 12
+                        },
+                        "borderRadius": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 64
+                        },
+                        "fontSize": {
+                          "type": "integer",
+                          "minimum": 10,
+                          "maximum": 96
+                        },
+                        "fontWeight": {
+                          "type": "string",
+                          "enum": [
+                            "400",
+                            "500",
+                            "600",
+                            "700"
+                          ]
+                        },
+                        "textAlign": {
+                          "type": "string",
+                          "enum": [
+                            "left",
+                            "center",
+                            "right"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "width",
+                        "height",
+                        "background",
+                        "color",
+                        "borderColor",
+                        "borderWidth",
+                        "borderRadius",
+                        "fontSize",
+                        "fontWeight",
+                        "textAlign"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "type": {
+                      "type": "string",
+                      "const": "Container"
+                    },
+                    "props": {
+                      "type": "object",
+                      "properties": {
+                        "direction": {
+                          "type": "string",
+                          "enum": [
+                            "column",
+                            "row"
+                          ]
+                        },
+                        "gap": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 128
+                        },
+                        "padding": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 128
+                        },
+                        "align": {
+                          "type": "string",
+                          "enum": [
+                            "stretch",
+                            "flex-start",
+                            "center",
+                            "flex-end"
+                          ]
+                        },
+                        "justify": {
+                          "type": "string",
+                          "enum": [
+                            "flex-start",
+                            "center",
+                            "flex-end",
+                            "space-between"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "direction",
+                        "gap",
+                        "padding",
+                        "align",
+                        "justify"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "events": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "parentId",
+                    "style",
+                    "type",
+                    "props",
+                    "events"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
           }
         },
         "required": [
           "id",
           "title",
-          "button"
+          "components"
         ],
         "additionalProperties": false
       }

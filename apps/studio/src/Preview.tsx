@@ -8,14 +8,14 @@ export function Preview({ project, state, run }: { project: Project; state: Reco
   function render() {
     const { project, state } = current.current;
     const screen = project.screens[0];
-    port.current?.postMessage({ type: 'render', title: screen.title, text: screen.button.text, color: screen.button.color, value: state.count ?? 0 });
+    port.current?.postMessage({ type: 'render', screen, value: state.count ?? 0 });
   }
   function connect() {
     port.current?.close();
     const channel = new MessageChannel(); port.current = channel.port1;
     channel.port1.onmessage = event => {
       if (event.data?.type === 'ready') render();
-      if (event.data?.type === 'button.click') current.current.run();
+      if (event.data?.type === 'button.click' && current.current.project.screens[0].components.some(c=>c.type==='Button' && !c.props.disabled && c.events.click===event.data.eventId)) current.current.run();
     };
     channel.port1.start();
     iframe.current?.contentWindow?.postMessage('forge:init', '*', [channel.port2]);

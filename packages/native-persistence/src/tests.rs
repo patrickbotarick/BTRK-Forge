@@ -7,6 +7,118 @@ fn fixture() -> Value {
     ))
     .unwrap()
 }
+#[test]
+fn visual_v2_matches_typescript_migration_and_preserves_legacy_on_disk() {
+    let legacy = include_bytes!("../../../tests/fixtures/projects/phase0-v1.json");
+    let modern = model::parse(include_bytes!(
+        "../../../tests/fixtures/projects/visual-v2.json"
+    ))
+    .unwrap();
+    assert_eq!(model::parse(legacy).unwrap(), modern);
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join(MANIFEST);
+    fs::write(&path, legacy).unwrap();
+    let mut session = Session::open(&path).unwrap();
+    assert_eq!(session.receipt().document["schemaVersion"], 2);
+    assert_eq!(fs::read(&path).unwrap(), legacy);
+    session.save(&modern).unwrap();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&fs::read(&path).unwrap()).unwrap()["schemaVersion"],
+        2
+    );
+    assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), legacy);
+}
+#[test]
+fn visual_tree_rejects_cycles_invalid_parents_events_styles_and_global_ids() {
+    let base = fixture();
+    for (field, value) in [
+        ("parentId", serde_json::json!("missing")),
+        ("id", serde_json::json!("click")),
+    ] {
+        let mut p = base.clone();
+        p["screens"][0]["components"][0][field] = value;
+        assert!(model::encode(&p).is_err());
+    }
+    let mut p = base.clone();
+    p["screens"][0]["components"][0]["events"]["click"] = "sum".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["screens"][0]["components"][0]["style"]["background"] = "url(file:///private)".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["screens"][0]["components"][0]["html"] = "<script>".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base;
+    let button = p["screens"][0]["components"][0].clone();
+    p["screens"][0]["components"][0]["parentId"] = button["id"].clone();
+    assert!(model::encode(&p).is_err());
+}
+#[test]
+fn visual_component_count_and_depth_are_bounded() {
+    let mut p = fixture();
+    let template = p["screens"][0]["components"][0].clone();
+    let mut many = vec![];
+    for i in 0..200 {
+        let mut c = template.clone();
+        c["id"] = format!("component-{i}").into();
+        many.push(c);
+    }
+    p["screens"][0]["components"] = many.clone().into();
+    assert!(model::encode(&p).is_ok());
+    let mut extra = template.clone();
+    extra["id"] = "extra".into();
+    many.push(extra);
+    p["screens"][0]["components"] = many.into();
+    assert!(model::encode(&p).is_err());
+    let mut chain = vec![];
+    for i in 0..13 {
+        let mut c = template.clone();
+        c["id"] = format!("panel-{i}").into();
+        c["type"] = "Container".into();
+        c["props"] = serde_json::json!({"direction":"column","gap":16,"padding":24,"align":"stretch","justify":"flex-start"});
+        c["events"] = serde_json::json!({});
+        c["parentId"] = if i == 0 {
+            Value::Null
+        } else {
+            format!("panel-{}", i - 1).into()
+        };
+        chain.push(c);
+    }
+    p["screens"][0]["components"] = chain[..12].to_vec().into();
+    assert!(model::encode(&p).is_ok());
+    p["screens"][0]["components"] = chain.into();
+    assert!(model::encode(&p).is_err());
+}
+#[test]
+fn visual_tree_all_component_types_round_trip_through_real_disk() {
+    let (root, mut session) = setup();
+    let mut p = fixture();
+    let mut panel = p["screens"][0]["components"][0].clone();
+    panel["id"] = "panel".into();
+    panel["type"] = "Container".into();
+    panel["events"] = serde_json::json!({});
+    panel["props"] = serde_json::json!({"direction":"row","gap":12,"padding":20,"align":"center","justify":"space-between"});
+    let mut text = panel.clone();
+    text["id"] = "title".into();
+    text["type"] = "Text".into();
+    text["parentId"] = "panel".into();
+    text["props"] = serde_json::json!({"text":"Forge Visual Demo"});
+    let mut input = text.clone();
+    input["id"] = "input".into();
+    input["type"] = "Input".into();
+    input["props"] = serde_json::json!({"placeholder":"Nome","initialValue":"BTRK","inputType":"text","disabled":false});
+    p["screens"][0]["components"]
+        .as_array_mut()
+        .unwrap()
+        .extend([panel, text, input]);
+    session.save(&p).unwrap();
+    let path = main_path(&session);
+    drop(session);
+    let reopened = Session::open(&path).unwrap();
+    assert_eq!(reopened.receipt().document, p);
+    let copy = Session::create(root.path(), "Cópia visual", &p).unwrap();
+    assert_eq!(copy.receipt().document, p);
+}
 fn setup() -> (TempDir, Session) {
     let root = tempfile::tempdir().unwrap();
     let s = Session::create(root.path(), "Projeto São José", &fixture()).unwrap();

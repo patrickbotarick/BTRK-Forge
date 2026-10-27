@@ -1,4 +1,5 @@
 import { test as base, expect } from '@playwright/test';
+import { buildVisualDemo } from '../designer-flow';
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
@@ -108,4 +109,13 @@ test('erro de nome é localizado e o runtime não altera definição persistente
   await create(page);const saved = await disk.read();
   await page.getByRole('button', { name: 'Executar evento' }).click();await expect(page.getByRole('status')).toContainText('Evento executado');
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);expect(basename(disk.path())).toBe('project.btrk.json');
+});
+test('Design v2 preserva árvore, IDs e propriedades no filesystem Rust real',async({page,disk})=>{
+  await page.goto('/');await create(page,'Forge Visual Demo');const initial=await disk.read();await buildVisualDemo(page);await page.keyboard.press('Control+s');await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const saved=await disk.read();expect(saved.schemaVersion).toBe(2);expect(saved.id).toBe(initial.id);expect(saved.screens[0].components).toHaveLength(7);expect(saved.graph).toEqual(initial.graph);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);await page.getByRole('button',{name:'Preview',exact:true}).click();await expect(page.frameLocator('iframe').getByText('Forge Visual Demo',{exact:true})).toBeVisible();await page.screenshot({path:'artifacts/phase01b/designer-rust.png',fullPage:true});
+});
+test('abrir v1 migra apenas em memória e Salvar mantém backup dos bytes antigos',async({page,disk})=>{
+  await page.goto('/');await create(page);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();const legacy=await readFile('tests/fixtures/projects/phase0-v1.json','utf8');await writeFile(disk.path(),legacy);await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await readFile(disk.path(),'utf8')).toBe(legacy);await page.getByRole('button',{name:'Design',exact:true}).click();await expect(page.locator('.tree-select')).toHaveCount(1);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect((await disk.read()).schemaVersion).toBe(2);expect(await readFile(disk.path().replace('project.btrk.json','project.btrk.backup.json'),'utf8')).toBe(legacy);
+});
+test('salvar mantém histórico apesar da ordenação JSON do recibo Rust',async({page,disk})=>{
+  await page.goto('/');await create(page);await buildVisualDemo(page);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const saved=await disk.read();await expect(page.getByRole('button',{name:'Desfazer',exact:true})).toBeEnabled();await page.getByRole('button',{name:'Desfazer',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toContainText('Alterações não salvas');await page.getByRole('button',{name:'Refazer',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);
 });

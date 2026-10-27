@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { exampleProject } from '../packages/forge-core/example';
 import { canConnect, execute, validateProject } from '../packages/blueprint-core';
 import { deserialize, parseProject, serialize } from '../packages/project-schema';
@@ -20,11 +21,11 @@ describe('Modelo independente e runtime', () => {
     expect(execute(deserialize(serialize(p))).state.count).toBe(1);
   });
   it('migra v0 sem modificar a entrada', () => {
-    const legacy = { ...exampleProject(), schemaVersion: 0, functions: undefined };
-    expect(parseProject(legacy).schemaVersion).toBe(1); expect(legacy.schemaVersion).toBe(0);
+    const legacy = JSON.parse(readFileSync('tests/fixtures/projects/phase0-v0.json','utf8'));
+    expect(parseProject(legacy).schemaVersion).toBe(2); expect(legacy.schemaVersion).toBe(0);
   });
   it('recusa esquema futuro, JSON inválido e arquivos excessivos', () => {
-    expect(() => parseProject({ ...exampleProject(), schemaVersion: 2 })).toThrow();
+    expect(() => parseProject({ ...exampleProject(), schemaVersion: 99 })).toThrow();
     expect(() => deserialize('{')).toThrow();
     expect(() => deserialize(' '.repeat(2_000_001))).toThrow(/2 MB/);
   });
@@ -89,6 +90,7 @@ describe('Modelo independente e runtime', () => {
       { id: 'flow', source: 'event', output: 'next', target: 'write', input: 'in' },
       { id: 'data', source: 'literal', output: 'value', target: 'write', input: 'value' }
     ];
+    const button=p.screens[0].components.find(c=>c.type==='Button')!; if(button.type==='Button')button.events.click='event';
     expect(execute(p).state.result).toBe(value);
   });
   it('interrompe DAG válido com custo excessivo de avaliação', () => {
