@@ -71,6 +71,7 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
     },
     syncProperties(next: Project) { project.screens = structuredClone(next.screens); },
     fit: () => AreaExtensions.zoomAt(area, editor.getNodes()),
+    reveal: async (id: string) => { const node = editor.getNodes().find(n => n.id === id); if (node) { await AreaExtensions.zoomAt(area, [node], { scale: 0.8 }); container.dataset.revealedNodeId = id; } },
     destroy: () => area.destroy()
   };
 }

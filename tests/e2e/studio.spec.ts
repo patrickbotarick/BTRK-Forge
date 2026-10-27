@@ -75,8 +75,9 @@ test('JSON inválido não substitui modelo, salvamento e abertura', async ({ pag
   await expect(page.getByTestId('node')).toHaveCount(8);
   await page.locator('input[type=file]').setInputFiles('artifacts/project.btrk.json');
   await expect(page.getByRole('status')).toHaveText('Projeto validado e carregado');
-  await page.getByRole('button', { name: 'Modelo JSON' }).click();
-  await expect(page.locator('.monaco-editor').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Código', exact: true }).click();
+  await page.getByRole('tab', { name: 'Modelo JSON', exact: true }).click();
+  await expect(page.locator('.json-view .monaco-editor').first()).toBeVisible();
   expect(errors).toEqual([]);
 });
 test('rascunho corrompido é preservado até recuperação explícita', async ({ page }) => {

@@ -19,7 +19,8 @@ test('Studio de produção respeita CSP, preview e Monaco', async ({ page, conte
   await page.frameLocator('iframe').getByRole('button', { name: 'Forjar +1' }).click();
   await expect(page.frameLocator('iframe').getByLabel('Estado')).toHaveText('2');
   await context.setOffline(false);
-  await page.getByRole('button', { name: 'Modelo JSON' }).click();
-  await expect(page.locator('.monaco-editor').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Código', exact: true }).click();
+  await page.getByRole('tab', { name: 'Modelo JSON', exact: true }).click();
+  await expect(page.locator('.json-view .monaco-editor').first()).toBeVisible();
   expect(errors).toEqual([]);
 });
