@@ -24,7 +24,11 @@ Blueprint Engine entregue em `codex/phase-01c-blueprint-engine`, a partir da mai
 
 O responsável aprovou a subetapa 1D-A no commit 75473dc907fecb47568540fe38f435a4fc22dd7b e autorizou seu encerramento e integração por fast-forward à main, preservando a branch de desenvolvimento. A IR v1 tipada, imutável e transitória cobre os 11 nodes, portas, eventos, bindings, fluxo, origens e diagnósticos; distingue documentos editáveis/executáveis, define interfaces futuras do runtime e inclui fixtures com resultados manuais independentes. O documento schema v3 continua sendo a fonte oficial. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01D_A.md), [contrato](BLUEPRINT_IR.md), [relatório de candidatura](phases/RELATORIO_FASE_01D_A.md) e [QA anterior](qa/VALIDACAO_FASE_01D_A.md). A revalidação do encerramento repetiu 118 testes aprovados, zero falhas e zero ignorados, sem alterações funcionais. A homologação Windows anterior permanece histórica; não foi repetido smoke Tauri nesta operação. As cinco ressalvas herdadas permanecem abertas.
 
-A 1D-B não foi iniciada: geração TypeScript, implementação compartilhada de operações e testes diferenciais exigem nova aprovação. Integração Monaco somente leitura e diagnóstico ampliado continuam posteriores. Exportador geral, acessibilidade/escala, RustSec e instalação limpa não foram implementados por esta subetapa.
+## Fase 1D-B — implementada e candidata à revisão
+
+Após autorização específica, implementados gerador AST TypeScript para os 11 nodes, runtime básico, revisão determinística e mapa de origens. O código tem controle próprio e passa por typecheck/compilação reais, sem delegar ao interpretador. Diferenciais em processo controlado, fixtures independentes, oito seeds reproduzíveis e quatro mutações verificam os contratos. Regressão: 160 testes aprovados, zero falhas finais e zero ignorados. [Contrato](CODEGEN_TYPESCRIPT.md), [relatório](phases/RELATORIO_FASE_01D_B.md) e [QA](qa/VALIDACAO_FASE_01D_B.md). Estado: candidata à revisão, sem encerramento oficial ou merge à main; cinco ressalvas herdadas abertas. O harness não é uma sandbox para código hostil.
+
+A 1D-C não foi iniciada. Integração Monaco somente leitura e navegação por trechos dependem de nova aprovação; código gerado não executa no Preview. Diagnóstico avançado, exportador geral, acessibilidade/escala, RustSec e instalação limpa continuam separados.
 
 ## Fase 1 proposta — primeira fatia funcional
 

@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-27",
+  "branch": "codex/phase-01d-b-typescript-codegen",
+  "base": "e56e716ea639ceb7c1bfdc2014c21cc476e9734c",
+  "status": "implemented-review-candidate",
+  "recommendation": "GO COM RESSALVAS",
+  "tests": {
+    "typescript": 107,
+    "rustPersistence": 26,
+    "rustHost": 1,
+    "webE2E": 14,
+    "nativeIntegration": 9,
+    "production": 3,
+    "totalPassed": 160,
+    "failed": 0,
+    "skipped": 0
+  },
+  "codegen": {
+    "irVersion": 1,
+    "generatorVersion": 1,
+    "runtimeVersion": 1,
+    "sharedModuleForEventSequence": true,
+    "seedCorpus": [
+      1,
+      2,
+      42,
+      4096,
+      65535,
+      1793047,
+      3735928559,
+      4294967295
+    ],
+    "mutationDetections": [
+      "subtract",
+      "skip-write",
+      "choose-no",
+      "skip-visit"
+    ],
+    "negativeTypecheckRejected": true,
+    "exampleRevision": "526c1848d4c42993fc802e6730eb0b044d43152dc00e85fd8c194e39f1b15c0a",
+    "exampleSha256": "b7f09060680d5447a520ce0d7b989fda01e503f759f2099a430a81fd89161e4d"
+  },
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "cargoCheck": "passed",
+    "cargoFmt": "passed",
+    "webBuild": "passed",
+    "historicalWebExport": "passed",
+    "windowsBuild": "passed",
+    "securityScanner": "passed-zero-findings",
+    "npmAudit": "passed-zero-vulnerabilities",
+    "gitFsck": "passed-dangling-objects-only"
+  },
+  "windows": {
+    "target": "artifacts/phase01d-b-20261027/windows-target",
+    "exeSha256": "b296b302a364dbff3635484f33ec8ded15b893e105e648519adb1b14ebb50ef0",
+    "nsisSha256": "ca0388a417daa7f1d0984a8dc132db714ea374a29dd7bd5ac9da9e075bd46c4e",
+    "newNativeWindowSmoke": false,
+    "cleanInstallation": false
+  },
+  "phase1DCStarted": false,
+  "sourceEvidenceLFCheckoutVerified": true,
+  "implementationCommits": [
+    "8123fe521b9ddde4f1d87afffbc2c4d57adac907",
+    "82cfca4cee08154122778f059e880a6da390ab42",
+    "fd95f89e6e736e7d24c093fd246df8d581dd73d1"
+  ]
+}
