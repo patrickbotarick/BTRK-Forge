@@ -3,15 +3,15 @@ import { AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import { ConnectionPlugin, Presets as ConnectionPresets } from 'rete-connection-plugin';
 import { ReactPlugin, Presets, type ReactArea2D } from 'rete-react-plugin';
 import { createRoot } from 'react-dom/client';
-import { canConnect, ports, type PortType } from '../../../packages/blueprint-core';
+import { canConnect, ports, nodeLabels, type PortType } from '../../../packages/blueprint-core';
 import type { Project, GraphNode, Connection } from '../../../packages/project-schema';
 
 type Node = ClassicPreset.Node;
 type Edge = ClassicPreset.Connection<Node, Node>;
 type Schemes = GetSchemes<Node, Edge>;
 type Extra = ReactArea2D<Schemes>;
-const labels: Record<GraphNode['kind'], string> = { event: 'Evento · clique', constant: 'Constante', variable: 'Variável', add: 'Somar', greater: 'Maior que', condition: 'Condição', set: 'Ação · definir' };
-export async function createEditor(container: HTMLElement, initial: Project, onChange: (project: Project) => void, onError: (error: string) => void) {
+const labels: Record<GraphNode['kind'], string> = { ...nodeLabels,event: 'Evento · clique', variable: 'Variável',set: 'Ação · definir' };
+export async function createEditor(container: HTMLElement, initial: Project, onChange: (project: Project) => void, onError: (error: string) => void,onSelect:(id:string)=>void=()=>{}) {
   const project = structuredClone(initial); let ready = false;
   const editor = new NodeEditor<Schemes>();
   const area = new AreaPlugin<Schemes, Extra>(container);
@@ -50,6 +50,7 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
     return context;
   });
   area.addPipe(context => {
+    if(context.type==='nodepicked')onSelect(context.data.id);
     if (ready && context.type === 'nodetranslated') {
       const node = project.graph.nodes.find(n => n.id === context.data.id);
       if (node) { node.position = context.data.position; publish(); }
@@ -63,6 +64,7 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
   ready = true;
   await AreaExtensions.zoomAt(area, editor.getNodes());
   return {
+    mark(selected:string|null,executed:string[],invalid:string[]){for(const [id,view] of area.nodeViews){view.element.dataset.graphNodeId=id;view.element.style.outline=invalid.includes(id)?'2px solid #FF6868':selected===id?'2px solid #FF934F':executed.includes(id)?'2px solid #49C9B5':'';}},
     async addConstant() {
       const node: GraphNode = { id: `node-${crypto.randomUUID()}`, kind: 'constant', value: 1, position: { x: 500, y: 650 } };
       project.graph.nodes.push(node); await editor.addNode(visual(node)); await area.translate(node.id, node.position); publish();

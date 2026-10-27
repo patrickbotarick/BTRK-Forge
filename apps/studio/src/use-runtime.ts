@@ -1,0 +1,19 @@
+import { useEffect,useRef,useState } from 'react';
+import { initialRuntime,runtimeEventSchema,runtimeReplySchema,type RuntimeEvent,type RuntimeState } from '../../../packages/blueprint-core';
+import { serialize,type Project } from '../../../packages/project-schema';
+export function useRuntime(project:Project,status:(message:string)=>void,sessionKey='web'){
+  const [runtime,setRuntime]=useState<RuntimeState>(()=>initialRuntime(project));const runtimeRef=useRef(runtime);
+  const [trace,setTrace]=useState<string[]>([]);const [executed,setExecuted]=useState<string[]>([]);const [event,setEvent]=useState<RuntimeEvent|null>(null);const [errorNode,setErrorNode]=useState<string|null>(null);const [busy,setBusy]=useState(false);const [epoch,setEpoch]=useState(0);
+  const worker=useRef<Worker|null>(null);const queue=useRef<RuntimeEvent[]>([]);const pending=useRef<number|null>(null);const requestId=useRef(0);const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const pump=useRef<()=>void>(()=>{});const latest=useRef({project,status});latest.current={project,status};
+  const key=serialize({...project,metadata:undefined});
+  pump.current=()=>{if(pending.current!==null||!worker.current||!queue.current.length)return;const next=queue.current.shift()!;const id=++requestId.current;pending.current=id;setBusy(true);setEvent(next);setErrorNode(null);worker.current.postMessage({requestId:id,project:latest.current.project,runtime:runtimeRef.current,event:next});timer.current=setTimeout(()=>{worker.current?.terminate();queue.current=[];pending.current=null;setBusy(false);setEpoch(v=>v+1);latest.current.status('Execução interrompida após 2 segundos; estado reiniciado');},2000);};
+  useEffect(()=>{const instance=new Worker(new URL('../../../packages/preview-runtime/execution.worker.ts',import.meta.url),{type:'module'});worker.current=instance;queue.current=[];pending.current=null;const fresh=initialRuntime(latest.current.project);runtimeRef.current=fresh;setRuntime(fresh);setTrace([]);setExecuted([]);setEvent(null);setErrorNode(null);setBusy(false);
+    instance.onmessage=message=>{const parsed=runtimeReplySchema.safeParse(message.data);if(!parsed.success){if(timer.current)clearTimeout(timer.current);setBusy(false);queue.current=[];pending.current=null;latest.current.status('Resposta inválida do processo de execução');return;}const reply=parsed.data;if(reply.requestId!==pending.current)return;if(timer.current)clearTimeout(timer.current);pending.current=null;setBusy(false);setTrace(reply.trace);if(reply.runtime){runtimeRef.current=reply.runtime;if(!queue.current.length)setRuntime(reply.runtime);}if(reply.ok){setExecuted(reply.executedNodes);latest.current.status('Evento executado · estado atualizado');}else{setExecuted(reply.trace);setErrorNode(reply.nodeId);latest.current.status(`Erro${reply.nodeId?' no node '+reply.nodeId:''}: ${reply.error}`);}pump.current();};
+    instance.onerror=()=>{if(timer.current)clearTimeout(timer.current);queue.current=[];pending.current=null;setBusy(false);latest.current.status('Erro no processo de execução; reinicie o estado');};
+    return()=>{instance.terminate();if(timer.current)clearTimeout(timer.current);worker.current=null;queue.current=[];pending.current=null;};
+  },[key,epoch,sessionKey]);
+  function dispatch(input:unknown){const result=runtimeEventSchema.safeParse(input);if(!result.success){latest.current.status('Erro: evento de Preview inválido');return;}if(queue.current.length>=32){latest.current.status('Erro: fila de eventos excede 32; novo evento recusado');return;}queue.current.push(result.data);pump.current();}
+  function reset(){setEpoch(v=>v+1);latest.current.status('Estado runtime reiniciado');}
+  function interrupt(){setEpoch(v=>v+1);latest.current.status('Execução interrompida; fila e estado reiniciados');}
+  return {runtime,trace,executed,event,errorNode,busy,dispatch,reset,interrupt};
+}

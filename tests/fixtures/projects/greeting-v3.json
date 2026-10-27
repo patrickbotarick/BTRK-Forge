@@ -1,0 +1,325 @@
+{
+  "id": "counter-project",
+  "name": "Forge Logic Demo",
+  "version": "0.1.0",
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "id": "screen-main",
+      "title": "Da ideia ao aplicativo.",
+      "components": [
+        {
+          "id": "button-count",
+          "parentId": null,
+          "style": {
+            "width": "auto",
+            "height": "auto",
+            "background": "#FF934F",
+            "color": "#111820",
+            "borderColor": "#344454",
+            "borderWidth": 0,
+            "borderRadius": 4,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "textAlign": "left"
+          },
+          "type": "Button",
+          "props": {
+            "text": "Confirmar",
+            "disabled": false
+          },
+          "events": {
+            "click": "click"
+          }
+        },
+        {
+          "id": "name-input",
+          "parentId": null,
+          "style": {
+            "width": "auto",
+            "height": "auto",
+            "background": "#111820",
+            "color": "#F0F4F6",
+            "borderColor": "#344454",
+            "borderWidth": 1,
+            "borderRadius": 4,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "textAlign": "left"
+          },
+          "type": "Input",
+          "props": {
+            "placeholder": "Digite aqui",
+            "initialValue": "",
+            "inputType": "text",
+            "disabled": false,
+            "binding": "name"
+          },
+          "events": {
+            "change": "change"
+          }
+        },
+        {
+          "id": "result-text",
+          "parentId": null,
+          "style": {
+            "width": "auto",
+            "height": "auto",
+            "background": "transparent",
+            "color": "#F0F4F6",
+            "borderColor": "#344454",
+            "borderWidth": 0,
+            "borderRadius": 4,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "textAlign": "left"
+          },
+          "type": "Text",
+          "props": {
+            "text": "Resultado"
+          },
+          "events": {}
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "id": "count",
+      "name": "Contador",
+      "type": "number",
+      "initial": 0
+    },
+    {
+      "id": "name",
+      "name": "Nome",
+      "type": "string",
+      "initial": ""
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "click",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "kind": "event",
+        "event": "button.click",
+        "componentId": "button-count"
+      },
+      {
+        "id": "change",
+        "position": {
+          "x": 0,
+          "y": 250
+        },
+        "kind": "event",
+        "event": "input.change",
+        "componentId": "name-input"
+      },
+      {
+        "id": "read",
+        "position": {
+          "x": 0,
+          "y": 500
+        },
+        "kind": "component-value",
+        "componentId": "name-input",
+        "property": "value"
+      },
+      {
+        "id": "empty",
+        "position": {
+          "x": 300,
+          "y": 400
+        },
+        "kind": "empty"
+      },
+      {
+        "id": "branch",
+        "position": {
+          "x": 600,
+          "y": 0
+        },
+        "kind": "condition"
+      },
+      {
+        "id": "prompt",
+        "position": {
+          "x": 600,
+          "y": 300
+        },
+        "kind": "constant",
+        "value": "Digite seu nome"
+      },
+      {
+        "id": "prefix",
+        "position": {
+          "x": 300,
+          "y": 600
+        },
+        "kind": "constant",
+        "value": "Olá, "
+      },
+      {
+        "id": "suffix",
+        "position": {
+          "x": 600,
+          "y": 600
+        },
+        "kind": "constant",
+        "value": "!"
+      },
+      {
+        "id": "concat",
+        "position": {
+          "x": 600,
+          "y": 850
+        },
+        "kind": "concat"
+      },
+      {
+        "id": "greeting",
+        "position": {
+          "x": 900,
+          "y": 600
+        },
+        "kind": "concat"
+      },
+      {
+        "id": "yes",
+        "position": {
+          "x": 900,
+          "y": 0
+        },
+        "kind": "set-text",
+        "componentId": "result-text"
+      },
+      {
+        "id": "no",
+        "position": {
+          "x": 1200,
+          "y": 0
+        },
+        "kind": "set-text",
+        "componentId": "result-text"
+      },
+      {
+        "id": "typing",
+        "position": {
+          "x": 300,
+          "y": 200
+        },
+        "kind": "set-text",
+        "componentId": "result-text"
+      }
+    ],
+    "connections": [
+      {
+        "id": "logic-edge-0",
+        "source": "click",
+        "output": "next",
+        "target": "branch",
+        "input": "in"
+      },
+      {
+        "id": "logic-edge-1",
+        "source": "read",
+        "output": "value",
+        "target": "empty",
+        "input": "value"
+      },
+      {
+        "id": "logic-edge-2",
+        "source": "empty",
+        "output": "value",
+        "target": "branch",
+        "input": "test"
+      },
+      {
+        "id": "logic-edge-3",
+        "source": "branch",
+        "output": "yes",
+        "target": "yes",
+        "input": "in"
+      },
+      {
+        "id": "logic-edge-4",
+        "source": "branch",
+        "output": "no",
+        "target": "no",
+        "input": "in"
+      },
+      {
+        "id": "logic-edge-5",
+        "source": "prompt",
+        "output": "value",
+        "target": "yes",
+        "input": "value"
+      },
+      {
+        "id": "logic-edge-6",
+        "source": "prefix",
+        "output": "value",
+        "target": "concat",
+        "input": "a"
+      },
+      {
+        "id": "logic-edge-7",
+        "source": "read",
+        "output": "value",
+        "target": "concat",
+        "input": "b"
+      },
+      {
+        "id": "logic-edge-8",
+        "source": "concat",
+        "output": "value",
+        "target": "greeting",
+        "input": "a"
+      },
+      {
+        "id": "logic-edge-9",
+        "source": "suffix",
+        "output": "value",
+        "target": "greeting",
+        "input": "b"
+      },
+      {
+        "id": "logic-edge-10",
+        "source": "greeting",
+        "output": "value",
+        "target": "no",
+        "input": "value"
+      },
+      {
+        "id": "logic-edge-11",
+        "source": "change",
+        "output": "next",
+        "target": "typing",
+        "input": "in"
+      },
+      {
+        "id": "logic-edge-12",
+        "source": "read",
+        "output": "value",
+        "target": "typing",
+        "input": "value"
+      }
+    ]
+  },
+  "functions": [],
+  "resources": [],
+  "dependencies": [],
+  "permissions": {
+    "web": [],
+    "windows": []
+  },
+  "distribution": {
+    "appId": "studio.btrk.counter",
+    "version": "0.1.0",
+    "channel": "beta"
+  }
+}

@@ -1,0 +1,3 @@
+import {test,expect} from '@playwright/test';
+import {buildLogicDemo,verifyLogicDemo} from '../logic-flow';
+test('Blueprint v3 de produção executa com CSP e permanece isolado',async({page})=>{test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/studio/');await buildLogicDemo(page);await verifyLogicDemo(page);const preview=page.frames().find(f=>f.url()==='about:srcdoc')!;expect(await preview.evaluate(()=>({native:'__TAURI_INTERNALS__' in window,script:document.querySelectorAll('script').length}))).toEqual({native:false,script:1});expect(errors).toEqual([]);});

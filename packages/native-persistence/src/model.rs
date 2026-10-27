@@ -21,6 +21,15 @@ static LEGACY_SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
         .build(&schema)
         .expect("schema legado válido")
 });
+static V2_SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
+    let schema: Value =
+        serde_json::from_str(include_str!("../../project-schema/project-v2.schema.json"))
+            .expect("schema v2");
+    jsonschema::options()
+        .should_validate_formats(true)
+        .build(&schema)
+        .expect("schema v2 válido")
+});
 
 pub fn parse(bytes: &[u8]) -> Result<Value> {
     if bytes.len() > MAX_BYTES {
@@ -41,7 +50,7 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
             document["functions"] = Value::Array(vec![]);
         }
     }
-    if document["schemaVersion"].as_f64().is_some_and(|v| v > 2.0)
+    if document["schemaVersion"].as_f64().is_some_and(|v| v > 3.0)
         || document["metadata"]["documentVersion"]
             .as_f64()
             .is_some_and(|v| v > 1.0)
@@ -73,6 +82,33 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
         }
         document["schemaVersion"] = 2.into();
     }
+    if document["schemaVersion"] == 2 {
+        V2_SCHEMA
+            .validate(&document)
+            .map_err(|_| err("invalid_schema", "Documento v2 inválido."))?;
+        if document["graph"]["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|n| n["kind"] == "event")
+            .count()
+            != 1
+        {
+            return Err(err(
+                "invalid_graph",
+                "Formato legado exige exatamente um evento.",
+            ));
+        }
+        for screen in document["screens"].as_array_mut().unwrap() {
+            for c in screen["components"].as_array_mut().unwrap() {
+                if c["type"] == "Input" {
+                    c["props"]["binding"] = Value::Null;
+                    c["events"] = serde_json::json!({"change":null});
+                }
+            }
+        }
+        document["schemaVersion"] = 3.into();
+    }
     SCHEMA.validate(&document).map_err(|_| {
         err(
             "invalid_schema",
@@ -100,7 +136,7 @@ fn scalar_type(value: &Value) -> &'static str {
     }
 }
 type Ports = (HashMap<String, String>, HashMap<String, String>);
-fn ports(node: &Value, variables: &HashMap<String, String>) -> Result<Ports> {
+fn ports(node: &Value, variables: &HashMap<String, String>, components: &[Value]) -> Result<Ports> {
     let list = |entries: &[(&str, &str)]| {
         entries
             .iter()
@@ -113,8 +149,31 @@ fn ports(node: &Value, variables: &HashMap<String, String>) -> Result<Ports> {
             .cloned()
             .ok_or_else(|| err("invalid_reference", "Uma variável referenciada não existe."))
     };
+    let component_ref = || {
+        components
+            .iter()
+            .find(|c| c["id"] == node["componentId"])
+            .ok_or_else(|| err("invalid_reference", "Componente referenciado ausente."))
+    };
     Ok(match node["kind"].as_str().unwrap() {
-        "event" => (list(&[]), list(&[("next", "exec")])),
+        "event" => {
+            if !node["componentId"].is_null() {
+                let expected = if node["event"] == "button.click" {
+                    "Button"
+                } else {
+                    "Input"
+                };
+                if component_ref()?["type"] != expected {
+                    return Err(err("invalid_type", "Tipo de evento incompatível."));
+                }
+            } else if node["event"] == "input.change" {
+                return Err(err(
+                    "invalid_reference",
+                    "Evento de Input exige componente.",
+                ));
+            }
+            (list(&[]), list(&[("next", "exec")]))
+        }
         "constant" => (list(&[]), list(&[("value", scalar_type(&node["value"]))])),
         "variable" => (list(&[]), list(&[("value", &variable_type()?)])),
         "add" => (
@@ -133,6 +192,34 @@ fn ports(node: &Value, variables: &HashMap<String, String>) -> Result<Ports> {
             list(&[("in", "exec"), ("value", &variable_type()?)]),
             list(&[("next", "exec")]),
         ),
+        "empty" => (list(&[("value", "string")]), list(&[("value", "boolean")])),
+        "concat" => (
+            list(&[("a", "string"), ("b", "string")]),
+            list(&[("value", "string")]),
+        ),
+        "component-value" => {
+            let expected = if node["property"] == "value" {
+                "Input"
+            } else {
+                "Text"
+            };
+            if component_ref()?["type"] != expected {
+                return Err(err(
+                    "invalid_type",
+                    "Propriedade de componente incompatível.",
+                ));
+            }
+            (list(&[]), list(&[("value", "string")]))
+        }
+        "set-text" => {
+            if component_ref()?["type"] != "Text" {
+                return Err(err("invalid_type", "Ação exige Text."));
+            }
+            (
+                list(&[("in", "exec"), ("value", "string")]),
+                list(&[("next", "exec")]),
+            )
+        }
         _ => return Err(err("invalid_schema", "Tipo de node não suportado.")),
     })
 }
@@ -181,13 +268,38 @@ fn validate_graph(p: &Value) -> Result<()> {
             }
             if c["type"] == "Button"
                 && !c["events"]["click"].is_null()
-                && !p["graph"]["nodes"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|n| n["id"] == c["events"]["click"] && n["kind"] == "event")
+                && !p["graph"]["nodes"].as_array().unwrap().iter().any(|n| {
+                    n["id"] == c["events"]["click"]
+                        && n["kind"] == "event"
+                        && n["event"] == "button.click"
+                        && (n["componentId"].is_null() || n["componentId"] == c["id"])
+                })
             {
                 return Err(err("invalid_reference", "Referência de evento inválida."));
+            }
+            if c["type"] == "Input" {
+                if !c["props"]["binding"].is_null()
+                    && !p["variables"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|v| v["id"] == c["props"]["binding"] && v["type"] == "string")
+                {
+                    return Err(err(
+                        "invalid_reference",
+                        "Binding de Input exige variável string existente.",
+                    ));
+                }
+                if !c["events"]["change"].is_null()
+                    && !p["graph"]["nodes"].as_array().unwrap().iter().any(|n| {
+                        n["id"] == c["events"]["change"]
+                            && n["kind"] == "event"
+                            && n["event"] == "input.change"
+                            && n["componentId"] == c["id"]
+                    })
+                {
+                    return Err(err("invalid_reference", "Referência de evento inválida."));
+                }
             }
         }
     }
@@ -211,13 +323,17 @@ fn validate_graph(p: &Value) -> Result<()> {
         if node["kind"] == "event" {
             events += 1;
         }
-        definitions.insert(id, ports(node, &variables)?);
+        definitions.insert(
+            id,
+            ports(
+                node,
+                &variables,
+                p["screens"][0]["components"].as_array().unwrap(),
+            )?,
+        );
     }
-    if events != 1 {
-        return Err(err(
-            "invalid_graph",
-            "O grafo precisa de exatamente um node de evento.",
-        ));
+    if !(1..=32).contains(&events) {
+        return Err(err("invalid_graph", "O grafo exige de 1 a 32 eventos."));
     }
     let mut inputs = HashSet::new();
     let mut control_outputs = HashSet::new();

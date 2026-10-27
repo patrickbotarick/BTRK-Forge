@@ -1,0 +1,189 @@
+{
+  "id": "counter-project",
+  "name": "Contador da fundição",
+  "version": "0.1.0",
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "id": "screen-main",
+      "title": "Da ideia ao aplicativo.",
+      "components": [
+        {
+          "id": "button-count",
+          "parentId": null,
+          "style": {
+            "width": "auto",
+            "height": "auto",
+            "background": "#FF934F",
+            "color": "#111820",
+            "borderColor": "#344454",
+            "borderWidth": 0,
+            "borderRadius": 4,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "textAlign": "left"
+          },
+          "type": "Button",
+          "props": {
+            "text": "Forjar +1",
+            "disabled": false
+          },
+          "events": {
+            "click": "click"
+          }
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "id": "count",
+      "name": "Contador",
+      "type": "number",
+      "initial": 0
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "click",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "kind": "event",
+        "event": "button.click"
+      },
+      {
+        "id": "counter",
+        "position": {
+          "x": 0,
+          "y": 200
+        },
+        "kind": "variable",
+        "variableId": "count"
+      },
+      {
+        "id": "one",
+        "position": {
+          "x": 0,
+          "y": 400
+        },
+        "kind": "constant",
+        "value": 1
+      },
+      {
+        "id": "sum",
+        "position": {
+          "x": 300,
+          "y": 200
+        },
+        "kind": "add"
+      },
+      {
+        "id": "zero",
+        "position": {
+          "x": 300,
+          "y": 440
+        },
+        "kind": "constant",
+        "value": 0
+      },
+      {
+        "id": "positive",
+        "position": {
+          "x": 600,
+          "y": 240
+        },
+        "kind": "greater"
+      },
+      {
+        "id": "branch",
+        "position": {
+          "x": 900,
+          "y": 0
+        },
+        "kind": "condition"
+      },
+      {
+        "id": "assign",
+        "position": {
+          "x": 1200,
+          "y": 0
+        },
+        "kind": "set",
+        "variableId": "count"
+      }
+    ],
+    "connections": [
+      {
+        "id": "edge-1",
+        "source": "click",
+        "output": "next",
+        "target": "branch",
+        "input": "in"
+      },
+      {
+        "id": "edge-2",
+        "source": "counter",
+        "output": "value",
+        "target": "sum",
+        "input": "a"
+      },
+      {
+        "id": "edge-3",
+        "source": "one",
+        "output": "value",
+        "target": "sum",
+        "input": "b"
+      },
+      {
+        "id": "edge-4",
+        "source": "sum",
+        "output": "value",
+        "target": "positive",
+        "input": "a"
+      },
+      {
+        "id": "edge-5",
+        "source": "zero",
+        "output": "value",
+        "target": "positive",
+        "input": "b"
+      },
+      {
+        "id": "edge-6",
+        "source": "positive",
+        "output": "value",
+        "target": "branch",
+        "input": "test"
+      },
+      {
+        "id": "edge-7",
+        "source": "branch",
+        "output": "yes",
+        "target": "assign",
+        "input": "in"
+      },
+      {
+        "id": "edge-8",
+        "source": "sum",
+        "output": "value",
+        "target": "assign",
+        "input": "value"
+      }
+    ]
+  },
+  "functions": [],
+  "resources": [],
+  "dependencies": [],
+  "permissions": {
+    "web": [],
+    "windows": []
+  },
+  "distribution": {
+    "appId": "studio.btrk.counter",
+    "version": "0.1.0",
+    "channel": "beta"
+  }
+}

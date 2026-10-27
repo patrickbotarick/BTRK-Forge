@@ -22,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'sha256-21synqQLfEAj3LPgivHrs7C2GOzRi/b3CpFXY3onFPM='; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' about:; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'none'",
+      "csp": "default-src 'self'; script-src 'self' 'sha256-EwHVdb766IIreFKhnBJcXxy8jDTnhHpJGQ106JktwTo='; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' about:; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'none'",
       "capabilities": [
         "project-workspace"
       ]

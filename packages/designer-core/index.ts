@@ -25,7 +25,7 @@ export function editProject(project:Project, edit:Edit):{project:Project;selecte
     if(edit.kind==='duplicate'||edit.kind==='remove'){
       const group=new Set([target.id]);let changed=true;while(changed){changed=false;for(const c of list)if(c.parentId&&group.has(c.parentId)&&!group.has(c.id)){group.add(c.id);changed=true;}}
       if(edit.kind==='remove'){next.screens[0].components=list.filter(c=>!group.has(c.id));selectedId=null;}
-      else {const mapping=new Map([...group].map(id=>[id,fresh()]));const copies=list.filter(c=>group.has(c.id)).map(c=>({...structuredClone(c),id:mapping.get(c.id)!,parentId:c.parentId&&mapping.has(c.parentId)?mapping.get(c.parentId)!:c.parentId}));list.splice(list.indexOf(target)+1,0,...copies);selectedId=mapping.get(target.id)!;}
+      else {const mapping=new Map([...group].map(id=>[id,fresh()]));const copies=list.filter(c=>group.has(c.id)).map(c=>{const copy={...structuredClone(c),id:mapping.get(c.id)!,parentId:c.parentId&&mapping.has(c.parentId)?mapping.get(c.parentId)!:c.parentId};if(copy.type==='Button'&&next.graph.nodes.some(n=>n.id===copy.events.click&&n.kind==='event'&&n.componentId))copy.events.click=null;if(copy.type==='Input')copy.events.change=null;return copy;});list.splice(list.indexOf(target)+1,0,...copies);selectedId=mapping.get(target.id)!;}
     }
   }
   validateProject(next,{allowIncomplete:true});return {project:next,selectedId};
@@ -33,7 +33,7 @@ export function editProject(project:Project, edit:Edit):{project:Project;selecte
 export class EditHistory {
   private past:Project[]=[];private future:Project[]=[];
   get canUndo(){return this.past.length>0;}get canRedo(){return this.future.length>0;}
-  record(before:Project,after:Project){if(JSON.stringify(before)===JSON.stringify(after))return;this.past.push(structuredClone(before));this.past=this.past.slice(-100);this.future=[];}
+  record(before:Project,after:Project){validateProject(before,{allowIncomplete:true});validateProject(after,{allowIncomplete:true});if(JSON.stringify(before)===JSON.stringify(after))return;this.past.push(structuredClone(before));this.past=this.past.slice(-100);this.future=[];}
   undo(current:Project){const p=this.past.pop();if(!p)return current;this.future.push(structuredClone(current));if(current.metadata)p.metadata=structuredClone(current.metadata);return p;}
   redo(current:Project){const p=this.future.pop();if(!p)return current;this.past.push(structuredClone(current));if(current.metadata)p.metadata=structuredClone(current.metadata);return p;}
 }

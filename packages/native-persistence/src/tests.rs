@@ -19,12 +19,12 @@ fn visual_v2_matches_typescript_migration_and_preserves_legacy_on_disk() {
     let path = root.path().join(MANIFEST);
     fs::write(&path, legacy).unwrap();
     let mut session = Session::open(&path).unwrap();
-    assert_eq!(session.receipt().document["schemaVersion"], 2);
+    assert_eq!(session.receipt().document["schemaVersion"], 3);
     assert_eq!(fs::read(&path).unwrap(), legacy);
     session.save(&modern).unwrap();
     assert_eq!(
         serde_json::from_slice::<Value>(&fs::read(&path).unwrap()).unwrap()["schemaVersion"],
-        2
+        3
     );
     assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), legacy);
 }
@@ -106,7 +106,8 @@ fn visual_tree_all_component_types_round_trip_through_real_disk() {
     let mut input = text.clone();
     input["id"] = "input".into();
     input["type"] = "Input".into();
-    input["props"] = serde_json::json!({"placeholder":"Nome","initialValue":"BTRK","inputType":"text","disabled":false});
+    input["props"] = serde_json::json!({"placeholder":"Nome","initialValue":"BTRK","inputType":"text","disabled":false,"binding":null});
+    input["events"] = serde_json::json!({"change":null});
     p["screens"][0]["components"]
         .as_array_mut()
         .unwrap()
@@ -489,4 +490,80 @@ fn rejects_real_junction_and_hardlinked_manifest() {
             .code,
         "unsafe_path"
     );
+}
+#[test]
+fn logic_v3_roundtrip_events_bindings_and_backup_on_disk() {
+    let p = model::parse(include_bytes!(
+        "../../../tests/fixtures/projects/greeting-v3.json"
+    ))
+    .unwrap();
+    let (root, mut session) = setup();
+    session.save(&p).unwrap();
+    let path = main_path(&session);
+    drop(session);
+    let reopened = Session::open(&path).unwrap();
+    assert_eq!(reopened.receipt().document, p);
+    assert_eq!(
+        p["screens"][0]["components"][1]["events"]["change"],
+        "change"
+    );
+    assert!(root.path().join("Projeto São José").join(BACKUP).exists());
+}
+#[test]
+fn logic_v3_rejects_bad_types_events_references_bindings_and_scripts() {
+    let base = model::parse(include_bytes!(
+        "../../../tests/fixtures/projects/greeting-v3.json"
+    ))
+    .unwrap();
+    let mut p = base.clone();
+    p["screens"][0]["components"][1]["props"]["binding"] = "count".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["graph"]["nodes"][0]["componentId"] = "name-input".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["graph"]["nodes"][2]["property"] = "text".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["graph"]["nodes"][2]["componentId"] = "missing".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["graph"]["connections"][2]["source"] = "prefix".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base.clone();
+    p["graph"]["nodes"][0]["script"] = "eval('bad')".into();
+    assert!(model::encode(&p).is_err());
+    let mut p = base;
+    p["schemaVersion"] = 4.into();
+    assert!(model::encode(&p).is_err());
+}
+#[test]
+fn input_v2_migrates_without_writing_and_backup_keeps_original() {
+    let mut p: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/projects/greeting-v3.json"
+    ))
+    .unwrap();
+    let legacy: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/projects/visual-v2.json"
+    ))
+    .unwrap();
+    let mut input = p["screens"][0]["components"][1].clone();
+    input["props"].as_object_mut().unwrap().remove("binding");
+    input["events"] = serde_json::json!({});
+    p = legacy;
+    p["screens"][0]["components"]
+        .as_array_mut()
+        .unwrap()
+        .push(input);
+    let bytes = serde_json::to_vec_pretty(&p).unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join(MANIFEST);
+    fs::write(&path, &bytes).unwrap();
+    let mut session = Session::open(&path).unwrap();
+    assert_eq!(fs::read(&path).unwrap(), bytes);
+    let modern = session.receipt().document;
+    assert_eq!(modern["schemaVersion"], 3);
+    assert!(modern["screens"][0]["components"][1]["props"]["binding"].is_null());
+    session.save(&modern).unwrap();
+    assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), bytes);
 }

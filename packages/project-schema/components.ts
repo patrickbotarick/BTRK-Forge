@@ -8,11 +8,16 @@ export const styleSchema = z.object({
   fontSize: z.number().int().min(10).max(96), fontWeight: z.enum(['400','500','600','700']), textAlign: z.enum(['left','center','right'])
 }).strict();
 const base = { id: componentId, parentId: componentId.nullable(), style: styleSchema };
-export const componentSchema = z.discriminatedUnion('type', [
+export const componentSchemaV2 = z.discriminatedUnion('type', [
   z.object({ ...base, type: z.literal('Text'), props: z.object({ text: z.string().max(1000) }).strict(), events: z.object({}).strict() }).strict(),
   z.object({ ...base, type: z.literal('Button'), props: z.object({ text: z.string().max(100), disabled: z.boolean() }).strict(), events: z.object({ click: componentId.nullable() }).strict() }).strict(),
   z.object({ ...base, type: z.literal('Input'), props: z.object({ placeholder: z.string().max(100), initialValue: z.string().max(1000), inputType: z.enum(['text','email','number']), disabled: z.boolean() }).strict(), events: z.object({}).strict() }).strict(),
   z.object({ ...base, type: z.literal('Container'), props: z.object({ direction: z.enum(['column','row']), gap: z.number().int().min(0).max(128), padding: z.number().int().min(0).max(128), align: z.enum(['stretch','flex-start','center','flex-end']), justify: z.enum(['flex-start','center','flex-end','space-between']) }).strict(), events: z.object({}).strict() }).strict()
+]);
+export const componentSchema = z.discriminatedUnion('type', [
+  componentSchemaV2.options[0], componentSchemaV2.options[1],
+  componentSchemaV2.options[2].extend({ props: componentSchemaV2.options[2].shape.props.extend({binding:componentId.nullable()}), events:z.object({change:componentId.nullable()}).strict() }),
+  componentSchemaV2.options[3]
 ]);
 export type Component = z.infer<typeof componentSchema>;
 export type ComponentStyle = z.infer<typeof styleSchema>;
@@ -23,7 +28,7 @@ export function component(type: Component['type'], id: string, parentId: string 
   switch(type) {
     case 'Text': return {id,parentId,type,style,props:{text:'Texto'},events:{}};
     case 'Button': return {id,parentId,type,style:{...style,background:'#FF934F',color:'#111820'},props:{text:'Botão',disabled:false},events:{click:null}};
-    case 'Input': return {id,parentId,type,style:{...style,background:'#111820',borderWidth:1},props:{placeholder:'Digite aqui',initialValue:'',inputType:'text',disabled:false},events:{}};
+    case 'Input': return {id,parentId,type,style:{...style,background:'#111820',borderWidth:1},props:{placeholder:'Digite aqui',initialValue:'',inputType:'text',disabled:false,binding:null},events:{change:null}};
     case 'Container': return {id,parentId,type,style:{...style,width:'fill',background:'#1E2933'},props:{direction:'column',gap:16,padding:24,align:'stretch',justify:'flex-start'},events:{}};
   }
 }

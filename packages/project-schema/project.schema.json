@@ -17,7 +17,7 @@
     },
     "schemaVersion": {
       "type": "number",
-      "const": 2
+      "const": 3
     },
     "screens": {
       "minItems": 1,
@@ -557,19 +557,46 @@
                         },
                         "disabled": {
                           "type": "boolean"
+                        },
+                        "binding": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
                         "placeholder",
                         "initialValue",
                         "inputType",
-                        "disabled"
+                        "disabled",
+                        "binding"
                       ],
                       "additionalProperties": false
                     },
                     "events": {
                       "type": "object",
-                      "properties": {},
+                      "properties": {
+                        "change": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "change"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -887,7 +914,14 @@
                   },
                   "event": {
                     "type": "string",
-                    "const": "button.click"
+                    "enum": [
+                      "button.click",
+                      "input.change"
+                    ]
+                  },
+                  "componentId": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
                   }
                 },
                 "required": [
@@ -1154,6 +1188,180 @@
                   "position",
                   "kind",
                   "variableId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "empty"
+                  }
+                },
+                "required": [
+                  "id",
+                  "position",
+                  "kind"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "concat"
+                  }
+                },
+                "required": [
+                  "id",
+                  "position",
+                  "kind"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "component-value"
+                  },
+                  "componentId": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  },
+                  "property": {
+                    "type": "string",
+                    "enum": [
+                      "value",
+                      "text"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "position",
+                  "kind",
+                  "componentId",
+                  "property"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "set-text"
+                  },
+                  "componentId": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_-]{0,79}$"
+                  }
+                },
+                "required": [
+                  "id",
+                  "position",
+                  "kind",
+                  "componentId"
                 ],
                 "additionalProperties": false
               }
