@@ -1,0 +1,33 @@
+{
+  "greetingBranches": [
+    {
+      "event": { "type": "button.click", "componentId": "button-count" },
+      "text": "Digite seu nome", "name": "", "trace": ["click", "branch", "yes"]
+    },
+    {
+      "event": { "type": "input.change", "componentId": "name-input", "value": "Ana" },
+      "text": "Ana", "name": "Ana", "trace": ["change", "typing"]
+    },
+    {
+      "event": { "type": "button.click", "componentId": "button-count" },
+      "text": "Olá, Ana!", "name": "Ana", "trace": ["click", "branch", "no"]
+    }
+  ],
+  "readAfterWrite": {
+    "event": { "type": "button.click", "componentId": "button-count" },
+    "runtime": { "variables": { "count": 2 }, "properties": {} },
+    "trace": ["click", "assign", "branch", "second"],
+    "executedNodes": ["click", "assign", "sum", "counter", "one", "branch", "positive", "zero", "second"],
+    "values": { "counter": 1, "one": 1, "sum": 2, "zero": 0, "positive": true }
+  },
+  "ingestionRollback": {
+    "event": { "type": "input.change", "componentId": "name-input", "value": "Ana" },
+    "runtime": {
+      "variables": { "count": 0, "name": "Ana" },
+      "properties": { "name-input": "Ana", "result-text": "Resultado" }
+    },
+    "trace": ["change", "typing", "explode"],
+    "nodeId": "concat",
+    "error": "Texto runtime excede 1000 caracteres"
+  }
+}
