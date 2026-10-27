@@ -1,5 +1,6 @@
 * text=auto
 *.ts text eol=lf
+*.generated.ts.txt text eol=lf
 *.tsx text eol=lf
 *.js text eol=lf
 *.json text eol=lf

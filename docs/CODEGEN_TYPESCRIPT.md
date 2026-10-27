@@ -84,6 +84,7 @@ O harness chama eventos sequencialmente, entregando o estado retornado ao seguin
 - start/end: offsets em unidades UTF-16, base zero, intervalo [start,end).
 - Linhas e colunas: base um, também em unidades UTF-16; fim exclusivo.
 - Quebra de linha emitida: LF. Literais podem conter escapes; posições se referem ao código efetivamente impresso, não ao texto desescapado do projeto.
+- A amostra versionada *.generated.ts.txt tem LF fixado em .gitattributes para não invalidar offsets/hashes em checkouts Windows com autocrlf.
 - nodeRanges[nodeId]: definição e zero ou várias chamadas, com role=definition/call. Uma expressão compartilhada tem múltiplos trechos. Nodes desconectados também possuem definição.
 - helperRanges: imports, guard de versão, modelo básico, metadata e entrypoint auxiliar, sem node associado.
 - Intervalos podem se sobrepor: uma chamada a outro node está dentro da definição do chamador. A futura navegação deverá escolher o menor intervalo pertinente e distinguir a role. IDs, revisão e código são a identidade; números de linha não são persistidos como IDs.
