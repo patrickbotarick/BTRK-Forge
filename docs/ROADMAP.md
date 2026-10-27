@@ -20,9 +20,11 @@ O aceite é restrito ao Visual Designer demonstrado. Continuam os limites de uma
 
 Blueprint Engine entregue em `codex/phase-01c-blueprint-engine`, a partir da main aprovada. Catálogo funcional, portas tipadas, eventos por ID, binding string de Input, leitura/escrita de Text, histórico integrado, Worker com fila/limites e depuração inicial. Schema v3 migra v0/v1/v2; Forge Logic Demo montado visualmente e reaberto em processo Windows novo. [Relatório](phases/RELATORIO_FASE_01C.md), [QA](qa/VALIDACAO_FASE_01C.md), [contrato](BLUEPRINT_ENGINE.md) e [limitações atuais](LIMITACOES_FASE_01C.md). O responsável aprovou o encerramento e a integração à main por fast-forward, preservando a branch de desenvolvimento. A revalidação de encerramento repetiu 95 testes aprovados, zero falhas, sem alterações funcionais. Veja o [encerramento oficial](phases/ENCERRAMENTO_FASE_01C.md). As cinco ressalvas herdadas e todas as limitações funcionais registradas continuam abertas; builds Windows e janela desktop permanecem evidências históricas, sem repetição nesta operação. Não há aceite de distribuição comercial.
 
-## Fase 1D — não iniciada
+## Fase 1D — 1D-A implementada e candidata à revisão
 
-Autorizada somente para planejamento; nenhum desenvolvimento foi iniciado. Recomendações de planejamento: geração TypeScript fiel com equivalência, exportador geral separado do Preview, acessibilidade/escala, RustSec e instalação limpa. Implementação exige escopo e autorização próprios.
+Após autorização específica, a subetapa 1D-A implementou contrato semântico e IR v1 tipada, transitória e independente das bibliotecas visuais. Abrange os 11 nodes, portas, eventos, bindings, fluxo, origem e diagnósticos; fixtures com resultados manuais preparam a comparação futura. O documento schema v3 continua sendo a fonte oficial. [Contrato](BLUEPRINT_IR.md), [relatório](phases/RELATORIO_FASE_01D_A.md) e [QA](qa/VALIDACAO_FASE_01D_A.md). Estado: candidata à revisão, sem encerramento oficial ou merge à main. As cinco ressalvas herdadas permanecem abertas.
+
+A 1D-B não foi iniciada: geração TypeScript, implementação compartilhada de operações e testes diferenciais exigem nova aprovação. Integração Monaco somente leitura e diagnóstico ampliado continuam posteriores. Exportador geral, acessibilidade/escala, RustSec e instalação limpa não foram implementados por esta subetapa.
 
 ## Fase 1 proposta — primeira fatia funcional
 
