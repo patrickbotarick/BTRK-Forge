@@ -1,0 +1,149 @@
+import { runProgram, RUNTIME_VERSION, SemanticRuntime, type SemanticState, type RuntimeReply, type ProgramModel } from "./runtime.js";
+if (RUNTIME_VERSION !== 1) {
+    throw new Error("Vers\u00E3o do runtime incompat\u00EDvel com o c\u00F3digo gerado");
+}
+const programModel: ProgramModel = {
+    "variables": [
+        {
+            "id": "count",
+            "name": "Contador",
+            "type": "number",
+            "initial": 0
+        }
+    ],
+    "components": [
+        {
+            "id": "button-count",
+            "type": "Button",
+            "disabled": false,
+            "initialProperty": null
+        }
+    ],
+    "bindings": [],
+    "entrypoints": [
+        {
+            "componentId": "button-count",
+            "eventType": "button.click",
+            "eventNodeId": "click",
+            "enabled": true,
+            "legacy": true
+        }
+    ]
+};
+export const metadata = {
+    "irVersion": 1,
+    "generatorVersion": 1,
+    "runtimeVersion": 1,
+    "revision": "526c1848d4c42993fc802e6730eb0b044d43152dc00e85fd8c194e39f1b15c0a"
+};
+function n0_click(ctx: SemanticRuntime, state: SemanticState): void {
+    ctx.visit({
+        "nodeId": "click"
+    });
+    ctx.recordControl({
+        "nodeId": "click"
+    });
+    n7_assign(ctx, state);
+}
+function n1_counter(ctx: SemanticRuntime, state: SemanticState): number {
+    ctx.visit({
+        "nodeId": "counter"
+    });
+    const value: number = ctx.readVariable(state, "count") as number;
+    ctx.validateValue(value, "number", {
+        "nodeId": "counter"
+    });
+    ctx.recordValue({
+        "nodeId": "counter"
+    }, value);
+    return value;
+}
+function n2_one(ctx: SemanticRuntime, state: SemanticState): number {
+    ctx.visit({
+        "nodeId": "one"
+    });
+    const value: number = 1;
+    ctx.validateValue(value, "number", {
+        "nodeId": "one"
+    });
+    ctx.recordValue({
+        "nodeId": "one"
+    }, value);
+    return value;
+}
+function n3_sum(ctx: SemanticRuntime, state: SemanticState): number {
+    ctx.visit({
+        "nodeId": "sum"
+    });
+    const value: number = Number(n1_counter(ctx, state)) + Number(n2_one(ctx, state));
+    ctx.validateValue(value, "number", {
+        "nodeId": "sum"
+    });
+    ctx.recordValue({
+        "nodeId": "sum"
+    }, value);
+    return value;
+}
+function n4_zero(ctx: SemanticRuntime, state: SemanticState): number {
+    ctx.visit({
+        "nodeId": "zero"
+    });
+    const value: number = 0;
+    ctx.validateValue(value, "number", {
+        "nodeId": "zero"
+    });
+    ctx.recordValue({
+        "nodeId": "zero"
+    }, value);
+    return value;
+}
+function n5_positive(ctx: SemanticRuntime, state: SemanticState): boolean {
+    ctx.visit({
+        "nodeId": "positive"
+    });
+    const value: boolean = Number(n3_sum(ctx, state)) > Number(n4_zero(ctx, state));
+    ctx.validateValue(value, "boolean", {
+        "nodeId": "positive"
+    });
+    ctx.recordValue({
+        "nodeId": "positive"
+    }, value);
+    return value;
+}
+function n6_branch(ctx: SemanticRuntime, state: SemanticState): void {
+    ctx.visit({
+        "nodeId": "branch"
+    });
+    ctx.recordControl({
+        "nodeId": "branch"
+    });
+    if (n5_positive(ctx, state)) {
+        n8_second(ctx, state);
+    }
+    else {
+    }
+}
+function n7_assign(ctx: SemanticRuntime, state: SemanticState): void {
+    ctx.visit({
+        "nodeId": "assign"
+    });
+    ctx.recordControl({
+        "nodeId": "assign"
+    });
+    ctx.writeVariable(state, "count", n3_sum(ctx, state));
+    n6_branch(ctx, state);
+}
+function n8_second(ctx: SemanticRuntime, state: SemanticState): void {
+    ctx.visit({
+        "nodeId": "second"
+    });
+    ctx.recordControl({
+        "nodeId": "second"
+    });
+    ctx.writeVariable(state, "count", n3_sum(ctx, state));
+}
+export function execute(input: unknown): RuntimeReply {
+    return runProgram(programModel, input, {
+        "click": n0_click
+    });
+}

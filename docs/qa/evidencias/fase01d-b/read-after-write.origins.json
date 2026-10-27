@@ -1,0 +1,244 @@
+{
+  "irVersion": 1,
+  "generatorVersion": 1,
+  "runtimeVersion": 1,
+  "revision": "526c1848d4c42993fc802e6730eb0b044d43152dc00e85fd8c194e39f1b15c0a",
+  "nodeRanges": {
+    "click": [
+      {
+        "start": 1061,
+        "end": 1267,
+        "startLine": 39,
+        "startColumn": 1,
+        "endLine": 47,
+        "endColumn": 2,
+        "role": "definition"
+      }
+    ],
+    "assign": [
+      {
+        "start": 1243,
+        "end": 1264,
+        "startLine": 46,
+        "startColumn": 5,
+        "endLine": 46,
+        "endColumn": 26,
+        "role": "call"
+      },
+      {
+        "start": 3242,
+        "end": 3510,
+        "startLine": 126,
+        "startColumn": 1,
+        "endLine": 135,
+        "endColumn": 2,
+        "role": "definition"
+      }
+    ],
+    "counter": [
+      {
+        "start": 1268,
+        "end": 1625,
+        "startLine": 48,
+        "startColumn": 1,
+        "endLine": 60,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 2078,
+        "end": 2100,
+        "startLine": 78,
+        "startColumn": 34,
+        "endLine": 78,
+        "endColumn": 56,
+        "role": "call"
+      }
+    ],
+    "one": [
+      {
+        "start": 1626,
+        "end": 1926,
+        "startLine": 61,
+        "startColumn": 1,
+        "endLine": 73,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 2111,
+        "end": 2129,
+        "startLine": 78,
+        "startColumn": 67,
+        "endLine": 78,
+        "endColumn": 85,
+        "role": "call"
+      }
+    ],
+    "sum": [
+      {
+        "start": 1927,
+        "end": 2285,
+        "startLine": 74,
+        "startColumn": 1,
+        "endLine": 86,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 2754,
+        "end": 2772,
+        "startLine": 104,
+        "startColumn": 35,
+        "endLine": 104,
+        "endColumn": 53,
+        "role": "call"
+      },
+      {
+        "start": 3461,
+        "end": 3479,
+        "startLine": 133,
+        "startColumn": 39,
+        "endLine": 133,
+        "endColumn": 57,
+        "role": "call"
+      },
+      {
+        "start": 3730,
+        "end": 3748,
+        "startLine": 143,
+        "startColumn": 39,
+        "endLine": 143,
+        "endColumn": 57,
+        "role": "call"
+      }
+    ],
+    "zero": [
+      {
+        "start": 2286,
+        "end": 2590,
+        "startLine": 87,
+        "startColumn": 1,
+        "endLine": 99,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 2783,
+        "end": 2802,
+        "startLine": 104,
+        "startColumn": 64,
+        "endLine": 104,
+        "endColumn": 83,
+        "role": "call"
+      }
+    ],
+    "positive": [
+      {
+        "start": 2591,
+        "end": 2969,
+        "startLine": 100,
+        "startColumn": 1,
+        "endLine": 112,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 3159,
+        "end": 3182,
+        "startLine": 120,
+        "startColumn": 9,
+        "endLine": 120,
+        "endColumn": 32,
+        "role": "call"
+      }
+    ],
+    "branch": [
+      {
+        "start": 2970,
+        "end": 3241,
+        "startLine": 113,
+        "startColumn": 1,
+        "endLine": 125,
+        "endColumn": 2,
+        "role": "definition"
+      },
+      {
+        "start": 3486,
+        "end": 3507,
+        "startLine": 134,
+        "startColumn": 5,
+        "endLine": 134,
+        "endColumn": 26,
+        "role": "call"
+      }
+    ],
+    "second": [
+      {
+        "start": 3194,
+        "end": 3215,
+        "startLine": 121,
+        "startColumn": 9,
+        "endLine": 121,
+        "endColumn": 30,
+        "role": "call"
+      },
+      {
+        "start": 3511,
+        "end": 3752,
+        "startLine": 136,
+        "startColumn": 1,
+        "endLine": 144,
+        "endColumn": 2,
+        "role": "definition"
+      }
+    ]
+  },
+  "helperRanges": [
+    {
+      "start": 0,
+      "end": 134,
+      "startLine": 1,
+      "startColumn": 1,
+      "endLine": 1,
+      "endColumn": 135,
+      "role": "helper"
+    },
+    {
+      "start": 135,
+      "end": 255,
+      "startLine": 2,
+      "startColumn": 1,
+      "endLine": 4,
+      "endColumn": 2,
+      "role": "helper"
+    },
+    {
+      "start": 256,
+      "end": 876,
+      "startLine": 5,
+      "startColumn": 1,
+      "endLine": 32,
+      "endColumn": 3,
+      "role": "helper"
+    },
+    {
+      "start": 877,
+      "end": 1060,
+      "startLine": 33,
+      "startColumn": 1,
+      "endLine": 38,
+      "endColumn": 3,
+      "role": "helper"
+    },
+    {
+      "start": 3753,
+      "end": 3889,
+      "startLine": 145,
+      "startColumn": 1,
+      "endLine": 149,
+      "endColumn": 2,
+      "role": "helper"
+    }
+  ]
+}
