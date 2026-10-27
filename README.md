@@ -6,9 +6,11 @@ Studio de desenvolvimento visual híbrido para web e Windows. Produto em desenvo
 
 Tecnologias em avaliação: Tauri 2/Rust, React/TypeScript, Rete.js 2, Monaco, Vite e persistência estruturada versionada. Nenhuma licença de distribuição foi definida.
 
-Fase 0 concluída e aprovada para evolução; a **Fase 1A está concluída e homologada tecnicamente com GO COM RESSALVAS**, com projetos locais e persistência nativa Rust. O [encerramento oficial da Fase 1A](docs/phases/ENCERRAMENTO_FASE_01A.md) registra a aprovação e os limites das duas máquinas Windows. Não é uma IDE completa. O [encerramento da Fase 0](docs/phases/ENCERRAMENTO_FASE_00.md) permanece preservado; somente o planejamento da Fase 1B está autorizado, sem início nesta entrega.
+Fase 0 concluída e aprovada para evolução; a **Fase 1A está concluída e homologada tecnicamente com GO COM RESSALVAS**, com projetos locais e persistência nativa Rust. O [encerramento oficial da Fase 1A](docs/phases/ENCERRAMENTO_FASE_01A.md) registra a aprovação e os limites das duas máquinas Windows. Não é uma IDE completa. O [encerramento da Fase 0](docs/phases/ENCERRAMENTO_FASE_00.md) permanece preservado; a Fase 1B foi posteriormente autorizada para implementação em branch própria.
 
-No Studio Windows, use **Novo projeto** para informar nome e escolher uma pasta; **Abrir projeto** seleciona `project.btrk.json`. Salvar, Salvar como, Fechar projeto, aviso de alterações pendentes e recuperação de backup estão operacionais. O principal e o backup são validados no backend; conflitos preservam o conteúdo em memória e oferecem recarga/cópia/cancelamento. Veja [garantias e limites Windows](docs/ARQUITETURA_V0_2.md) e o [formato oficial](docs/FORMATO_PROJETO_V1.md).
+A **Fase 1B está implementada e candidata à aprovação** nesta branch, com modo Design, Text/Button/Input/Container, hierarquia, Inspector e undo/redo. Veja o [relatório](docs/phases/RELATORIO_FASE_01B.md), a [validação](docs/qa/VALIDACAO_FASE_01B.md) e a [matriz suportada](docs/COMPONENTES_FASE_01B.md). A Fase 1C não foi iniciada.
+
+No Studio Windows, use **Novo projeto** para informar nome e escolher uma pasta; **Abrir projeto** seleciona `project.btrk.json`. Salvar, Salvar como, Fechar projeto, aviso de alterações pendentes e recuperação de backup estão operacionais. O principal e o backup são validados no backend; conflitos preservam o conteúdo em memória e oferecem recarga/cópia/cancelamento. Entre em **Design**, selecione um Container ou a tela e adicione componentes pelo catálogo; organize pela árvore e edite no Inspector. Salve explicitamente. Veja [garantias e limites Windows](docs/ARQUITETURA_V0_2.md) e o [formato v2](docs/FORMATO_PROJETO_V2.md). Projetos v0/v1 migram em memória, sem gravação automática.
 
 ## Executar
 
@@ -29,7 +31,7 @@ npm run audit:environment
 npm run typecheck
 npm run lint
 npm test
-npm run test:persistence # 19 casos Rust reais de persistência (Windows)
+npm run test:persistence # persistência e componentes v2 em filesystem real (Windows)
 npx playwright install chromium
 npm run test:e2e
 npm run test:native      # UI com biblioteca Rust real; seletores substituídos por destinos de teste
@@ -44,7 +46,7 @@ npm run desktop:build
 npm run export:windows
 ```
 
-`desktop:dev` inicia Vite automaticamente; não precisa iniciar outro servidor na mesma porta. `test:persistence` executa os testes da biblioteca Rust; o host Tauri tem um teste adicional de rejeição de sessão inválida. O núcleo visual continua coberto por Vitest. `test:native` compila um driver de testes separado, que não é distribuído com o Studio, e usa Vite na porta 1422. Ao alterar o script fixo do iframe, execute `npm run sync:csp` e repita os testes de produção. Mudanças de contrato exigem `npm run schema:generate` e testes de compatibilidade.
+`desktop:dev` inicia Vite automaticamente; não precisa iniciar outro servidor na mesma porta. `test:persistence` executa os testes da biblioteca Rust; o host Tauri tem um teste adicional de rejeição de sessão inválida. O núcleo visual continua coberto por Vitest. `test:native` compila um driver de testes separado, que não é distribuído com o Studio, e usa Vite na porta 1422. Ao alterar o renderizador compartilhado, execute `npm run renderer:generate`; ao alterar o script fixo do iframe, execute `npm run sync:csp` e repita os testes de produção. Mudanças de contrato exigem `npm run schema:generate` e testes de compatibilidade.
 
 Saídas locais (ignoradas pelo Git):
 
@@ -66,6 +68,7 @@ packages/project-schema/      schema e migração
 packages/blueprint-core/      portas, validação e execução
 packages/forge-core/          exemplo e contratos IA/SDK/atualizações
 packages/native-persistence/ Rust: validação, sessão autorizada, escrita e recuperação
+packages/designer-core/       comandos, hierarquia e histórico de edição
 packages/preview-runtime/     documento isolado e Worker
 tools/feasibility/            auditoria, helper, exportação e host do app
 tests/                       domínio, integração, navegador e produção
@@ -81,7 +84,9 @@ Módulos compartilham o lockfile npm da raiz; não são pacotes publicados. Nenh
 - [Briefing oficial](docs/BRIEFING_OFICIAL.md)
 - [Arquitetura v0.1](docs/ARQUITETURA_V0_1.md)
 - [Arquitetura v0.2 — persistência nativa](docs/ARQUITETURA_V0_2.md)
-- [Formato de projeto v1](docs/FORMATO_PROJETO_V1.md)
+- [Formato v1 histórico](docs/FORMATO_PROJETO_V1.md) e [formato v2 / migração](docs/FORMATO_PROJETO_V2.md)
+- [Arquitetura v0.3 — Visual Designer](docs/ARQUITETURA_V0_3.md)
+- [Componentes e operações disponíveis](docs/COMPONENTES_FASE_01B.md)
 - [Decisões e comparação Tauri/Electron](docs/DECISOES_TECNICAS.md)
 - [Relatório da Fase 0](docs/phases/RELATORIO_FASE_00.md)
 - [Validação e limitações](docs/qa/VALIDACAO_FASE_00.md)

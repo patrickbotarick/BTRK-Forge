@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-26",
+  "timezone": "America/Sao_Paulo",
+  "sourceCommit": "1201f3eac35b783d1c6a9d3b9ccb290046ec2bd1",
+  "baseMain": "5a38ff5f9ef7dec36ef55bb801fe9fa12a7f95e7",
+  "schemaVersion": 2,
+  "tests": {
+    "typescript": 33,
+    "rustPersistence": 23,
+    "rustHost": 1,
+    "webE2E": 8,
+    "nativeIntegration": 8,
+    "production": 2,
+    "failed": 0,
+    "skipped": 0,
+    "totalPassed": 75
+  },
+  "nativeSmoke": {
+    "created": true,
+    "saved": true,
+    "reopenedAfterExit": true,
+    "documentPreserved": true,
+    "projectId": "project-7e1ae24e-0eca-4f63-ab5e-ec92059dc542",
+    "componentCount": 6,
+    "nodes": 8,
+    "connections": 8,
+    "undoRedo": true,
+    "historyAfterSave": true,
+    "previewAfterReopen": true,
+    "pageErrors": [],
+    "nativeSelectorsAssisted": 2,
+    "finalProcessClosed": true
+  },
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "cargoCheck": "passed",
+    "cargoFmt": "passed",
+    "webBuild": "passed",
+    "windowsBuild": "passed",
+    "npmAuditVulnerabilities": 0,
+    "secretScanner": "no findings in known-pattern scope"
+  },
+  "artifacts": [
+    {
+      "path": "apps/studio/src-tauri/target/release/btrk-forge.exe",
+      "bytes": 16678400,
+      "sha256": "3fc93c0cf723fb8e5cd9ffd89a4edbda136cb100cf5ac5375cb7120b6c58b7c3"
+    },
+    {
+      "path": "apps/studio/src-tauri/target/release/bundle/nsis/BTRK Forge_0.0.1_x64-setup.exe",
+      "bytes": 4182366,
+      "sha256": "03b65e623b3a39b61ff9582ae79fbc917750fd6aef1f40e47ac6bcbbf4cec140"
+    }
+  ]
+}

@@ -57,3 +57,11 @@ Não há evidência para afirmar superioridade medida de consumo, segurança abs
 - [Electron — isolamento de contexto](https://www.electronjs.org/docs/latest/tutorial/context-isolation)
 
 Versões reais vêm de `npm view`, `npm ls` e Cargo.lock; não são inferidas de exemplos da documentação.
+# Decisões adicionais da Fase 1B
+
+- Schema v2 incompatível estruturalmente: o botão único é generalizado por componentes tipados; v1 é validado antes da migração e preservado no disco até salvar.
+- Lista ordenada com parentId representa a árvore, evitando manter filhos e pai redundantes. Somente Container admite filhos; a validação global impõe IDs, profundidade e eventos no TypeScript e no Rust.
+- Comandos trabalham em cópia validada, com snapshots limitados a 100 transações. Recibos Rust são comparados por serialização canônica do schema, desconsiderando metadata, para preservar histórico após save.
+- Design e Preview compartilham um renderizador DOM allowlisted. A versão inline é gerada de fonte fixa e coberta por teste/CSP, sem eval ou HTML arbitrário.
+- Vários Buttons podem chamar o único evento existente do Blueprint; remoção preserva a lógica e duplicação mantém o vínculo externo. Não se declara nova semântica de eventos ou binding de Input.
+- Layout baseado em containers, dimensões auto/fill/px e viewport responsivo; sem coordenadas absolutas, CSS livre ou emulação Android. Nenhuma nova dependência ou permissão nativa.

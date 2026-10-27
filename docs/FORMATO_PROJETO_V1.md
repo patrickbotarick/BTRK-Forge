@@ -1,5 +1,7 @@
 # Formato de projeto BTRK v1
 
+Registro histórico da Fase 1A. O Studio da Fase 1B lê este formato por migração explícita em memória para o [formato v2](FORMATO_PROJETO_V2.md); só Salvar materializa a nova estrutura. As garantias e limitações de persistência abaixo continuam aplicáveis.
+
 Contrato da Fase 1A. A única fonte persistente de verdade é **`project.btrk.json`**, dentro da pasta escolhida pelo usuário. React, Rete e Monaco não participam do formato. Schema executável: `packages/project-schema/index.ts`; JSON Schema versionado: `packages/project-schema/project.schema.json`.
 
 ## Campos e versões

@@ -1,5 +1,7 @@
 # Arquitetura v0.2 — persistência nativa (Fase 1A)
 
+A [arquitetura v0.3](ARQUITETURA_V0_3.md) acrescenta o Visual Designer e o schema v2 sem alterar os comandos, sessões, caminhos e garantias de escrita definidos neste documento.
+
 Complementa e preserva a [arquitetura da Fase 0](ARQUITETURA_V0_1.md). Tauri/Rust, React/TypeScript, Rete, Monaco e Blueprint Core continuam. Não há nuvem, autenticação, execução arbitrária, IA ou SDK de plugins habilitados.
 
 ## Fluxo implementado

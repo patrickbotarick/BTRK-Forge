@@ -37,7 +37,7 @@ export type GraphNode = Project['graph']['nodes'][number];
 export type Connection = Project['graph']['connections'][number];
 export type Scalar = z.infer<typeof scalar>;
 
-// Version 0 is the only legacy format supported by the feasibility prototype.
+// Known v0/v1 documents migrate to the current visual component model.
 // A migration operates on a copy, preserves IDs and never downgrades newer projects.
 export function parseProject(input: unknown): Project {
   if (typeof input !== 'object' || input === null) throw new Error('Projeto deve ser um objeto');
