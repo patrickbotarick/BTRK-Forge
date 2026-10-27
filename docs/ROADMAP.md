@@ -10,9 +10,15 @@ Novo/Abrir/Salvar/Salvar como/Fechar projeto, workspace autorizado por seleção
 
 O responsável aprovou o encerramento e a integração à `main`, preservando a branch de desenvolvimento. Permanecem abertas: durabilidade física sob falha de energia, janela residual de corrida externa, auditoria RustSec, instalação em máquina limpa e mensagem WebView2 no encerramento. Matriz de filesystems/DPI e política de retenção de snapshots também exigem evolução. A decisão é GO COM RESSALVAS dentro das garantias documentadas, sem aceite de distribuição comercial.
 
-## Fase 1B — implementada, candidata à aprovação
+## Fase 1B — concluída e aprovada com GO COM RESSALVAS
 
-Após autorização específica, foram implementados Design, catálogo Text/Button/Input/Container, hierarquia, Inspector, operações transacionais e undo/redo, schema v2 e migração, Preview compartilhado e persistência Rust da árvore. Veja [relatório](phases/RELATORIO_FASE_01B.md), [QA](qa/VALIDACAO_FASE_01B.md) e [limites do catálogo](COMPONENTES_FASE_01B.md). Esta entrega permanece em codex/phase-01b-visual-designer, sem integração automática à main. A Fase 1C não foi iniciada; as cinco ressalvas herdadas da Fase 1A continuam abertas.
+Após autorização específica, foram implementados Design, catálogo Text/Button/Input/Container, hierarquia, Inspector, operações transacionais e undo/redo, schema v2 e migração, Preview compartilhado e persistência Rust da árvore. O responsável aprovou o encerramento e a integração à main por fast-forward, preservando a branch codex/phase-01b-visual-designer. A revalidação repetiu 75 testes aprovados, sem falhas finais. Veja [encerramento oficial](phases/ENCERRAMENTO_FASE_01B.md), [relatório de implementação](phases/RELATORIO_FASE_01B.md), [QA](qa/VALIDACAO_FASE_01B.md) e [limites do catálogo](COMPONENTES_FASE_01B.md).
+
+O aceite é restrito ao Visual Designer demonstrado. Continuam os limites de uma tela, Input sem binding de variáveis, quatro tipos de componentes, ausência de seleção múltipla, layout por containers, ausência de edição livre bidirecional código/Blueprint e de exportação generalizada de projetos visuais. As cinco ressalvas herdadas — energia, corrida externa residual, RustSec, máquina limpa e mensagem WebView2 — permanecem abertas, sem serem consideradas resolvidas pelo encerramento.
+
+## Fase 1C — não iniciada
+
+A main consolidada fica pronta para planejamento posterior sob orientação do responsável. Este encerramento documental não define nem inicia o escopo da Fase 1C.
 
 ## Fase 1 proposta — primeira fatia funcional
 
