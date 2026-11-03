@@ -45,3 +45,38 @@ try {
 ```
 
 Logs locais em artifacts/phase01e-a. O spike é independente do Studio. A validação acima não é homologação da 1D e não inclui reexecução da suíte histórica.
+
+## Segunda rodada
+
+Executada no Windows build 26300 com papel de administrador inativo. O spike compilou com /W4 e /WX. A matriz principal terminou com código 1. O roteiro separado de encerramento abrupto e recuperação terminou com código 0.
+
+| Cenário | Classificação e evidência nova |
+|---|---|
+| Rede de controle | **Permitido.** O host conectou a localhost:49177 e o servidor aceitou a conexão em 2.033 ms. |
+| Rede no AppContainer | **Inconclusivo.** localhost resolveu com código 0. A conexão IPv4 retornou 10060 após 1.016 ms e o servidor não observou nova conexão. O timeout não comprova bloqueio. Sem segundo endpoint controlado disponível, TCP fora de loopback e DNS externo ficaram sem teste. |
+| Acesso externo e traversal | **Bloqueado.** Leitura, escrita e leitura do canário de credencial por caminhos relativos fora do staging negadas com Win32 5. Escrita no insumo concedido para leitura também negada com Win32 5. |
+| Junction e hard link | **Bloqueado.** Fixtures reais criadas. A inspeção por handle detectou o reparse point e a identidade NTFS comum entre o canário e o hard link. A sonda confinada recebeu Win32 5 nas quatro tentativas de leitura e escrita. |
+| Symlink | **Inconclusivo.** Fixture indisponível com usuário padrão. A sonda retornou Win32 3. |
+| Troca concorrente | **Bloqueada no cenário ensaiado.** A thread concorrente recebeu Win32 32 ao tentar renomear o insumo aberto sem compartilhamento de exclusão. Volume e índice do arquivo por handle permaneceram iguais. Isso não cobre trocas pré-abertura nem todos os ancestrais. |
+| CPU | **Aprovado no ensaio.** Para a mesma carga de 1,5 s, o Job contabilizou 1.500 ms sem cap e 234 ms com hard cap de 1% da capacidade agregada. |
+| Disco | **Pendente.** Nenhum volume de teste com quota de escrita foi provisionado. O tamanho do PE não é evidência de quota. |
+| Memória, tempo, logs e cancelamento | **Aprovados novamente.** Alocação de 256 MiB recusada com Job limitado a 96 MiB. Timeout de 250 ms e cancelamento deixaram zero processos ativos no Job. Drenados 2.000.000 bytes, retidos 4.096. |
+| Morte do host e recuperação | **Aprovados no cenário sintético.** O roteiro capturou handles de quatro membros vivos antes de matar exclusivamente o host do spike. Os quatro terminaram em até 5 s após a morte. O perfil e a árvore conhecida foram removidos com exclusão não recursiva e verificação de reparse. As execuções normais retêm artefatos sintéticos para inspeção. |
+| Falha fechada | **Aprovada.** O host recusou iniciar a tarefa com SID ausente. |
+
+### Build MSVC real
+
+Toolchain MSVC Build Tools 17.14.41, árvore 14.44.35207 x64, provisionada da instalação local em Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64. O [manifesto SHA-256](../../tools/isolation-spike/msvc-14.44.35207.sha256) fixa os binários, DLLs e recursos de idioma utilizados. O roteiro valida origem e cópia, e o host copia a lista fixa do staging confiável. O sistema operacional fornece as DLLs de sistema. O ambiente explícito contém SystemRoot, LOCALAPPDATA exigido pelo lançamento, PATH restrito à toolchain, TEMP/TMP na saída e um marcador do spike. A tarefa usa somente C fixo do host, sem includes, CRT no artefato, bibliotecas de projeto, downloads ou scripts. Os processos de compilação e link usam o mesmo perfil AppContainer sem capacidades e recebem Jobs próprios.
+
+Os erros iniciais C1510 e C1356 foram resolvidos provisionando o recurso de idioma e as dependências transitivas do PDB. O C1056 foi resolvido com herança do SID restrita à saída, permitindo reabrir o objeto criado sem conceder escrita na entrada ou fora do staging. Resultado final: compilador e linker saíram com 0, a coleta verificou um PE x64 de console e o PE executado dentro do isolamento retornou 42. SHA-256 observado: E9F54D18B52299C71E813A325524631EA1E6B5C22A34BE2E38B522518489A4C4. Isso demonstra um build nativo mínimo offline, com a cadeia de exportação completa e o bloqueio de rede ainda pendentes.
+
+### Repetição
+
+Compilar com o comando MSVC da primeira rodada. Depois rodar, em PowerShell, na raiz do repositório:
+
+```powershell
+& ./tools/isolation-spike/validate.ps1
+& ./tools/isolation-spike/validate-crash.ps1
+```
+
+Os logs locais são artifacts/phase01e-a/round2.log e artifacts/phase01e-a/round2-crash.log. Nenhum componente do Studio mudou e a suíte do Studio não foi repetida.
