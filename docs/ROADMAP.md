@@ -95,3 +95,5 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 **1G-B1 concluída e integrada com GO COM RESSALVAS, em escopo restrito.** Hierarquia, seleção múltipla e operações atômicas em lote foram aceitas. A homologação funcional Tauri permanece pendente e a Fase 1G-B continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B1.md), [relatório](phases/RELATORIO_FASE_01G_B1.md) e [validação](qa/VALIDACAO_FASE_01G_B1.md).
 
 **1G-B2 concluída com GO COM RESSALVAS, em escopo restrito.** O aceite cobre dimensões individuais e em lote no schema v3 e viewport compartilhada entre Designer e Preview. A homologação Tauri permanece pendente e a 1G-B continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B2.md).
+
+**1G-B3-A em revisão.** Fundação do schema v4, migrações e compatibilidade semântica em branch própria. A 1G-B3 continua em andamento. [Relatório da 1G-B3-A](phases/RELATORIO_FASE_01G_B3_A.md).

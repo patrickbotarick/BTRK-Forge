@@ -42,3 +42,9 @@ Proposta inicial de limites por projeto: 64 entradas e 64 MiB de objetos persist
 | Conteúdo ativo ou remoto | Catálogo fechado, bytes raster validados e CSP. Testar que scripts, SVG arbitrário, HTTP e acesso nativo permanecem bloqueados. |
 
 A autorização de assets é uma fronteira de persistência e renderização. A qualificação de sandbox de build da 1E permanece independente.
+
+## Decisões implementadas na 1G-B3-A
+
+O v4 fixa image/png como mídia declarada, IDs globais, SHA-256 minúsculo com 64 caracteres, 64 entradas, até 8 MiB por entrada, 64 MiB agregados por declaração, 4096 px por eixo e até 8.000.000 de pixels. Entradas com o mesmo hash precisam concordar em bytes e dimensões. Alt e label informativos exigem conteúdo além de espaço, tabulação ou quebra de linha e admitem até 1.000 unidades UTF-16. Decorativos exigem texto vazio. As chaves Icon são check, info, warning e close.
+
+O recibo nativo lista IDs declarados como não provisionados. Nesta etapa o diagnóstico indica ausência de resolução, sem verificar a presença física do arquivo. Save As com recursos declarados é recusado. Image e Icon ficam fora da projeção semântica e da renderização até aprovação das etapas seguintes. [Relatório da implementação](../phases/RELATORIO_FASE_01G_B3_A.md).
