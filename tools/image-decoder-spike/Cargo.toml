@@ -1,0 +1,12 @@
+[package]
+name = "forge-image-decoder-spike"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "webp"] }
+sha2 = "=0.10.9"
+crc32fast = "=1.5.3"
