@@ -1,11 +1,13 @@
+import { DimensionField } from './DimensionField';
+import { viewportWidths, type Viewport } from './viewport';
 import { useEffect, useRef, useState } from 'react';
 import type { Component, ComponentStyle, Project } from '../../../packages/project-schema';
 import { selectionRoots, type BatchEdit, type Edit } from '../../../packages/designer-core';
 import { renderVisual } from '../../../packages/preview-runtime/visual-renderer';
-export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRedo,openBlueprint}:{project:Project;edit:(e:Edit)=>string|void;selectedId:string|null;select:(id:string|null)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;openBlueprint?:(id:string)=>void}) {
+export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRedo,openBlueprint,viewport,setViewport}:{project:Project;edit:(e:Edit)=>string|void;selectedId:string|null;select:(id:string|null)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;openBlueprint?:(id:string)=>void;viewport:Viewport;setViewport:(value:Viewport)=>void}) {
   const components=project.screens[0].components;
   const selected=components.find(c=>c.id===selectedId);
-  const canvas=useRef<HTMLDivElement>(null);const [viewport,setViewport]=useState('desktop');
+  const canvas=useRef<HTMLDivElement>(null);
   const [confirmRemove,setConfirmRemove]=useState(false);
   const [selection,setSelection]=useState<string[]>([]);
   const anchor=useRef<string|null>(null);
@@ -53,6 +55,19 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
     }
     setSelection(ids);
     select(id&&ids.includes(id)?id:ids.at(-1)??null);
+  }
+  function dimensions(){
+    const members=components.filter(c=>selectedSet.has(c.id));
+    return (['width','height'] as const).map(axis=>{
+      const first=members[0]?.style[axis];
+      const value=members.every(c=>c.style[axis]===first)?first:undefined;
+      return <DimensionField key={JSON.stringify([axis,members.map(c=>[c.id,c.style[axis]])])}
+        label={axis==='width'?'Largura':'Altura'} value={value}
+        apply={dimension=>{
+          if(multi)runBatch({kind:'batch-dimension',ids:activeIds,axis,value:dimension});
+          else style(axis,dimension);
+        }}/>;
+    });
   }
   function runBatch(command:BatchEdit){
     const message=edit(command);
@@ -143,7 +158,7 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
   function drop(event:React.DragEvent) {event.preventDefault();const type=event.dataTransfer.getData('application/btrk-component');if(['Text','Button','Input','Container'].includes(type))add(type as Component['type']);}
   return <section className="designer" aria-label="Editor visual">
     <aside className="design-library"><p className="eyebrow">COMPONENTES</p><div className="catalog">{(['Text','Button','Input','Container'] as const).map(type=><button key={type} draggable onDragStart={e=>e.dataTransfer.setData('application/btrk-component',type)} onClick={()=>add(type)}>+ {type}</button>)}</div><p className="hint">Insere no container selecionado ou ao lado do elemento. Arraste ao canvas ou use os botões.</p><p className="eyebrow">HIERARQUIA</p><button className="screen-select" ref={treeRoot} aria-pressed={!selected} onClick={()=>choose(null)}>▧ Tela · {project.screens[0].title||'Principal'}</button><ul className="component-tree" aria-label="Hierarquia de componentes">{tree(null)}</ul>{!components.length&&<p className="hint">Adicione o primeiro componente.</p>}</aside>
-    <div className="design-center"><div className="design-toolbar"><button disabled={!canUndo} onClick={undo}>Desfazer</button><button disabled={!canRedo} onClick={redo}>Refazer</button><label>Viewport Design<select aria-label="Viewport Design" value={viewport} onChange={e=>setViewport(e.target.value)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label></div><p className="design-caption">DESIGN CANVAS · {components.length}/200 componentes · seleção por clique ou Enter · viewport responsivo</p><div className="design-scroll" onDragOver={e=>e.preventDefault()} onDrop={drop}><div className="design-artboard" style={{width:viewport==='desktop'?'100%':viewport==='web'?768:375}}><h1>{project.screens[0].title}</h1><div ref={canvas} data-testid="design-canvas" className="design-render" onClickCapture={canvasModifiers} onKeyDownCapture={canvasModifiers} /></div></div></div>
+    <div className="design-center"><div className="design-toolbar"><button disabled={!canUndo} onClick={undo}>Desfazer</button><button disabled={!canRedo} onClick={redo}>Refazer</button><label>Viewport Design<select aria-label="Viewport Design" value={viewport} onChange={e=>setViewport(e.target.value as Viewport)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label></div><p className="design-caption">DESIGN CANVAS · {components.length}/200 componentes · seleção por clique ou Enter · viewport responsivo</p><div className="design-scroll" onDragOver={e=>e.preventDefault()} onDrop={drop}><div className="design-artboard" style={{width:viewportWidths[viewport]}}><h1>{project.screens[0].title}</h1><div ref={canvas} data-testid="design-canvas" className="design-render" onClickCapture={canvasModifiers} onKeyDownCapture={canvasModifiers} /></div></div></div>
     <aside className="design-inspector" aria-label="Inspector"><p className="eyebrow">INSPECTOR</p>{multi?<div>
       <h2>{activeIds.length} componentes selecionados</h2>
       <fieldset><legend>Geral</legend>
@@ -158,6 +173,7 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
         </select></label>
       </fieldset>
       <fieldset><legend>Layout</legend>
+        {dimensions()}
         {!sharedParent&&<p className="hint">Mover e reordenar exigem componentes irmãos.</p>}
         <button disabled={!sharedParent} onClick={()=>runBatch({kind:'batch-reorder',ids:activeIds,direction:-1})}>Subir seleção</button>
         <button disabled={!sharedParent} onClick={()=>runBatch({kind:'batch-reorder',ids:activeIds,direction:1})}>Descer seleção</button>
@@ -180,7 +196,7 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
       </fieldset>
       <fieldset><legend>Layout</legend>
       <label>Mover para<select aria-label="Mover para" aria-invalid={!!errorFor('parent')} aria-describedby={errorFor('parent')?'design-error-parent':undefined} value={selected.parentId??''} onChange={e=>report('parent',edit({kind:'move',id:selected.id,parentId:e.target.value||null,index:components.length}))}><option value="">Tela (raiz)</option>{components.filter(c=>c.type==='Container'&&c.id!==selected.id).map(c=><option value={c.id} key={c.id}>{c.id}</option>)}</select>{errorMessage('parent')}</label>
-      {(['width','height'] as const).map((key,i)=><div key={key}><label>{i?'Altura':'Largura'}<select aria-label={i?'Altura':'Largura'} value={typeof selected.style[key]==='number'?'px':selected.style[key]} onChange={e=>style(key,e.target.value==='px'?200:e.target.value as 'auto'|'fill')}><option value="auto">Automática</option><option value="fill">Preencher (100%)</option><option value="px">Pixels</option></select></label>{typeof selected.style[key]==='number'&&number(i?'Altura em pixels':'Largura em pixels',selected.style[key],n=>style(key,n))}</div>)}
+      {dimensions()}
       {selected.type==='Container'&&<><label>Direção<select aria-label="Direção" value={selected.props.direction} onChange={e=>change(c=>{if(c.type==='Container')c.props.direction=e.target.value as 'row'|'column';})}><option value="column">Vertical</option><option value="row">Horizontal</option></select></label>{number('Gap (px)',selected.props.gap,n=>change(c=>{if(c.type==='Container')c.props.gap=n;}),0,128)}{number('Padding (px)',selected.props.padding,n=>change(c=>{if(c.type==='Container')c.props.padding=n;}),0,128)}<label>Alinhamento dos filhos<select aria-label="Alinhamento dos filhos" value={selected.props.align} onChange={e=>change(c=>{if(c.type==='Container')c.props.align=e.target.value as typeof c.props.align;})}>{['stretch','flex-start','center','flex-end'].map(v=><option key={v}>{v}</option>)}</select></label><label>Justificação<select aria-label="Justificação" value={selected.props.justify} onChange={e=>change(c=>{if(c.type==='Container')c.props.justify=e.target.value as typeof c.props.justify;})}>{['flex-start','center','flex-end','space-between'].map(v=><option key={v}>{v}</option>)}</select></label></>}
       </fieldset>
       {selected.type!=='Container'&&<fieldset><legend>Comportamento</legend>

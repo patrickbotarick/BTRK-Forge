@@ -218,3 +218,24 @@ test('lote no Designer salva v3 e reabre com estrutura e seleção transitória'
   await expect(tree.locator('[aria-pressed=true]')).toHaveCount(0);
   expect((await disk.read()).screens).toEqual(saved.screens);
 });
+
+test('layout relativo v3 salvo pelo Inspector reabre pelo driver Rust',async({page,disk})=>{
+  await page.goto('/');
+  await create(page,'Layout v3');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await page.getByRole('button',{name:'+ Container',exact:true}).click();
+  await page.getByRole('button',{name:'+ Input',exact:true}).click();
+  await page.getByLabel('Largura',{exact:true}).selectOption('fill');
+  await page.getByRole('button',{name:'Aplicar largura'}).click();
+  await page.getByRole('button',{name:'Salvar',exact:true}).click();
+  await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
+  const saved=await disk.read();
+  expect(saved.schemaVersion).toBe(3);
+  expect(saved.screens[0].components.find(c=>c.type==='Input')?.style.width).toBe('fill');
+  await page.getByRole('button',{name:'Fechar projeto'}).click();
+  await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();
+  await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await expect(page.getByTestId('design-canvas').locator('input')).toHaveCSS('max-width','100%');
+  expect((await disk.read()).screens).toEqual(saved.screens);
+});

@@ -4,6 +4,7 @@ export type BatchEdit =
   | {kind:'batch-remove'|'batch-duplicate';ids:readonly string[]}
   | {kind:'batch-move';ids:readonly string[];parentId:string|null}
   | {kind:'batch-reorder';ids:readonly string[];direction:-1|1}
+  | {kind:'batch-dimension';ids:readonly string[];axis:'width'|'height';value:Component['style']['width']}
   | {kind:'batch-alignment';ids:readonly string[];value:Component['style']['textAlign']};
 export type Edit =
   | {kind:'add';type:Component['type'];parentId:string|null}
@@ -55,10 +56,13 @@ function editBatch(project:Project, edit:BatchEdit):EditResult {
       next.screens[0].components=list.map(c=>c.parentId===parent?siblings[index++]:c);
     }
   }
-  if(edit.kind==='batch-alignment'){
+  if(edit.kind==='batch-alignment'||edit.kind==='batch-dimension'){
     next=structuredClone(project);
     const selected=new Set(edit.ids);
-    for(const c of next.screens[0].components)if(selected.has(c.id))c.style.textAlign=edit.value;
+    for(const c of next.screens[0].components)if(selected.has(c.id)){
+      if(edit.kind==='batch-dimension')c.style[edit.axis]=edit.value;
+      else c.style.textAlign=edit.value;
+    }
   }
   validateProject(next,{allowIncomplete:true});
   return {project:next,selectedId:edit.kind==='batch-remove'?null:edit.ids.at(-1)!};

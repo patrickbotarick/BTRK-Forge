@@ -47,3 +47,14 @@ test('recusa referências em uso, ciclos, seleção obsoleta e pais incompatíve
   expect(()=>editProject(project,{kind:'batch-move',ids:['first','referenced'],parentId:'nested'})).toThrow(/irmãos/);
   expect(serialize(project)).toBe(original);
 });
+
+test('dimensões v3 em lote validam unidades e preservam outros campos',()=>{
+  const project=fixture();
+  const edit={kind:'batch-dimension',ids:['first','last'],axis:'width',value:'fill'} as const;
+  const next=editProject(project,edit).project;
+  expect(next.screens[0].components.filter(c=>edit.ids.some(id=>id===c.id)).map(c=>c.style.width)).toEqual(['fill','fill']);
+  expect(next.graph).toEqual(project.graph);
+  expect(deserialize(serialize(next))).toEqual(next);
+  for(const value of [-1,2001,1.5])expect(()=>editProject(project,{...edit,value})).toThrow();
+  expect(project.screens[0].components.find(c=>c.id==='first')?.style.width).toBe('auto');
+});

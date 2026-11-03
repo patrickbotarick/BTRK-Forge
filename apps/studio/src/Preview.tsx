@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { viewportWidths, type Viewport } from './viewport';
+import { useEffect, useRef } from 'react';
 import { previewDocument } from '../../../packages/preview-runtime/document';
 import type { Project } from '../../../packages/project-schema';
 import { runtimeEventSchema,type RuntimeEvent,type RuntimeState } from '../../../packages/blueprint-core';
 import { z } from 'zod';
 const messageSchema=z.discriminatedUnion('type',[z.object({type:z.literal('ready')}).strict(),z.object({type:z.literal('event'),event:runtimeEventSchema}).strict()]);
-export function Preview({ project, runtime, run }: { project: Project; runtime:RuntimeState; run: (event:RuntimeEvent) => void }) {
+export function Preview({ project, runtime, run, width, setWidth }: { project: Project; runtime:RuntimeState; run: (event:RuntimeEvent) => void; width:Viewport; setWidth:(value:Viewport)=>void }) {
   const iframe = useRef<HTMLIFrameElement>(null); const port = useRef<MessagePort | null>(null);
-  const [width, setWidth] = useState('desktop');
+
   const current = useRef({ project, runtime, run }); current.current = { project, runtime, run };
   function render() {
     const { project, runtime } = current.current;
@@ -25,5 +26,5 @@ export function Preview({ project, runtime, run }: { project: Project; runtime:R
   }
   useEffect(render, [project, runtime]);
   useEffect(() => () => port.current?.close(), []);
-  return <section className="preview-panel"><div className="preview-tools"><label>Viewport <select aria-label="Viewport" value={width} onChange={e => setWidth(e.target.value)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label><span>Simulação responsiva · não é emulação nativa</span></div><div className="viewport"><iframe title="Preview isolado" sandbox="allow-scripts" srcDoc={previewDocument} onLoad={connect} ref={iframe} style={{ width: width === 'desktop' ? '100%' : width === 'web' ? 768 : 375 }} /></div></section>;
+  return <section className="preview-panel"><div className="preview-tools"><label>Viewport <select aria-label="Viewport" value={width} onChange={e => setWidth(e.target.value as Viewport)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label><span>Simulação responsiva · não é emulação nativa</span></div><div className="viewport"><iframe title="Preview isolado" sandbox="allow-scripts" srcDoc={previewDocument} onLoad={connect} ref={iframe} style={{ width: viewportWidths[width] }} /></div></section>;
 }
