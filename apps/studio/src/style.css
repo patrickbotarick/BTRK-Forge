@@ -42,3 +42,9 @@
 .workspace-regions>:nth-child(3){grid-column:3}
 .workspace-regions>:nth-child(4){grid-column:4}
 .workspace-regions>:nth-child(5){grid-column:5}
+
+.workspace-view-menu{position:relative;font-size:12px}
+.workspace-view-menu summary{cursor:pointer;border:1px solid #344454;border-radius:4px;padding:4px 8px;color:#F0F4F6}
+.workspace-view-menu summary:focus-visible{outline:2px solid #FF934F;outline-offset:2px}
+.workspace-view-options{position:absolute;bottom:calc(100% + 6px);left:0;z-index:20;display:grid;gap:6px;width:max-content;max-width:280px;padding:8px;border:1px solid #536879;background:#1a242e}
+.workspace-view-options label{display:flex;align-items:center;gap:6px}
