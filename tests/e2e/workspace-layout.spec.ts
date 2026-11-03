@@ -30,9 +30,11 @@ test('ajusta o workspace sem editar o projeto nem perder o Preview',async({page}
   await expect(left).toHaveAttribute('aria-valuenow','160');
   await mode('Recolher Biblioteca e hierarquia').click();
   await expect(left).toHaveCount(0);
+  expect((await page.locator('.design-center').boundingBox())!.width).toBeGreaterThan(500);
   await mode('Reabrir Biblioteca e hierarquia').click();
   await expect(selected).toHaveAttribute('title',id!);
   await mode('Recolher Inspector').click();
+  expect((await page.locator('.design-center').boundingBox())!.width).toBeGreaterThan(500);
   await mode('Reabrir Inspector').click();
   await expect(page.getByLabel('Padding (px)')).toHaveValue('16');
   await mode('Restaurar layout do Designer').click();
