@@ -105,3 +105,30 @@ Para repetir os casos novos de arquivo, recompilar conforme o comando da primeir
 ```
 
 Logs locais em artifacts/phase01e-a/decisive-files-standard.log e artifacts/phase01e-a/decisive-files-low.log. O token de execução restrito negou também o hard link com código 5. A decisão usa o resultado com o token normal, que permitiu a criação.
+
+## Spike de VM Windows
+
+### Pré-requisitos efetivamente verificados
+
+| Item | Resultado |
+|---|---|
+| SO e CPU | Windows 11 Pro build 26300, Intel Core i5-12400F, 12 processadores lógicos. |
+| Firmware e virtualização | HypervisorPresent=True. systeminfo detectou hipervisor e integridade de código imposta por hipervisor em execução. Os campos CIM de firmware, monitor e SLAT retornaram False e systeminfo omitiu esses requisitos individuais. O estado de cada capacidade de firmware permanece inconclusivo nesta configuração. |
+| Gestão de VM | Nenhum serviço vmms ou vmcompute visível na consulta. Get-VM, New-VM e New-VHD indisponíveis, assim como VBoxManage, vmrun e qemu-system-x86_64 no PATH. |
+| Privilégios | Papel administrativo inativo na sessão de diagnóstico. Delegação para operação de hipervisor sem comprovação. |
+| Capacidade do host | 31,84 GiB de RAM visível, 16,74 GiB livre na amostra e 485,3 GiB livres em C:. Valores instantâneos, sem reserva para VM. |
+| Imagem Windows | Nenhuma imagem ISO, VHD/VHDX, WIM ou VMDK identificada na busca do workspace. Imagem de laboratório licenciada e autorizada ainda necessária. |
+| Toolchain | 16 de 16 arquivos da instalação local MSVC 14.44.35207 conferiram com o manifesto SHA-256. A verificação foi no host. |
+
+### Matriz reservada ao laboratório
+
+| Prova | Evidência exigida | Resultado desta execução |
+|---|---|---|
+| Build offline e destino | MSVC pinado em VM, compilação e link com código 0, PE x64 e SHA-256, execução no Windows de destino com retorno 42. | Bloqueada por infraestrutura e imagem. |
+| Rede, canais e host | Inventário pré-boot e sondas contra endpoints controlados, canário do host e canais de integração, com controles positivos externos e evidência da barreira. | Não executada. |
+| Capacidade | Crescimento adversarial até falha real de escrita nos discos virtuais, com medição da ocupação do host e verificação das demais superfícies. | Não executada. |
+| Limites e interrupções | Registrar CPU, RAM e timeout sob carga, desligamento forçado durante build e recuperação após morte do controlador. | Não executada. |
+| Coleta | Aceitar somente PE esperado após desligamento. Recusar links, caminhos inválidos, arquivos inesperados, substituição e saída parcial, com falha fechada diante de controle ausente. | Não executada. |
+| Custo | Medir provisionamento, boot, build, desligamento e coleta separadamente, com pico de RAM, disco e impacto no host. | Não medido. |
+
+Nenhuma VM, disco ou mídia de laboratório foi criada. O diagnóstico não alterou recursos do Windows, firmware, políticas ou hipervisor. A suíte do Studio e as provas anteriores do AppContainer não foram repetidas. A homologação integral Windows da 1D e as cinco ressalvas históricas permanecem abertas.
