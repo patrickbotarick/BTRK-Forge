@@ -103,3 +103,5 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 **1G-B3-C1 concluída em escopo restrito com GO COM RESSALVAS.** Panel é um preset visual que cria Container no schema v4. A homologação funcional Tauri permanece pendente. A 1G-B3-C segue aberta e a 1G-B3-C2 não foi iniciada. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B3_C1.md).
 
 **1G-UX-P em revisão.** Proposta documental para workspace modular e evolução incremental do Designer e Blueprint. [Plano 1G-UX](phases/PLANO_FASE_01G_UX.md).
+
+**1G-UX-A em revisão.** Workspace redimensionável e recolhível no Designer e no console. Homologação Tauri parcial. Docking e preferências persistentes aguardam UX-B. [Relatório](phases/RELATORIO_FASE_01G_UX_A.md).
