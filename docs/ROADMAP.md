@@ -105,3 +105,5 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 **1G-UX-P em revisão.** Proposta documental para workspace modular e evolução incremental do Designer e Blueprint. [Plano 1G-UX](phases/PLANO_FASE_01G_UX.md).
 
 **1G-UX-A concluída em escopo restrito com GO COM RESSALVAS.** Workspace redimensionável e recolhível no Designer e no console. A homologação Tauri completa segue pendente. A 1G-UX permanece aberta e a UX-B segue sem início. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_UX_A.md).
+
+**1G-UX-B1 em revisão.** Registro tipado de painéis e preferências locais por modo, com recuperação pelo menu Exibir. Docking e movimentação livre permanecem fora da entrega. [Relatório](phases/RELATORIO_FASE_01G_UX_B1.md).
