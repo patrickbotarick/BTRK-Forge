@@ -33,7 +33,7 @@ impl From<io::Error> for Failure {
 struct Job(HANDLE);
 
 impl Job {
-    fn new() -> io::Result<Self> {
+    fn new(memory: usize) -> io::Result<Self> {
         let handle = unsafe { CreateJobObjectW(std::ptr::null(), std::ptr::null()) };
         if handle.is_null() {
             return Err(io::Error::last_os_error());
@@ -44,7 +44,7 @@ impl Job {
             | JOB_OBJECT_LIMIT_JOB_MEMORY
             | JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
         limits.BasicLimitInformation.ActiveProcessLimit = 1;
-        limits.JobMemoryLimit = MEMORY;
+        limits.JobMemoryLimit = memory;
         let result = unsafe {
             SetInformationJobObject(
                 job.0,
@@ -100,7 +100,7 @@ fn run(frame: Option<Vec<u8>>, deadline: Duration) -> Result<(Vec<u8>, usize), F
     if Sha256::digest(std::fs::read(DECODER)?) != expected {
         return Err(Failure::Protocol);
     }
-    let job = Job::new()?;
+    let job = Job::new(MEMORY)?;
     let mut child = Command::new(DECODER)
         .env_clear()
         .stdin(Stdio::piped())
@@ -236,5 +236,108 @@ fn windows_job_protocol_timeout_and_recovery() {
             .all(|(actual, expected)| actual.abs_diff(expected) <= 5)));
         assert!((1..=MEMORY).contains(&peak));
         println!("{format:?} 7996000 pixels: {} ms including output verification, peak job commit={peak} bytes", start.elapsed().as_millis());
+    }
+}
+
+#[test]
+#[ignore = "executed only by the suspended Job probe"]
+fn memory_probe_child() {
+    use windows_sys::Win32::System::Memory::{
+        VirtualAlloc, MEM_COMMIT, MEM_RESERVE, PAGE_READWRITE,
+    };
+
+    const BLOCK: usize = 4 * 1024 * 1024;
+    for step in 0..50 {
+        let address = unsafe {
+            VirtualAlloc(
+                std::ptr::null(),
+                BLOCK,
+                MEM_COMMIT | MEM_RESERVE,
+                PAGE_READWRITE,
+            )
+        };
+        if address.is_null() {
+            let error = io::Error::last_os_error().raw_os_error().unwrap_or(0);
+            eprintln!("commit refused after {step} blocks of 4 MiB: Win32 {error}");
+            std::process::exit(if matches!(error, 8 | 1455 | 1816) {
+                100 + step
+            } else {
+                72
+            });
+        }
+        for offset in (0..BLOCK).step_by(4096) {
+            unsafe { address.cast::<u8>().add(offset).write_volatile(1) };
+        }
+    }
+}
+
+#[test]
+fn windows_suspended_probe_rejects_commit_above_192_mib() {
+    use std::os::windows::ffi::OsStrExt;
+    use windows_sys::Win32::Foundation::{WAIT_OBJECT_0, WAIT_TIMEOUT};
+    use windows_sys::Win32::System::Threading::*;
+
+    let executable = std::env::current_exe().unwrap();
+    let application: Vec<u16> = executable.as_os_str().encode_wide().chain([0]).collect();
+    for budget in [256 * 1024 * 1024, MEMORY] {
+        let job = Job::new(budget).unwrap();
+        let mut command: Vec<u16> = "memory-probe --exact memory_probe_child --ignored --nocapture"
+            .encode_utf16()
+            .chain([0])
+            .collect();
+        let mut startup = STARTUPINFOW::default();
+        startup.cb = std::mem::size_of_val(&startup) as u32;
+        let mut process = PROCESS_INFORMATION::default();
+        let created = unsafe {
+            CreateProcessW(
+                application.as_ptr(),
+                command.as_mut_ptr(),
+                std::ptr::null(),
+                std::ptr::null(),
+                0,
+                CREATE_SUSPENDED,
+                std::ptr::null(),
+                std::ptr::null(),
+                &startup,
+                &mut process,
+            )
+        };
+        assert_ne!(created, 0, "{}", io::Error::last_os_error());
+        let result = (|| {
+            if unsafe { AssignProcessToJobObject(job.0, process.hProcess) } == 0
+                || unsafe { ResumeThread(process.hThread) } != 1
+            {
+                return Err(io::Error::last_os_error());
+            }
+            match unsafe { WaitForSingleObject(process.hProcess, 5000) } {
+                WAIT_OBJECT_0 => {}
+                WAIT_TIMEOUT => return Err(io::Error::from(io::ErrorKind::TimedOut)),
+                _ => return Err(io::Error::last_os_error()),
+            }
+            let mut code = 0;
+            if unsafe { GetExitCodeProcess(process.hProcess, &mut code) } == 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok((code, job.peak()?))
+        })();
+        unsafe {
+            if result.is_err() {
+                TerminateProcess(process.hProcess, 73);
+                WaitForSingleObject(process.hProcess, 5000);
+            }
+            CloseHandle(process.hThread);
+            CloseHandle(process.hProcess);
+        }
+        let (code, peak) = result.unwrap();
+        println!("probe budget={budget} peak={peak} exit={code}");
+        if budget == MEMORY {
+            assert!(
+                (140..148).contains(&code),
+                "expected a near-budget allocation refusal"
+            );
+        } else {
+            assert_eq!(code, 0);
+            assert!(peak > MEMORY);
+        }
     }
 }
