@@ -10,3 +10,6 @@ publish = false
 image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "webp"] }
 sha2 = "=0.10.9"
 crc32fast = "=1.5.3"
+
+[target.'cfg(windows)'.dev-dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Security", "Win32_System_JobObjects", "Win32_System_Threading"] }
