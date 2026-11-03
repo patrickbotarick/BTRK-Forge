@@ -89,3 +89,5 @@ A sequência recomendada é **1E → 1F → 1G → 1H**, com CI e validação de
 - **Pós-1.0.** IA, marketplace, nuvem, colaboração, macOS/Linux e edição bidirecional irrestrita. Execução de código de terceiros depende de sandbox e homologação próprios.
 
 Continuam abertas a durabilidade física sob falha de energia, corrida externa sem CAS, RustSec, instalação/desinstalação limpa, mensagem histórica WebView2, sandbox de terceiros, exportação generalizada, edição bidirecional e limites de escala, desempenho, DPI e acessibilidade. A classificação só muda com evidência específica. O plano não autoriza distribuição comercial ou início de implementação.
+
+**1G-A disponível para revisão, com ressalvas.** Inspector categorizado e paleta contextual com transação única foram implementados na branch da subetapa. A homologação funcional Tauri permanece pendente. [Relatório](phases/RELATORIO_FASE_01G_A.md) e [validação](qa/VALIDACAO_FASE_01G_A.md).
