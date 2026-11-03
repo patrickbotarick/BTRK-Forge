@@ -98,4 +98,4 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 
 **1G-B3-A concluída em escopo restrito com GO COM RESSALVAS.** O aceite cobre a fundação persistente v4, migrações e compatibilidade semântica. A 1G-B3 continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B3_A.md).
 
-**1G-B3-B parcial, em revisão com NO-GO para integração.** Resolução nativa somente leitura implementada na branch da subetapa. Importação, publicação e transporte de assets aguardam os gates de segurança. [Relatório](phases/RELATORIO_FASE_01G_B3_B.md).
+**1G-B3-B suspensa por dependência de laboratório Windows descartável. NO-GO para integração e publicação.** O resolver somente leitura e as provas experimentais estão preservados na branch da subetapa. A importação continua desabilitada e a 1G-B3-C segue sem início. A retomada exige ambiente reproduzível e evidência de lançamento restrito, proteção de arquivos e qualificação dos limites do processo. [Checkpoint](phases/CHECKPOINT_FASE_01G_B3_B.md) · [Matriz de laboratório](qa/PLANO_LABORATORIO_FASE_01G_B3_B.md).
