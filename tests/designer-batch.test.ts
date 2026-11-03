@@ -58,3 +58,35 @@ test('dimensões v3 em lote validam unidades e preservam outros campos',()=>{
   for(const value of [-1,2001,1.5])expect(()=>editProject(project,{...edit,value})).toThrow();
   expect(project.screens[0].components.find(c=>c.id==='first')?.style.width).toBe('auto');
 });
+
+test('pai, filho e neto explícitos recebem largura, altura e alinhamento sem atingir irmãos',()=>{
+  const project=fixture();
+  project.screens[0].components.push(component('Text','grandchild','nested'));
+  const ids=['panel','nested','grandchild','first'];
+  const before=serialize(project);
+  const width=editProject(project,{kind:'batch-dimension',ids:['panel','first'],axis:'width',value:300}).project;
+  expect(width.screens[0].components.filter(c=>['panel','first'].includes(c.id)).map(c=>c.style.width)).toEqual([300,300]);
+  let edited=width;
+  const history=new EditHistory();
+  for(const command of [
+    {kind:'batch-dimension',ids,axis:'width',value:300},
+    {kind:'batch-dimension',ids,axis:'height',value:120},
+    {kind:'batch-alignment',ids,value:'center'}
+  ] as const){
+    const next=editProject(edited,command).project;
+    history.record(edited,next);
+    expect(history.undo(next)).toEqual(edited);
+    expect(history.redo(edited)).toEqual(next);
+    edited=next;
+  }
+  for(const c of edited.screens[0].components){
+    if(ids.includes(c.id))expect(c.style).toMatchObject({width:300,height:120,textAlign:'center'});
+    else expect(c).toEqual(project.screens[0].components.find(original=>original.id===c.id));
+  }
+  for(const invalid of [['panel','panel'],['panel','missing'],[]]){
+    expect(()=>editProject(project,{kind:'batch-alignment',ids:invalid,value:'center'})).toThrow(/Seleção inválida/);
+  }
+  expect(()=>editProject(project,{kind:'batch-dimension',ids,axis:'height',value:2001})).toThrow();
+  expect(serialize(project)).toBe(before);
+  expect(deserialize(serialize(edited))).toEqual(edited);
+});

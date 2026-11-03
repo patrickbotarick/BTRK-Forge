@@ -46,3 +46,36 @@ test('dimensões em lote, undo e viewport compartilhada com Preview isolado',asy
   await page.reload();
   expect(await read()).toEqual(after);
 });
+
+test('largura, altura e alinhamento atingem pai, filho e neto selecionados',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await page.getByRole('button',{name:'+ Container',exact:true}).click();
+  await page.getByRole('button',{name:'+ Container',exact:true}).click();
+  await page.getByRole('button',{name:'+ Text',exact:true}).click();
+  const read=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('btrk-forge:phase0:project')!) as Project);
+  const before=await read();
+  const [parent,child,grandchild]=before.screens[0].components.slice(-3);
+  const row=(id:string)=>page.locator(`.tree-select[title="${id}"]`);
+  await row(parent.id).click();
+  await row(grandchild.id).click({modifiers:['Shift']});
+  await expect(row(child.id)).toHaveAttribute('aria-pressed','true');
+  await expect(page.getByLabel('Largura',{exact:true})).toHaveValue('');
+  for(const [label,value] of [['Largura','300'],['Altura','120']]){
+    await page.getByLabel(label,{exact:true}).selectOption('px');
+    await page.getByLabel(label+' em pixels').fill(value);
+    await page.getByRole('button',{name:'Aplicar '+label.toLowerCase()}).click();
+  }
+  await page.getByLabel('Alinhamento do texto em lote').selectOption('center');
+  const applied=await read();
+  expect(applied.screens[0].components.slice(-3).map(c=>[c.style.width,c.style.height,c.style.textAlign]))
+    .toEqual([[300,120,'center'],[300,120,'center'],[300,120,'center']]);
+  const undo=page.getByRole('button',{name:'Desfazer',exact:true});
+  for(let i=0;i<3;i++)await undo.click();
+  expect(await read()).toEqual(before);
+  const redo=page.getByRole('button',{name:'Refazer',exact:true});
+  for(let i=0;i<3;i++)await redo.click();
+  expect(await read()).toEqual(applied);
+  await page.reload();
+  expect(await read()).toEqual(applied);
+});

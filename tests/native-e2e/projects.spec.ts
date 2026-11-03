@@ -219,19 +219,23 @@ test('lote no Designer salva v3 e reabre com estrutura e seleção transitória'
   expect((await disk.read()).screens).toEqual(saved.screens);
 });
 
-test('layout relativo v3 salvo pelo Inspector reabre pelo driver Rust',async({page,disk})=>{
+test('largura em pai e filho no v3 salva e reabre pelo driver Rust',async({page,disk})=>{
   await page.goto('/');
   await create(page,'Layout v3');
   await page.getByRole('button',{name:'Design',exact:true}).click();
   await page.getByRole('button',{name:'+ Container',exact:true}).click();
   await page.getByRole('button',{name:'+ Input',exact:true}).click();
-  await page.getByLabel('Largura',{exact:true}).selectOption('fill');
+  await page.getByRole('list',{name:'Hierarquia de componentes'}).getByRole('button',{name:/Container/})
+    .click({modifiers:['Control']});
+  await page.getByLabel('Largura',{exact:true}).selectOption('px');
+  await page.getByLabel('Largura em pixels').fill('300');
   await page.getByRole('button',{name:'Aplicar largura'}).click();
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
   const saved=await disk.read();
   expect(saved.schemaVersion).toBe(3);
-  expect(saved.screens[0].components.find(c=>c.type==='Input')?.style.width).toBe('fill');
+  expect(saved.screens[0].components.filter(c=>c.type==='Input'||c.type==='Container').map(c=>c.style.width))
+    .toEqual([300,300]);
   await page.getByRole('button',{name:'Fechar projeto'}).click();
   await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');

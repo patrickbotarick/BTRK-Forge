@@ -14,10 +14,15 @@ export type Edit =
   | BatchEdit;
 type EditResult={project:Project;selectedId:string|null};
 
-export function selectionRoots(components:readonly Component[], ids:readonly string[]) {
+function validatedSelection(parents:ReadonlyMap<string,string|null>,ids:readonly string[]) {
   const selected=new Set(ids);
-  const parents=new Map(components.map(c=>[c.id,c.parentId]));
   if(!ids.length||selected.size!==ids.length||ids.some(id=>!parents.has(id)))throw new Error('Seleção inválida ou desatualizada.');
+  return selected;
+}
+
+export function selectionRoots(components:readonly Component[], ids:readonly string[]) {
+  const parents=new Map(components.map(c=>[c.id,c.parentId]));
+  const selected=validatedSelection(parents,ids);
   return components.filter(c=>{
     if(!selected.has(c.id))return false;
     for(let parent=c.parentId;parent;parent=parents.get(parent)??null)if(selected.has(parent))return false;
@@ -27,6 +32,16 @@ export function selectionRoots(components:readonly Component[], ids:readonly str
 
 function editBatch(project:Project, edit:BatchEdit):EditResult {
   const components=project.screens[0].components;
+  if(edit.kind==='batch-alignment'||edit.kind==='batch-dimension'){
+    const selected=validatedSelection(new Map(components.map(c=>[c.id,c.parentId])),edit.ids);
+    const next=structuredClone(project);
+    for(const c of next.screens[0].components)if(selected.has(c.id)){
+      if(edit.kind==='batch-dimension')c.style[edit.axis]=edit.value;
+      else c.style.textAlign=edit.value;
+    }
+    validateProject(next,{allowIncomplete:true});
+    return {project:next,selectedId:edit.ids.at(-1)!};
+  }
   const roots=selectionRoots(components,edit.ids);
   let next=project;
   if(edit.kind==='batch-remove'||edit.kind==='batch-duplicate'){
@@ -54,14 +69,6 @@ function editBatch(project:Project, edit:BatchEdit):EditResult {
       }
       let index=0;
       next.screens[0].components=list.map(c=>c.parentId===parent?siblings[index++]:c);
-    }
-  }
-  if(edit.kind==='batch-alignment'||edit.kind==='batch-dimension'){
-    next=structuredClone(project);
-    const selected=new Set(edit.ids);
-    for(const c of next.screens[0].components)if(selected.has(c.id)){
-      if(edit.kind==='batch-dimension')c.style[edit.axis]=edit.value;
-      else c.style.textAlign=edit.value;
     }
   }
   validateProject(next,{allowIncomplete:true});

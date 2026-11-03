@@ -18,3 +18,9 @@ Designer e Preview usam o mesmo renderizador declarativo. A decoração e a áre
 O schema final continua **v3**, sem migração nova. O JSON Schema consumido pelo Rust e o contrato TypeScript permanecem intactos. Grid, percentuais livres, min/max por componente e expansão Flex configurável exigiriam novos campos e validação equivalente antes da persistência. Esses itens ficam bloqueados nesta entrega. Alças de dimensionamento, breakpoints arbitrários e posicionamento absoluto ficam fora da fatia. Nenhum CSS livre, URL, HTML ou script entra no documento.
 
 A [validação](../qa/VALIDACAO_FASE_01G_B2.md) separa Chromium, UI/Rust e Tauri. Os quatro componentes, IR v1, Blueprint, TypeScript gerado, eventos, bindings e Preview isolado conservam seus contratos. A homologação Tauri da 1G-A e 1G-B1, a homologação integral Windows da 1D e as ressalvas históricas seguem abertas. A 1E-A continua suspensa, a 1E-B em NO-GO e a 1F sem início. A 1G-B3 aguarda autorização.
+
+## Revisão de alvos em lote
+
+A reprodução na base 7edb059 confirmou largura de 300 px no Container e no Text. Altura e alinhamento também alcançavam os descendentes selecionados. O domínio já percorria todos os IDs explícitos para propriedades, mas calculava as raízes antes de decidir o tipo de operação.
+
+A revisão separa as duas rotas. Largura, altura e alinhamento validam IDs explícitos, recusam seleção vazia, duplicada ou inexistente e aplicam a propriedade uma vez por componente em uma cópia validada. Duplicação, remoção, movimento e reordenação continuam usando raízes de subárvore. A publicação e o histórico continuam atômicos. O schema v3 e o escopo de layout permanecem os mesmos.
