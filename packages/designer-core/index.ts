@@ -6,8 +6,9 @@ export type BatchEdit =
   | {kind:'batch-reorder';ids:readonly string[];direction:-1|1}
   | {kind:'batch-dimension';ids:readonly string[];axis:'width'|'height';value:Component['style']['width']}
   | {kind:'batch-alignment';ids:readonly string[];value:Component['style']['textAlign']};
+export type LibraryComponent = ComponentV3['type'] | 'Panel';
 export type Edit =
-  | {kind:'add';type:ComponentV3['type'];parentId:string|null}
+  | {kind:'add';type:LibraryComponent;parentId:string|null}
   | {kind:'update';id:string;component:Component}
   | {kind:'move';id:string;parentId:string|null;index:number}
   | {kind:'duplicate'|'remove';id:string}
@@ -82,7 +83,15 @@ export function editProject(project:Project, edit:Edit):EditResult {
   const ids=new Set([next.id,...next.screens.map(s=>s.id),...next.variables.map(v=>v.id),...next.graph.nodes.map(n=>n.id),...next.graph.connections.map(e=>e.id),...next.resources.map(r=>r.id),...list.map(c=>c.id)]);
   const fresh=()=>{let id;do{id=`component-${crypto.randomUUID()}`;}while(ids.has(id));ids.add(id);return id;};
   let selectedId:string|null=null;
-  if(edit.kind==='add'){const c=component(edit.type,fresh(),edit.parentId);list.push(c);selectedId=c.id;}
+  if(edit.kind==='add'){
+    const c=component(edit.type==='Panel'?'Container':edit.type,fresh(),edit.parentId);
+    if(edit.type==='Panel'&&c.type==='Container'){
+      Object.assign(c.style,{background:'#F1F5F9',color:'#1E293B',borderColor:'#64748B',borderWidth:1,width:'fill'});
+      Object.assign(c.props,{padding:16,gap:12});
+    }
+    list.push(c);
+    selectedId=c.id;
+  }
   else {
     const target=find(edit.id);selectedId=target.id;
     if(edit.kind==='update'){if(edit.component.id!==target.id || edit.component.type!==target.type)throw new Error('Identidade e tipo não podem ser alterados');list[list.indexOf(target)]=structuredClone(edit.component);}

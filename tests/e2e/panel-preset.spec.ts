@@ -1,0 +1,55 @@
+import { test, expect } from '@playwright/test';
+import type { Project } from '../../packages/project-schema';
+
+test('Panel pela biblioteca e arraste usa Container no Designer e no Preview',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  const read=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('btrk-forge:phase0:project')!) as Project);
+  const before=await read();
+  const library=page.getByRole('button',{name:'+ Panel',exact:true});
+  await library.focus();
+  await library.press('Enter');
+  const canvas=page.getByTestId('design-canvas');
+  const root=(await read()).screens[0].components.at(-1)!;
+  expect(root).toMatchObject({type:'Container',parentId:null});
+  const dragData=await page.evaluateHandle(()=>new DataTransfer());
+  await library.dispatchEvent('dragstart',{dataTransfer:dragData});
+  await canvas.dispatchEvent('drop',{dataTransfer:dragData});
+  const after=await read();
+  const child=after.screens[0].components.at(-1)!;
+  expect(child).toMatchObject({type:'Container',parentId:root.id});
+  const row=(id:string)=>page.locator(`.tree-select[title="${id}"]`);
+  await row(root.id).focus();
+  await row(root.id).press('Enter');
+  await expect(row(root.id)).toHaveAttribute('aria-pressed','true');
+  await expect(page.getByLabel('Padding (px)')).toHaveValue('16');
+  await row(child.id).click({modifiers:['Control']});
+  await expect(page.getByLabel('Largura',{exact:true})).toHaveValue('fill');
+  await expect(page.getByLabel('Altura',{exact:true})).toHaveValue('auto');
+  const undo=page.getByRole('button',{name:'Desfazer',exact:true});
+  const redo=page.getByRole('button',{name:'Refazer',exact:true});
+  await undo.click();
+  await undo.click();
+  expect(await read()).toEqual(before);
+  await redo.click();
+  await redo.click();
+  expect(await read()).toEqual(after);
+  const selector=`[data-component-id="${child.id}"]`;
+  for(const viewport of ['mobile','web','desktop']){
+    await page.getByLabel('Viewport Design').selectOption(viewport);
+    const design=canvas.locator(selector);
+    await expect(design).toHaveCSS('padding','16px');
+    await expect(design).toHaveCSS('background-color','rgb(241, 245, 249)');
+    await page.getByRole('button',{name:'Preview',exact:true}).click();
+    await expect(page.getByLabel('Viewport',{exact:true})).toHaveValue(viewport);
+    const preview=page.frameLocator('iframe').locator(selector);
+    await expect(preview).toHaveCSS('padding','16px');
+    await expect(preview).toHaveCSS('background-color','rgb(241, 245, 249)');
+    await expect(preview).toHaveCSS('flex-direction','column');
+    await page.getByRole('button',{name:'Design',exact:true}).click();
+  }
+  await page.reload();
+  expect(await read()).toEqual(after);
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await expect(row(child.id)).toContainText('Container');
+});

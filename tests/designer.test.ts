@@ -1,3 +1,5 @@
+import { lowerBlueprint } from '../packages/blueprint-ir';
+import { generateTypeScript } from '../packages/typescript-codegen';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
@@ -46,4 +48,36 @@ describe('Designer declarativo v2',()=>{
   it('mantém renderizador do iframe gerado da mesma implementação do canvas',()=>{
     const source=ts.transpileModule(readFileSync('packages/preview-runtime/visual-renderer.ts','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,removeComments:true}}).outputText.replace('export function renderVisual','function renderVisual');expect(rendererSource).toBe(source);
   });
+});
+
+it('persiste Panel de uma fixture legada como Container sem alterar IR ou código',async()=>{
+  const original=readDocument(readFileSync('tests/fixtures/projects/phase0-v1.json','utf8'));
+  const root=editProject(original,{kind:'add',type:'Panel',parentId:null});
+  const child=editProject(root.project,{kind:'add',type:'Panel',parentId:root.selectedId});
+  const reopened=readDocument(writeDocument(child.project));
+  expect(reopened).toEqual(child.project);
+  expect(reopened.schemaVersion).toBe(4);
+  const panel=reopened.screens[0].components.at(-1)!;
+  expect(panel).toMatchObject({type:'Container',parentId:root.selectedId,
+    props:{padding:16,gap:12,direction:'column'},
+    style:{background:'#F1F5F9',color:'#1E293B',borderColor:'#64748B',borderWidth:1,width:'fill',height:'auto'}});
+  const copy=editProject(reopened,{kind:'duplicate',id:panel.id});
+  expect(copy.selectedId).not.toBe(panel.id);
+  expect(copy.project.screens[0].components.find(c=>c.id===copy.selectedId)).toEqual({...panel,id:copy.selectedId});
+  const moved=editProject(copy.project,{kind:'move',id:copy.selectedId!,parentId:null,index:0});
+  expect(moved.project.screens[0].components[0]).toMatchObject({id:copy.selectedId,parentId:null});
+  const reordered=editProject(moved.project,{kind:'batch-reorder',ids:[copy.selectedId!],direction:1});
+  expect(reordered.project.screens[0].components.filter(c=>c.parentId===null)[1].id).toBe(copy.selectedId);
+  const removed=editProject(reordered.project,{kind:'remove',id:copy.selectedId!});
+  expect(removed.project.screens[0].components.some(c=>c.id===copy.selectedId)).toBe(false);
+  const equivalent=structuredClone(original);
+  for(const {id,parentId} of reopened.screens[0].components.slice(-2)){
+    equivalent.screens[0].components.push(component('Container',id,parentId));
+  }
+  const before=lowerBlueprint(equivalent), after=lowerBlueprint(reopened);
+  if(!before.ok||!after.ok)throw new Error('Blueprint inválido');
+  expect(after.ir).toEqual(before.ir);
+  const generated=await generateTypeScript(before.ir);
+  expect(generated.ok).toBe(true);
+  expect(await generateTypeScript(after.ir)).toEqual(generated);
 });
