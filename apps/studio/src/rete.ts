@@ -10,14 +10,39 @@ type Node = ClassicPreset.Node;
 type Edge = ClassicPreset.Connection<Node, Node>;
 type Schemes = GetSchemes<Node, Edge>;
 type Extra = ReactArea2D<Schemes>;
+export type PortAnchor = { nodeId: string; key: string; side: 'input' | 'output' };
 const labels: Record<GraphNode['kind'], string> = { ...nodeLabels,event: 'Evento · clique', variable: 'Variável',set: 'Ação · definir' };
-export async function createEditor(container: HTMLElement, initial: Project, onChange: (project: Project) => void, onError: (error: string) => void,onSelect:(id:string)=>void=()=>{}) {
+export async function createEditor(container: HTMLElement, initial: Project, onChange: (project: Project) => void, onError: (error: string) => void,onSelect:(id:string)=>void=()=>{}, onEmptyDrop?: (anchor: PortAnchor) => void, viewport?: {x:number;y:number;k:number}) {
   const project = structuredClone(initial); let ready = false;
   const editor = new NodeEditor<Schemes>();
   const area = new AreaPlugin<Schemes, Extra>(container);
   const connection = new ConnectionPlugin<Schemes, Extra>();
   const render = new ReactPlugin<Schemes, Extra>({ createRoot });
   const sockets = Object.fromEntries(['exec', 'number', 'boolean', 'string'].map(type => [type, new ClassicPreset.Socket(type)])) as Record<PortType, ClassicPreset.Socket>;
+  let emptyCanvasDrop = false;
+  let occupiedAtPick = false;
+  const trackDrop = (event: PointerEvent) => {
+    emptyCanvasDrop = event.target instanceof Element && !event.target.closest('[data-graph-node-id]');
+  };
+  const clearDrop = () => { emptyCanvasDrop = false; };
+  container.addEventListener('pointerup', trackDrop, true);
+  container.addEventListener('pointerdown', clearDrop, true);
+  connection.addPipe(context => {
+    if(context.type==='render'&&context.data.type==='socket'){
+      const {element,side,key}=context.data;
+      element.dataset.graphPort=side+':'+key;
+    }
+    if(context.type==='connectionpick'){
+      const {side,nodeId,key}=context.data.socket;
+      occupiedAtPick=side==='input'&&project.graph.connections.some(edge=>edge.target===nodeId&&edge.input===key);
+    }
+    if(context.type==='connectiondrop'&&ready&&emptyCanvasDrop&&!occupiedAtPick&&!context.data.socket&&!context.data.created){
+      emptyCanvasDrop=false;
+      const {nodeId,key,side}=context.data.initial;
+      onEmptyDrop?.({nodeId,key,side});
+    }
+    return context;
+  });
   connection.addPreset(ConnectionPresets.classic.setup());
   render.addPreset(Presets.classic.setup());
   editor.use(area); area.use(connection); area.use(render);
@@ -62,7 +87,10 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
     const edge = new ClassicPreset.Connection(editor.getNode(c.source)!, c.output, editor.getNode(c.target)!, c.input); edge.id = c.id; await editor.addConnection(edge);
   }
   ready = true;
-  await AreaExtensions.zoomAt(area, editor.getNodes());
+  if(viewport){
+    await area.area.zoom(viewport.k);
+    await area.area.translate(viewport.x,viewport.y);
+  }else await AreaExtensions.zoomAt(area, editor.getNodes());
   return {
     mark(selected:string|null,executed:string[],invalid:string[]){for(const [id,view] of area.nodeViews){view.element.dataset.graphNodeId=id;view.element.dataset.executionState=invalid.includes(id)?'ERRO / INVÁLIDO':executed.includes(id)?'EXECUTADO':'';view.element.dataset.selected=String(selected===id);view.element.style.outline=invalid.includes(id)?'2px solid #FF6868':selected===id?'2px solid #FF934F':executed.includes(id)?'2px solid #49C9B5':'';}},
     async addConstant() {
@@ -72,6 +100,11 @@ export async function createEditor(container: HTMLElement, initial: Project, onC
     syncProperties(next: Project) { project.screens = structuredClone(next.screens); },
     fit: () => AreaExtensions.zoomAt(area, editor.getNodes()),
     reveal: async (id: string) => { const node = editor.getNodes().find(n => n.id === id); if (node) { await AreaExtensions.zoomAt(area, [node], { scale: 0.8 }); container.dataset.revealedNodeId = id; } },
-    destroy: () => area.destroy()
+    viewport: () => ({...area.area.transform}),
+    destroy: () => {
+      container.removeEventListener('pointerup',trackDrop,true);
+      container.removeEventListener('pointerdown',clearDrop,true);
+      area.destroy();
+    }
   };
 }

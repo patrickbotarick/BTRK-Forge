@@ -1,6 +1,6 @@
 import type { GraphNode, Project, Connection } from '../project-schema';
 import { ports, validateProject } from './index';
-export type GraphEdit={kind:'add';node:GraphNode}|{kind:'update';id:string;node:GraphNode}|{kind:'remove';id:string}|{kind:'connect';edge:Connection}|{kind:'disconnect';id:string};
+export type GraphEdit={kind:'add';node:GraphNode}|{kind:'add-connected';node:GraphNode;edge:Connection}|{kind:'update';id:string;node:GraphNode}|{kind:'remove';id:string}|{kind:'connect';edge:Connection}|{kind:'disconnect';id:string};
 export function makeNode(project:Project,kind:GraphNode['kind'],componentId?:string):GraphNode {
   const base={id:`node-${crypto.randomUUID()}`,position:{x:(project.graph.nodes.length%4)*300,y:Math.floor(project.graph.nodes.length/4)*240}};const components=project.screens[0].components;
   const selected=components.find(c=>c.id===componentId);
@@ -19,10 +19,11 @@ function bindEvent(project:Project,node:GraphNode){if(node.kind!=='event')return
 }
 export function editGraph(project:Project,edit:GraphEdit):Project {
   const next=structuredClone(project);
-  if(edit.kind==='add'){next.graph.nodes.push(structuredClone(edit.node));bindEvent(next,edit.node);}
+  if(edit.kind==='add'||edit.kind==='add-connected'){next.graph.nodes.push(structuredClone(edit.node));bindEvent(next,edit.node);}
   if(edit.kind==='update'){const index=next.graph.nodes.findIndex(n=>n.id===edit.id);if(index<0||edit.node.id!==edit.id||next.graph.nodes[index].kind!==edit.node.kind)throw new Error('Node ou identidade inválida');next.graph.nodes[index]=structuredClone(edit.node);bindEvent(next,edit.node);}
   if(edit.kind==='remove'){if(!next.graph.nodes.some(n=>n.id===edit.id))throw new Error('Node ausente');next.graph.nodes=next.graph.nodes.filter(n=>n.id!==edit.id);next.graph.connections=next.graph.connections.filter(c=>c.source!==edit.id&&c.target!==edit.id);for(const c of next.screens[0].components){if(c.type==='Button'&&c.events.click===edit.id)c.events.click=null;if(c.type==='Input'&&c.events.change===edit.id)c.events.change=null;}}
-  if(edit.kind==='connect')next.graph.connections.push(structuredClone(edit.edge));
+  if(edit.kind==='add-connected'&&((edit.edge.source===edit.node.id)===(edit.edge.target===edit.node.id)))throw new Error('A conexão deve ligar o novo node a um node existente');
+  if(edit.kind==='connect'||edit.kind==='add-connected')next.graph.connections.push(structuredClone(edit.edge));
   if(edit.kind==='disconnect'){if(!next.graph.connections.some(c=>c.id===edit.id))throw new Error('Conexão ausente');next.graph.connections=next.graph.connections.filter(c=>c.id!==edit.id);}
   return validateProject(next,{allowIncomplete:true});
 }

@@ -1,0 +1,81 @@
+import { expect, test, type Page } from '@playwright/test';
+import type { Project } from '../../packages/project-schema';
+
+const read = (page:Page) => page.evaluate(() => JSON.parse(localStorage.getItem('btrk-forge:phase0:project')!) as Project);
+
+test('Inspector mostra apenas categorias aplicáveis e persiste a propriedade editada',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await page.locator('.tree-select[title="button-count"]').click();
+  const inspector=page.getByRole('complementary',{name:'Inspector'});
+  await expect(inspector.getByRole('group',{name:'Eventos'}).getByLabel('Evento de clique')).toBeVisible();
+  await expect(inspector.getByRole('group',{name:'Comportamento'}).getByLabel('Desabilitado')).toBeVisible();
+  const before=await read(page);
+  await inspector.getByRole('group',{name:'Geral'}).getByLabel('Texto do componente').fill('Novo texto');
+  const expected=structuredClone(before);
+  const button=expected.screens[0].components.find(component=>component.id==='button-count');
+  if(button?.type!=='Button')throw new Error('Botão da fixture ausente');
+  button.props.text='Novo texto';
+  await expect.poll(()=>read(page)).toEqual(expected);
+  await page.screenshot({path:'artifacts/phase01g-a/inspector-web.png',fullPage:true});
+  await page.getByRole('button',{name:'+ Container',exact:true}).click();
+  await expect(inspector.getByRole('group',{name:'Eventos'})).toHaveCount(0);
+  await expect(inspector.getByRole('group',{name:'Comportamento'})).toHaveCount(0);
+  await inspector.getByLabel('Gap (px)',{exact:true}).fill('300');
+  await expect(inspector.getByRole('alert')).toContainText('entre 0 e 128');
+  await page.reload();
+  expect((await read(page)).screens[0].components.find(component=>component.id==='button-count')).toEqual(button);
+});
+
+test('paleta usa teclado, mostra incompatibilidade e grava node e edge em um único passo',async({page})=>{
+  await page.goto('/');
+  const before=await read(page);
+  await page.getByLabel('Node selecionado',{exact:true}).selectOption('sum');
+  const opener=page.getByRole('button',{name:'Adicionar pela saída value · number',exact:true});
+  await opener.click();
+  const dialog=page.getByRole('dialog',{name:'Paleta contextual de nodes'});
+  const search=dialog.getByRole('combobox');
+  await expect(search).toBeFocused();
+  await search.fill('concatenar');
+  await expect(dialog.getByRole('option')).toHaveCount(0);
+  await dialog.getByText(/Opções incompatíveis/).click();
+  await expect(dialog.getByText(/Sem porta de entrada do tipo number/)).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(opener).toBeFocused();
+  expect(await read(page)).toEqual(before);
+  await opener.click();
+  await search.fill('matematica soma');
+  await expect(dialog.getByRole('option')).toHaveCount(2);
+  await page.screenshot({path:'artifacts/phase01g-a/paleta-web.png',fullPage:true});
+  await search.press('ArrowDown');
+  await expect(dialog.getByRole('option',{name:'Somar · b'})).toHaveAttribute('aria-selected','true');
+  await search.press('Enter');
+  const saved=await read(page);
+  expect(saved.graph.nodes).toHaveLength(before.graph.nodes.length+1);
+  expect(saved.graph.connections.at(-1)).toMatchObject({source:'sum',output:'value',target:saved.graph.nodes.at(-1)?.id,input:'b'});
+  await page.getByRole('button',{name:'Desfazer lógica'}).click();
+  expect(await read(page)).toEqual(before);
+  await page.getByRole('button',{name:'Refazer lógica'}).click();
+  expect(await read(page)).toEqual(saved);
+  await page.reload();
+  expect(await read(page)).toEqual(saved);
+});
+
+test('soltar uma conexão em área vazia do Rete abre a paleta',async({page})=>{
+  await page.goto('/');
+  const before=await read(page);
+  const socket=page.locator('[data-graph-node-id="sum"] [data-graph-port="output:value"]');
+  await expect(socket).toBeVisible();
+  const position=await socket.boundingBox();
+  const canvas=await page.getByTestId('graph').boundingBox();
+  if(!position||!canvas)throw new Error('Canvas ou porta ausente');
+  await page.mouse.move(position.x+position.width/2,position.y+position.height/2);
+  await page.mouse.down();
+  await page.mouse.move(canvas.x+canvas.width-18,canvas.y+18,{steps:6});
+  await page.mouse.up();
+  const dialog=page.getByRole('dialog',{name:'Paleta contextual de nodes'});
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('graph')).toBeFocused();
+  expect(await read(page)).toEqual(before);
+});

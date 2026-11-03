@@ -169,3 +169,30 @@ test('Forge Debug Demo pela UI/Rust: histórico, navegação, rollback e manifes
   await page.getByRole('button', { name: 'Fechar projeto', exact: true }).click(); await page.getByRole('button', { name: 'Abrir projeto', exact: true }).click(); await expect(page.getByLabel('Histórico de eventos').getByRole('button')).toHaveCount(0); expect((await disk.read()).graph).toEqual(faultSaved.graph);
   await page.getByRole('button', { name: 'Fechar projeto', exact: true }).click(); await create(page, 'Outro projeto'); await expect(page.getByLabel('Histórico de eventos').getByRole('button')).toHaveCount(0); expect((await disk.read()).id).not.toBe(saved.id);
 });
+
+test('paleta persiste transação v3 e descarta contexto ao fechar e trocar de projeto',async({page,disk})=>{
+  await page.goto('/');
+  await create(page,'Paleta v3');
+  const original=await disk.read();
+  await page.getByLabel('Node selecionado',{exact:true}).selectOption('sum');
+  const opener=page.getByRole('button',{name:'Adicionar pela saída value · number',exact:true});
+  await opener.click();
+  const palette=page.getByRole('dialog',{name:'Paleta contextual de nodes'});
+  await palette.getByRole('combobox').fill('soma');
+  await palette.getByRole('option',{name:'Somar · a'}).click();
+  await page.getByRole('button',{name:'Salvar',exact:true}).click();
+  await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
+  const saved=await disk.read();
+  expect(saved.schemaVersion).toBe(3);
+  expect(saved.graph.nodes).toHaveLength(original.graph.nodes.length+1);
+  expect(saved.graph.connections.at(-1)).toMatchObject({source:'sum',target:saved.graph.nodes.at(-1)?.id,input:'a'});
+  await page.getByRole('button',{name:'Fechar projeto'}).click();
+  await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();
+  await expect(page.getByTestId('node')).toHaveCount(saved.graph.nodes.length);
+  expect((await disk.read()).graph).toEqual(saved.graph);
+  await expect(palette).toHaveCount(0);
+  await page.getByRole('button',{name:'Fechar projeto'}).click();
+  await create(page,'Outro projeto');
+  await expect(page.getByLabel('Node selecionado',{exact:true})).toHaveValue('');
+  await expect(palette).toHaveCount(0);
+});
