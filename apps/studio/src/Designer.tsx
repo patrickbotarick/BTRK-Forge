@@ -1,12 +1,67 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Component, ComponentStyle, Project } from '../../../packages/project-schema';
-import type { Edit } from '../../../packages/designer-core';
+import { selectionRoots, type BatchEdit, type Edit } from '../../../packages/designer-core';
 import { renderVisual } from '../../../packages/preview-runtime/visual-renderer';
 export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRedo,openBlueprint}:{project:Project;edit:(e:Edit)=>string|void;selectedId:string|null;select:(id:string|null)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;openBlueprint?:(id:string)=>void}) {
   const components=project.screens[0].components;
   const selected=components.find(c=>c.id===selectedId);
   const canvas=useRef<HTMLDivElement>(null);const [viewport,setViewport]=useState('desktop');
   const [confirmRemove,setConfirmRemove]=useState(false);
+  const [selection,setSelection]=useState<string[]>([]);
+  const anchor=useRef<string|null>(null);
+  const treeRoot=useRef<HTMLButtonElement>(null);
+  const treeButtons=useRef(new Map<string,HTMLButtonElement>());
+  const [batchError,setBatchError]=useState('');
+  const [destination,setDestination]=useState('');
+  const activeIds=selectedId&&components.some(c=>c.id===selectedId)
+    ? selection.includes(selectedId)?selection.filter(id=>components.some(c=>c.id===id)):[selectedId]
+    : [];
+  const multi=activeIds.length>1;
+  const selectedSet=new Set(activeIds);
+  const roots=multi?selectionRoots(components,activeIds):[];
+  const sharedParent=roots.every(c=>c.parentId===roots[0]?.parentId);
+  const destinations=components.filter(c=>c.type==='Container').map(c=>{
+    let ancestor:Component|undefined=c;
+    while(ancestor&&!selectedSet.has(ancestor.id))ancestor=components.find(parent=>parent.id===ancestor?.parentId);
+    return {id:c.id,blocked:!!ancestor};
+  });
+  const destinationBlocked=destinations.some(c=>c.id===destination&&c.blocked);
+  const commonAlignment=selected?.style.textAlign;
+  const mixedAlignment=components.some(c=>selectedSet.has(c.id)&&c.style.textAlign!==commonAlignment);
+  const orderedIds:string[]=[];
+  function flatten(parentId:string|null){
+    for(const c of components.filter(c=>c.parentId===parentId)){
+      orderedIds.push(c.id);
+      if(c.type==='Container')flatten(c.id);
+    }
+  }
+  flatten(null);
+
+  function choose(id:string|null, modifiers?:{ctrlKey:boolean;metaKey:boolean;shiftKey:boolean}){
+    setBatchError('');
+    setDestination('');
+    let ids=id?[id]:[];
+    if(id&&modifiers?.shiftKey){
+      const from=orderedIds.indexOf(anchor.current??selectedId??id);
+      const to=orderedIds.indexOf(id);
+      if(from>=0&&to>=0)ids=orderedIds.slice(Math.min(from,to),Math.max(from,to)+1);
+    }else{
+      if(id&&(modifiers?.ctrlKey||modifiers?.metaKey)){
+        ids=selectedSet.has(id)?activeIds.filter(value=>value!==id):[...activeIds,id];
+      }
+      anchor.current=id;
+    }
+    setSelection(ids);
+    select(id&&ids.includes(id)?id:ids.at(-1)??null);
+  }
+  function runBatch(command:BatchEdit){
+    const message=edit(command);
+    setBatchError(message??'');
+    if(!message&&command.kind==='batch-remove'){
+      choose(null);
+      treeRoot.current?.focus();
+    }
+  }
   const [fieldError,setFieldError]=useState<{project:Project;id:string;field:string;message:string}|null>(null);
   const errorFor=(field:string)=>fieldError?.project===project&&fieldError.id===selectedId&&fieldError.field===field?fieldError.message:undefined;
   function report(field:string,message?:string|void){
@@ -17,7 +72,32 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
     return message&&<span id={`design-error-${field}`} className="logic-error" role="alert">{message}</span>;
   }
   useEffect(()=>{const key=(e:KeyboardEvent)=>{const target=e.target as HTMLElement;if(confirmRemove){if(e.key==='Escape')setConfirmRemove(false);if(e.key==='Tab'){const buttons=[...document.querySelectorAll<HTMLButtonElement>('[aria-label="Remover componente"] button')];if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1)?.focus();}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0]?.focus();}}return;}if(e.key==='Delete'&&selected&&!target.closest('input,textarea,select,[contenteditable=true]')){e.preventDefault();setConfirmRemove(true);}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key);},[selected,confirmRemove]);
-  useEffect(()=>{renderVisual(canvas.current!,project.screens[0],{design:true,selected:selectedId,onSelect:select});},[project,selectedId,select]);
+  const canvasSelect=useRef(choose);
+  canvasSelect.current=choose;
+  useEffect(()=>{
+    renderVisual(canvas.current!,project.screens[0],{design:true,onSelect:id=>canvasSelect.current(id)});
+  },[project]);
+  useEffect(()=>{
+    const valid=new Set(activeIds);
+    for(const element of canvas.current?.querySelectorAll<HTMLElement>('[data-component-id]')??[]){
+      const pressed=valid.has(element.dataset.componentId??'');
+      element.setAttribute('aria-pressed',String(pressed));
+      element.style.outline=pressed?'2px solid #FF934F':'1px dashed #536879';
+    }
+  });
+  useEffect(()=>{
+    setSelection(ids=>ids.filter(id=>components.some(c=>c.id===id)));
+    if(anchor.current&&!components.some(c=>c.id===anchor.current))anchor.current=null;
+  },[components]);
+  function canvasModifiers(event:React.MouseEvent|React.KeyboardEvent){
+    if(!(event.ctrlKey||event.metaKey||event.shiftKey))return;
+    if('key' in event&&event.key!=='Enter'&&event.key!==' ')return;
+    const element=(event.target as Element).closest<HTMLElement>('[data-component-id]');
+    if(!element?.dataset.componentId)return;
+    event.preventDefault();
+    event.stopPropagation();
+    choose(element.dataset.componentId,event);
+  }
   const parent=selected?.type==='Container'?selected.id:selected?.parentId??null;
   const add=(type:Component['type'])=>edit({kind:'add',type,parentId:parent});
   const change=(mutate:(c:Component)=>void)=>{if(!selected)return;const c=structuredClone(selected);mutate(c);edit({kind:'update',id:c.id,component:c});};
@@ -34,13 +114,61 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
         if(input.valueAsNumber!==value)update(input.valueAsNumber);
       }}/>{errorMessage(field)}</label>;
   };
-  function tree(parentId:string|null,depth=0):React.ReactNode {return components.filter(c=>c.parentId===parentId).map(c=><li key={c.id}><button className="tree-select" aria-pressed={selectedId===c.id} onClick={()=>select(c.id)} style={{paddingLeft:12+depth*14}} title={c.id}>{c.type==='Container'?'▾':'◇'} {c.type} {'text' in c.props?c.props.text.slice(0,20):c.type==='Input'?c.props.placeholder:''}</button>{c.type==='Container'&&<ul>{tree(c.id,depth+1)}</ul>}</li>);}
+  function tree(parentId:string|null,depth=0):React.ReactNode {
+    return components.filter(c=>c.parentId===parentId).map(c=><li key={c.id}>
+      <button className="tree-select" aria-pressed={selectedSet.has(c.id)}
+        ref={element=>{if(element)treeButtons.current.set(c.id,element);else treeButtons.current.delete(c.id);}}
+        onClick={event=>choose(c.id,event)} onKeyDown={event=>{
+          const index=orderedIds.indexOf(c.id);
+          const target=event.key==='ArrowDown'?orderedIds[index+1]:event.key==='ArrowUp'?orderedIds[index-1]
+            :event.key==='Home'?orderedIds[0]:event.key==='End'?orderedIds.at(-1):undefined;
+          if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+            event.preventDefault();
+            if(target){
+              treeButtons.current.get(target)?.focus();
+              if(event.shiftKey)choose(target,event);
+            }
+          }
+          if((event.key==='Enter'||event.key===' ')&&(event.ctrlKey||event.metaKey||event.shiftKey)){
+            event.preventDefault();
+            choose(c.id,event);
+          }
+        }} style={{paddingLeft:12+depth*14}} title={c.id}>
+        {c.type==='Container'?'▾':'◇'} {c.type} {'text' in c.props?c.props.text.slice(0,20):c.type==='Input'?c.props.placeholder:''}
+      </button>
+      {c.type==='Container'&&<ul>{tree(c.id,depth+1)}</ul>}
+    </li>);
+  }
   const siblings=components.filter(c=>c.parentId===selected?.parentId);const position=siblings.findIndex(c=>c.id===selectedId);
   function drop(event:React.DragEvent) {event.preventDefault();const type=event.dataTransfer.getData('application/btrk-component');if(['Text','Button','Input','Container'].includes(type))add(type as Component['type']);}
   return <section className="designer" aria-label="Editor visual">
-    <aside className="design-library"><p className="eyebrow">COMPONENTES</p><div className="catalog">{(['Text','Button','Input','Container'] as const).map(type=><button key={type} draggable onDragStart={e=>e.dataTransfer.setData('application/btrk-component',type)} onClick={()=>add(type)}>+ {type}</button>)}</div><p className="hint">Insere no container selecionado ou ao lado do elemento. Arraste ao canvas ou use os botões.</p><p className="eyebrow">HIERARQUIA</p><button className="screen-select" aria-pressed={!selected} onClick={()=>select(null)}>▧ Tela · {project.screens[0].title||'Principal'}</button><ul className="component-tree" aria-label="Hierarquia de componentes">{tree(null)}</ul>{!components.length&&<p className="hint">Adicione o primeiro componente.</p>}</aside>
-    <div className="design-center"><div className="design-toolbar"><button disabled={!canUndo} onClick={undo}>Desfazer</button><button disabled={!canRedo} onClick={redo}>Refazer</button><label>Viewport Design<select aria-label="Viewport Design" value={viewport} onChange={e=>setViewport(e.target.value)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label></div><p className="design-caption">DESIGN CANVAS · {components.length}/200 componentes · seleção por clique ou Enter · viewport responsivo</p><div className="design-scroll" onDragOver={e=>e.preventDefault()} onDrop={drop}><div className="design-artboard" style={{width:viewport==='desktop'?'100%':viewport==='web'?768:375}}><h1>{project.screens[0].title}</h1><div ref={canvas} data-testid="design-canvas" className="design-render" /></div></div></div>
-    <aside className="design-inspector" aria-label="Inspector"><p className="eyebrow">INSPECTOR</p>{selected?<><h2>{selected.type}</h2><code className="component-id">{selected.id}</code>
+    <aside className="design-library"><p className="eyebrow">COMPONENTES</p><div className="catalog">{(['Text','Button','Input','Container'] as const).map(type=><button key={type} draggable onDragStart={e=>e.dataTransfer.setData('application/btrk-component',type)} onClick={()=>add(type)}>+ {type}</button>)}</div><p className="hint">Insere no container selecionado ou ao lado do elemento. Arraste ao canvas ou use os botões.</p><p className="eyebrow">HIERARQUIA</p><button className="screen-select" ref={treeRoot} aria-pressed={!selected} onClick={()=>choose(null)}>▧ Tela · {project.screens[0].title||'Principal'}</button><ul className="component-tree" aria-label="Hierarquia de componentes">{tree(null)}</ul>{!components.length&&<p className="hint">Adicione o primeiro componente.</p>}</aside>
+    <div className="design-center"><div className="design-toolbar"><button disabled={!canUndo} onClick={undo}>Desfazer</button><button disabled={!canRedo} onClick={redo}>Refazer</button><label>Viewport Design<select aria-label="Viewport Design" value={viewport} onChange={e=>setViewport(e.target.value)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label></div><p className="design-caption">DESIGN CANVAS · {components.length}/200 componentes · seleção por clique ou Enter · viewport responsivo</p><div className="design-scroll" onDragOver={e=>e.preventDefault()} onDrop={drop}><div className="design-artboard" style={{width:viewport==='desktop'?'100%':viewport==='web'?768:375}}><h1>{project.screens[0].title}</h1><div ref={canvas} data-testid="design-canvas" className="design-render" onClickCapture={canvasModifiers} onKeyDownCapture={canvasModifiers} /></div></div></div>
+    <aside className="design-inspector" aria-label="Inspector"><p className="eyebrow">INSPECTOR</p>{multi?<div>
+      <h2>{activeIds.length} componentes selecionados</h2>
+      <fieldset><legend>Geral</legend>
+        <button onClick={()=>runBatch({kind:'batch-duplicate',ids:activeIds})}>Duplicar seleção</button>
+        <button onClick={()=>setConfirmRemove(true)}>Remover seleção</button>
+      </fieldset>
+      <fieldset><legend>Aparência</legend>
+        <label>Alinhamento do texto em lote<select value={mixedAlignment?'':commonAlignment} onChange={event=>
+          runBatch({kind:'batch-alignment',ids:activeIds,value:event.target.value as ComponentStyle['textAlign']})}>
+          {mixedAlignment&&<option value="" disabled>Valores mistos</option>}
+          <option value="left">Esquerda</option><option value="center">Centro</option><option value="right">Direita</option>
+        </select></label>
+      </fieldset>
+      <fieldset><legend>Layout</legend>
+        {!sharedParent&&<p className="hint">Mover e reordenar exigem componentes irmãos.</p>}
+        <button disabled={!sharedParent} onClick={()=>runBatch({kind:'batch-reorder',ids:activeIds,direction:-1})}>Subir seleção</button>
+        <button disabled={!sharedParent} onClick={()=>runBatch({kind:'batch-reorder',ids:activeIds,direction:1})}>Descer seleção</button>
+        <label>Destino da seleção<select disabled={!sharedParent} value={destination} onChange={event=>setDestination(event.target.value)}>
+          <option value="">Escolher destino</option><option value=":root">Tela (raiz)</option>
+          {destinations.map(c=><option key={c.id} value={c.id} disabled={c.blocked}>{c.id}{c.blocked?' · dentro da seleção':''}</option>)}
+        </select></label>
+        <button disabled={!sharedParent||!destination||destinationBlocked} onClick={()=>runBatch({kind:'batch-move',ids:activeIds,parentId:destination===':root'?null:destination})}>Mover seleção</button>
+      </fieldset>
+      {batchError&&<p className="logic-error" role="alert">{batchError}</p>}
+    </div>:selected?<><h2>{selected.type}</h2><code className="component-id">{selected.id}</code>
       <fieldset><legend>Geral</legend>
       <div className="design-actions"><button disabled={position<=0} onClick={()=>edit({kind:'move',id:selected.id,parentId:selected.parentId,index:position-1})}>Subir</button><button disabled={position>=siblings.length-1} onClick={()=>edit({kind:'move',id:selected.id,parentId:selected.parentId,index:position+1})}>Descer</button><button onClick={()=>edit({kind:'duplicate',id:selected.id})}>Duplicar</button><button onClick={()=>setConfirmRemove(true)}>Remover</button></div>
       {selected.type==='Text'&&<label>Conteúdo textual<textarea aria-label="Conteúdo textual" maxLength={1000} value={selected.props.text} onChange={e=>change(c=>{if(c.type==='Text')c.props.text=e.target.value;})}/></label>}
@@ -66,6 +194,6 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
         {selected.type==='Input'&&<label>Evento de alteração<select aria-label="Evento de alteração" value={selected.events.change??''} onChange={e=>change(c=>{if(c.type==='Input')c.events.change=e.target.value||null;})}><option value="">Sem ação onChange</option>{project.graph.nodes.filter(n=>n.kind==='event'&&n.event==='input.change'&&n.componentId===selected.id).map(n=><option key={n.id} value={n.id}>{n.id}</option>)}</select></label>}
       </fieldset>}
     </>:<p className="hint">Selecione um componente na árvore ou no canvas. Para inserir na raiz, selecione a tela.</p>}</aside>
-    {confirmRemove&&selected&&<div className="modal-shade"><section role="dialog" aria-modal="true" aria-label="Remover componente" className="project-dialog"><h2>Remover componente e seus descendentes?</h2><p>A operação será recusada se nodes ainda referenciarem estes componentes. Remova ou redirecione essas referências no Blueprint primeiro. Nenhum node será apagado automaticamente. Você poderá desfazer.</p><div className="dialog-actions"><button autoFocus onClick={()=>setConfirmRemove(false)}>Cancelar</button><button onClick={()=>{edit({kind:'remove',id:selected.id});setConfirmRemove(false);}}>Confirmar remoção</button></div></section></div>}
+    {confirmRemove&&selected&&<div className="modal-shade"><section role="dialog" aria-modal="true" aria-label="Remover componente" className="project-dialog"><h2>Remover componente e seus descendentes?</h2><p>A operação será recusada se nodes ainda referenciarem estes componentes. Remova ou redirecione essas referências no Blueprint primeiro. Nenhum node será apagado automaticamente. Você poderá desfazer.</p><div className="dialog-actions"><button autoFocus onClick={()=>setConfirmRemove(false)}>Cancelar</button><button onClick={()=>{if(multi)runBatch({kind:'batch-remove',ids:activeIds});else if(!edit({kind:'remove',id:selected.id}))treeRoot.current?.focus();setConfirmRemove(false);}}>Confirmar remoção</button></div></section></div>}
   </section>;
 }

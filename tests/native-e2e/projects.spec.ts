@@ -196,3 +196,25 @@ test('paleta persiste transação v3 e descarta contexto ao fechar e trocar de p
   await expect(page.getByLabel('Node selecionado',{exact:true})).toHaveValue('');
   await expect(palette).toHaveCount(0);
 });
+
+test('lote no Designer salva v3 e reabre com estrutura e seleção transitória',async({page,disk})=>{
+  await page.goto('/');
+  await create(page,'Hierarquia v3');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await page.getByRole('button',{name:'+ Container',exact:true}).click();
+  await page.getByRole('button',{name:'+ Text',exact:true}).click();
+  const tree=page.getByRole('list',{name:'Hierarquia de componentes'});
+  await tree.getByRole('button',{name:/Container/}).click({modifiers:['Control']});
+  await page.getByRole('button',{name:'Duplicar seleção'}).click();
+  await page.getByRole('button',{name:'Salvar',exact:true}).click();
+  await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
+  const saved=await disk.read();
+  expect(saved.schemaVersion).toBe(3);
+  expect(saved.screens[0].components.filter(c=>c.type==='Container')).toHaveLength(2);
+  await page.getByRole('button',{name:'Fechar projeto'}).click();
+  await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();
+  await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
+  await page.getByRole('button',{name:'Design',exact:true}).click();
+  await expect(tree.locator('[aria-pressed=true]')).toHaveCount(0);
+  expect((await disk.read()).screens).toEqual(saved.screens);
+});
