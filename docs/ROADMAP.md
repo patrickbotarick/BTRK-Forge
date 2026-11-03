@@ -92,4 +92,4 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 
 **1G-A concluída e integrada com GO COM RESSALVAS, em escopo restrito.** Inspector categorizado e paleta contextual com transação única foram aceitos. A homologação funcional Tauri permanece pendente. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_A.md), [relatório](phases/RELATORIO_FASE_01G_A.md) e [validação](qa/VALIDACAO_FASE_01G_A.md).
 
-**1G-B1 implementada em branch própria, em revisão.** Hierarquia e seleção múltipla são o escopo desta entrega. A 1G-B continua em andamento. [Relatório da 1G-B1](phases/RELATORIO_FASE_01G_B1.md).
+**1G-B1 concluída e integrada com GO COM RESSALVAS, em escopo restrito.** Hierarquia, seleção múltipla e operações atômicas em lote foram aceitas. A homologação funcional Tauri permanece pendente e a Fase 1G-B continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B1.md), [relatório](phases/RELATORIO_FASE_01G_B1.md) e [validação](qa/VALIDACAO_FASE_01G_B1.md).
