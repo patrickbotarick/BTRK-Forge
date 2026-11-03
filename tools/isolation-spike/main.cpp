@@ -435,6 +435,70 @@ bool sameFile(const BY_HANDLE_FILE_INFORMATION& first, const BY_HANDLE_FILE_INFO
            first.nFileIndexHigh == second.nFileIndexHigh && first.nFileIndexLow == second.nFileIndexLow;
 }
 
+int testPendingFileCases(const fs::path& base) {
+    const auto stage = base / "stage";
+    const auto out = stage / "out";
+    const auto input = stage / "input.txt";
+    const auto output = out / "sample.bin";
+    fs::create_directory(stage);
+    fs::create_directory(out);
+    std::ofstream(input) << "original";
+    std::ofstream(stage / "replacement.txt") << "replacement";
+    std::ofstream(output) << "synthetic artifact";
+
+    Handle root, expected, actual;
+    pinDirectory(base, root);
+    BY_HANDLE_FILE_INFORMATION expectedId{}, actualId{};
+    require(inspectFile(input, expected, expectedId), "capture expected identity");
+    CloseHandle(expected.value);
+    expected.value = nullptr;
+    require(MoveFileExW((stage / "replacement.txt").c_str(), input.c_str(),
+                        MOVEFILE_REPLACE_EXISTING) != FALSE, "replace before opening");
+    const bool staleRejected = inspectFile(input, actual, actualId) && !sameFile(expectedId, actualId);
+
+    Handle stagePin, outPin, collected;
+    pinDirectory(stage, stagePin);
+    pinDirectory(out, outPin);
+    BY_HANDLE_FILE_INFORMATION collectedId{};
+    require(inspectFile(output, collected, collectedId), "open synthetic artifact");
+
+    bool ancestorMoved = false, artifactMoved = false, aliasCreated = false;
+    DWORD ancestorError = 0, artifactError = 0, aliasError = 0;
+    const auto alias = base / "late-hard-link.bin";
+    std::thread attacker([&] {
+        ancestorMoved = MoveFileExW(stage.c_str(), (base / "moved-stage").c_str(), 0) != FALSE;
+        ancestorError = ancestorMoved ? 0 : GetLastError();
+        artifactMoved = MoveFileExW(output.c_str(), (out / "moved-artifact.bin").c_str(), 0) != FALSE;
+        artifactError = artifactMoved ? 0 : GetLastError();
+        aliasCreated = CreateHardLinkW(alias.c_str(), output.c_str(), nullptr) != FALSE;
+        aliasError = aliasCreated ? 0 : GetLastError();
+    });
+    attacker.join();
+    BY_HANDLE_FILE_INFORMATION after{};
+    require(GetFileInformationByHandle(collected.value, &after), "recheck collection identity");
+    const bool hardLinkDetected = aliasCreated && sameFile(collectedId, after) && after.nNumberOfLinks > 1;
+
+    const auto symbolic = out / "symbolic.bin";
+    const bool symlink = CreateSymbolicLinkW(symbolic.c_str(), input.c_str(),
+                                            SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE) != FALSE;
+    const DWORD symlinkError = symlink ? 0 : GetLastError();
+    Handle symbolicHandle;
+    BY_HANDLE_FILE_INFORMATION symbolicId{};
+    const bool symlinkRejected = symlink && !inspectFile(symbolic, symbolicHandle, symbolicId) &&
+                                 (symbolicId.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
+
+    printf("before-open identity-mismatch=%d\n", staleRejected);
+    printf("ancestor rename=%d error=%lu\n", ancestorMoved, ancestorError);
+    printf("collection rename=%d error=%lu\n", artifactMoved, artifactError);
+    printf("late-hard-link created=%d error=%lu links=%lu detected=%d\n",
+           aliasCreated, aliasError, after.nNumberOfLinks, hardLinkDetected);
+    printf("symlink created=%d error=%lu rejected=%d\n", symlink, symlinkError, symlinkRejected);
+    // Detection alone does not close a race after the final identity check.
+    return staleRejected && !ancestorMoved && ancestorError == ERROR_SHARING_VIOLATION &&
+           !artifactMoved && artifactError == ERROR_SHARING_VIOLATION &&
+           !aliasCreated && aliasError == ERROR_SHARING_VIOLATION && symlinkRejected ? 0 : 1;
+}
+
 bool testFileBoundary(const fs::path& stage) {
     const auto outside = stage.parent_path() / "outside";
     const auto out = stage / "out";
@@ -491,13 +555,15 @@ int wmain(int argc, wchar_t** argv) {
     try {
         if (argc == 3 && std::wstring(argv[1]) == L"child") return task(argv[2]);
         const bool crash = argc == 2 && std::wstring(argv[1]) == L"--crash-test";
-        if (argc != 1 && !crash) return 2;
+        const bool files = argc == 2 && std::wstring(argv[1]) == L"--pending-file-tests";
+        if (argc != 1 && !crash && !files) return 2;
         wchar_t image[MAX_PATH]{};
         const DWORD length = GetModuleFileNameW(nullptr, image, MAX_PATH);
         require(length > 0 && length < MAX_PATH, "resolve host image");
         const fs::path base = fs::absolute(fs::path(image).parent_path() /
             (L"run-" + std::to_wstring(GetCurrentProcessId()) + L"-" + std::to_wstring(GetTickCount64())));
         require(fs::create_directory(base), "create exclusive root");
+        if (files) return testPendingFileCases(base);
         const auto staging = base / "stage";
         fs::create_directory(staging);
         fs::create_directory(staging / "out");

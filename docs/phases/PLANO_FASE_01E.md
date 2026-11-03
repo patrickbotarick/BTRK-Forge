@@ -24,3 +24,9 @@ Entregar um broker Rust no host Tauri do Studio para compilar um artefato de pro
 Para aprovar a 1E, exigir sucesso do build de prova em ambiente limpo e offline, limites exercitados sob carga, ausência de escrita fora das concessões, falha fechada, logs contidos e nenhum artefato promovido em erro ou cancelamento. Registrar limitações da fronteira e versões suportadas. Se a toolchain não funcionar sob o isolamento, retornar com evidências e proposta de revisão antes de liberar o build. A homologação Windows da 1D segue como pendência independente e deve estar concluída para o aceite da v1.0.
 
 **Estado.** Proposta para aprovação. Implementação não iniciada.
+
+## Revisão após a validação decisiva da 1E-A
+
+A arquitetura candidata para a próxima validação passa a ser **VM Windows descartável**. O desenho AppContainer das seções anteriores fica como registro da proposta inicial e das evidências já obtidas. O broker da 1E-B permanece em **NO-GO**. [Decisão e comparação](RELATORIO_FASE_01E_A.md#validação-decisiva--arquitetura-recomendada)
+
+A prova anterior deve ser reproduzida dentro de uma VM preparada offline com MSVC pinado, sem adaptador de rede, com discos de capacidade limitada e sem compartilhamentos de diretórios. O host medeia entrada e coleta, valida identidade e hash do artefato após desligamento e registra o inventário descartável para recuperação. Verificar limites de vCPU, memória, tempo e disco sob carga, ausência de rede com endpoints controlados, segurança da coleta, compatibilidade do PE no destino e falha fechada diante de configuração inválida. O modelo de IPC e a integração do Studio continuam propostas para revisão posterior.

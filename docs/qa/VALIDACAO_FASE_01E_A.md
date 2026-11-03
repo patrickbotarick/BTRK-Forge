@@ -80,3 +80,28 @@ Compilar com o comando MSVC da primeira rodada. Depois rodar, em PowerShell, na 
 ```
 
 Os logs locais são artifacts/phase01e-a/round2.log e artifacts/phase01e-a/round2-crash.log. Nenhum componente do Studio mudou e a suíte do Studio não foi repetida.
+
+## Validação decisiva
+
+O spike foi recompilado com MSVC /W4 /WX e executado somente no modo --pending-file-tests. Nenhuma prova já aprovada foi repetida. O token Windows normal reportou papel administrativo inativo. A matriz nova retornou código 1.
+
+| Sonda | Resultado observado no token normal |
+|---|---|
+| Troca antes da abertura | A substituição foi realizada e a comparação com a identidade esperada detectou a divergência. O ensaio demonstra detecção com identidade previamente capturada, sem resolver a obtenção confiável dessa identidade em um namespace hostil. |
+| Troca de ancestral durante preparação | Renomear o diretório stage enquanto os handles estavam abertos foi recusado com Win32 5. O ensaio cobre o ancestral sintético pinado. |
+| Substituição durante coleta | A renomeação do artefato aberto foi recusada com Win32 32. |
+| Hard link concorrente | **Falha do controle preventivo.** A thread criou o hard link mesmo com o handle aberto. A segunda inspeção detectou duas ligações com a mesma identidade. Ainda existe uma janela depois da inspeção. |
+| Symlink real | **Inconclusivo.** O Windows retornou 1314, privilégio necessário ausente. |
+| Loopback | Evidência anterior preservada. Controle positivo aceito pelo servidor em 2.033 ms. AppContainer expirou com 10060 em 1.016 ms e o servidor observou zero conexões adicionais. Sem evento de negação atribuído à política. |
+| Segundo endpoint | **Inconclusivo.** Não havia endpoint não loopback sob controle disponível. Nenhum serviço externo foi utilizado. |
+| WFP | Sessão local aberta com código 0 por FwpmEngineOpen0. FwpmTransactionBegin0, em modo de escrita, devolveu 5. Nenhum filtro foi instalado, portanto aplicação pré-resume, auditoria do bloqueio e falha fechada da política continuam sem demonstração. |
+| Volume e quota | **Pendente.** Nenhum volume descartável disponível para o ensaio. New-VHD, New-VM e serviço vmms indisponíveis na consulta. Nenhum volume foi alterado. TEMP/TMP e saída no staging cobrem apenas os caminhos escolhidos pela tarefa. Armazenamento do perfil AppContainer e outros destinos com ACL permissiva precisam ser inventariados e contidos. Crescimento adversarial, falta de espaço e recuperação do volume ficaram sem teste. |
+| VM Windows | **Não executada.** Avaliação arquitetural no relatório. |
+
+Para repetir os casos novos de arquivo, recompilar conforme o comando da primeira rodada e executar:
+
+```powershell
+& ./artifacts/phase01e-a/spike.exe --pending-file-tests
+```
+
+Logs locais em artifacts/phase01e-a/decisive-files-standard.log e artifacts/phase01e-a/decisive-files-low.log. O token de execução restrito negou também o hard link com código 5. A decisão usa o resultado com o token normal, que permitiu a criação.
