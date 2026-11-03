@@ -90,4 +90,4 @@ A sequência recomendada é **1E → 1F → 1G → 1H**, com CI e validação de
 
 Continuam abertas a durabilidade física sob falha de energia, corrida externa sem CAS, RustSec, instalação/desinstalação limpa, mensagem histórica WebView2, sandbox de terceiros, exportação generalizada, edição bidirecional e limites de escala, desempenho, DPI e acessibilidade. A classificação só muda com evidência específica. O plano não autoriza distribuição comercial ou início de implementação.
 
-**1E-A iniciada.** Contrato e spike independentes em branch própria. A [validação Windows](qa/VALIDACAO_FASE_01E_A.md) registra o estado da prova de isolamento. A 1E-B depende de revisão e aprovação posterior.
+**1E-A suspensa por dependência externa.** A investigação aguarda laboratório Windows autorizado com VM licenciada. A homologação do isolamento está pendente e a decisão para a 1E-B permanece NO-GO. [Checkpoint da 1E-A](phases/CHECKPOINT_FASE_01E_A.md).
