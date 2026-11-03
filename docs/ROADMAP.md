@@ -91,3 +91,5 @@ A sequência recomendada é **1E → 1F → 1G → 1H**, com CI e validação de
 Continuam abertas a durabilidade física sob falha de energia, corrida externa sem CAS, RustSec, instalação/desinstalação limpa, mensagem histórica WebView2, sandbox de terceiros, exportação generalizada, edição bidirecional e limites de escala, desempenho, DPI e acessibilidade. A classificação só muda com evidência específica. O plano não autoriza distribuição comercial ou início de implementação.
 
 **1G-A concluída e integrada com GO COM RESSALVAS, em escopo restrito.** Inspector categorizado e paleta contextual com transação única foram aceitos. A homologação funcional Tauri permanece pendente. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_A.md), [relatório](phases/RELATORIO_FASE_01G_A.md) e [validação](qa/VALIDACAO_FASE_01G_A.md).
+
+**1G-B1 implementada em branch própria, em revisão.** Hierarquia e seleção múltipla são o escopo desta entrega. A 1G-B continua em andamento. [Relatório da 1G-B1](phases/RELATORIO_FASE_01G_B1.md).
