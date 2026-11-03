@@ -97,3 +97,7 @@ Continuam abertas a durabilidade física sob falha de energia, corrida externa s
 **1G-B2 concluída com GO COM RESSALVAS, em escopo restrito.** O aceite cobre dimensões individuais e em lote no schema v3 e viewport compartilhada entre Designer e Preview. A homologação Tauri permanece pendente e a 1G-B continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B2.md).
 
 **1G-B3-A concluída em escopo restrito com GO COM RESSALVAS.** O aceite cobre a fundação persistente v4, migrações e compatibilidade semântica. A 1G-B3 continua em andamento. [Encerramento oficial](phases/ENCERRAMENTO_FASE_01G_B3_A.md).
+
+**1G-B3-B suspensa por dependência de laboratório, em NO-GO para integração e publicação.** A importação permanece desabilitada. [Checkpoint experimental](https://github.com/patrickbotarick/BTRK-Forge/blob/0f5826b1b855726ad9498d94fb917494113f24d4/docs/phases/CHECKPOINT_FASE_01G_B3_B.md).
+
+**1G-B3-C1 em revisão.** Panel é um preset visual que cria Container no schema v4. A 1G-B3-C permanece aberta. [Relatório](phases/RELATORIO_FASE_01G_B3_C1.md).
