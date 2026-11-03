@@ -1,3 +1,4 @@
+mod assets;
 mod model;
 mod paths;
 pub use model::parse as validate_document;

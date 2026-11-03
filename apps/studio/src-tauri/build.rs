@@ -7,6 +7,7 @@ fn main() {
             "project_save_as",
             "project_reload",
             "project_restore",
+            "project_resolve_asset",
             "project_close",
             "project_exit",
         ]),

@@ -12,6 +12,7 @@ fn main() {
             projects::project_save_as,
             projects::project_reload,
             projects::project_restore,
+            projects::project_resolve_asset,
             projects::project_close,
             projects::project_exit,
         ])

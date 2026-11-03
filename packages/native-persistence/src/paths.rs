@@ -35,6 +35,12 @@ pub struct AuthorizedDirectory {
 }
 
 impl AuthorizedDirectory {
+    #[cfg(windows)]
+    pub(crate) fn root_handle(&self) -> &File {
+        self._pins
+            .last()
+            .expect("authorized directory has a handle")
+    }
     pub fn authorize(path: &Path) -> Result<Self> {
         if !cfg!(windows) {
             return Err(err(
@@ -172,7 +178,7 @@ impl AuthorizedDirectory {
     }
 }
 
-fn check_file(file: &File, directory: bool) -> Result<()> {
+pub(crate) fn check_file(file: &File, directory: bool) -> Result<()> {
     let metadata = file.metadata().map_err(io_error)?;
     if metadata.is_dir() != directory || metadata.file_type().is_symlink() {
         return Err(err(

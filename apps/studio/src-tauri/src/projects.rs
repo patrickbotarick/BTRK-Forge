@@ -1,7 +1,10 @@
 use forge_persistence::{err, valid_folder_name, validate_document, ForgeError, Receipt, Session};
 use std::{
     collections::HashMap,
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
 };
 use tauri::Manager;
 type Result<T> = std::result::Result<T, ForgeError>;
@@ -55,6 +58,46 @@ fn get<'a>(registry: &'a mut HashMap<String, Session>, id: &str) -> Result<&'a m
             "A sessão do projeto não está autorizada. Abra a pasta novamente pelo Studio.",
         )
     })
+}
+static ASSET_RESOLUTION_BUSY: AtomicBool = AtomicBool::new(false);
+
+struct AssetResolutionPermit;
+impl Drop for AssetResolutionPermit {
+    fn drop(&mut self) {
+        ASSET_RESOLUTION_BUSY.store(false, Ordering::Release);
+    }
+}
+
+#[tauri::command]
+pub async fn project_resolve_asset(
+    window: tauri::WebviewWindow,
+    store: tauri::State<'_, Store>,
+    session_id: String,
+    resource_id: String,
+    revision: String,
+) -> Result<tauri::ipc::Response> {
+    trusted(&window)?;
+    if session_id.len() != 36
+        || resource_id.is_empty()
+        || resource_id.len() > 80
+        || revision.len() != 64
+    {
+        return Err(err("asset_request", "Solicitação de recurso inválida."));
+    }
+    if ASSET_RESOLUTION_BUSY.swap(true, Ordering::AcqRel) {
+        return Err(err(
+            "busy",
+            "Já existe uma resolução de asset em andamento.",
+        ));
+    }
+    let permit = AssetResolutionPermit;
+    work(store.inner().clone(), move |registry| {
+        let _permit = permit;
+        get(registry, &session_id)?
+            .resolve_asset(&resource_id, &revision)
+            .map(tauri::ipc::Response::new)
+    })
+    .await
 }
 #[tauri::command]
 pub async fn project_create(
