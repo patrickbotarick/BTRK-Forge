@@ -1,0 +1,22 @@
+# Fase 1E-A — contrato de segurança e spike Windows
+
+**Estado em 03/11/2026.** Spike independente iniciado e executado no Windows. **NO-GO para iniciar o broker 1E-B.** O AppContainer executou uma tarefa fixa e impôs restrições observadas, mas a matriz adversarial ficou incompleta. A [validação](../qa/VALIDACAO_FASE_01E_A.md) separa resultados e lacunas. A homologação integral Windows da 1D e as ressalvas do roadmap seguem abertas.
+
+## Operações permitidas, recusadas e auditadas
+
+O futuro broker Rust aceita exclusivamente IDs de tarefas internas e revisões de snapshots autorizados, vinculados à sessão que solicitou o build. Resolve ferramentas por caminho absoluto, versão e hash fixados. Prepara insumos declarativos em raiz exclusiva, executa offline e coleta apenas arquivos regulares e previstos. Consulta e cancelamento exigem a mesma autorização. Executável, argumentos de shell, variáveis, diretórios de trabalho, plugins e scripts fornecidos pelo projeto são recusados. Auditar ID da tarefa, sessão correlacionável, revisão, perfil aplicado, versão da ferramenta, recusas, motivo terminal, quotas, truncamento e hash de artefato. Não registrar segredos, ambiente ou caminhos privados completos.
+
+| Ameaça | Controle exigido para o futuro broker | Estado na 1E-A |
+|---|---|---|
+| Comando não autorizado e abuso da bridge Tauri | Catálogo interno, IPC tipado e restrito por sessão/origem. Runner independente sem URL, IPC, handles ou token de acesso ao Studio. | Imagem fixa e modos internos no spike. Bridge futura fora do escopo. |
+| Arquivos externos, credenciais e rede | AppContainer sem capacidades, ambiente explícito, handles enumerados, ACL por SID, sem exceções de rede. Revisar ACLs de ALL APPLICATION PACKAGES, armazenamento próprio do perfil, serviços e objetos nomeados. | Canários externos e ambiente exercitados. Cobertura de credenciais do SO, rede geral e ACLs amplas pendente. |
+| Traversal, symlinks, junctions, hard links e substituição concorrente | Staging de propriedade do host. Abrir por handle, verificar tipo, volume, identidade e alvo antes de copiar e coletar. Recusar reparse points e validar troca concorrente em ambas as fronteiras. | Traversal contra canários negado pelo SO. Reparse e corridas pendentes. |
+| Descendentes e interrupção | Criar suspenso, verificar token, anexar a Job sem breakaway e só então retomar. Encerrar a árvore em timeout/cancelamento, kill-on-close e limpeza de sobras após falha do host. | Descendente, timeout e cancelamento interno exercitados. Crash e recuperação pendentes. |
+| Excesso de memória, CPU, disco e logs | Memória e CPU por Job, teto de tempo no host, quota real de disco e logs drenados continuamente com retenção limitada. | Memória, tempo e logs exercitados. CPU e disco pendentes. |
+| Falha de isolamento ou saída parcial | Falhar fechado. Coletar e publicar somente após término autorizado e verificação de arquivos esperados. | SID ausente e falha real de criação recusados. Promoção futura fora do escopo. |
+
+## Protótipo e decisão
+
+O [executável de prova](../../tools/isolation-spike/main.cpp) é compilado previamente com MSVC e CRT estático. O host provisiona uma cópia dessa imagem por execução e verifica os bytes emitidos pelo compilador de recurso fixo. Esse caminho exercita um build mínimo de entrada e saída. Compatibilidade de uma toolchain de produto, por exemplo MSVC dentro do contêiner, continua sem demonstração. A entrada e a imagem recebem ACL de leitura/execução conforme seu papel e a saída tem concessão de escrita. AppContainer é a fronteira candidata para arquivos e rede. Job Object cuida de recursos e ciclo de vida. A arquitetura segue o lançamento AppContainer via atributos de processo documentado pela Microsoft. [Referência](https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/SecAuthZ/implementing-an-appcontainer.md)
+
+O protótipo deixa diretórios sintéticos de evidência ao lado do executável e tenta remover o perfil ao sair. Provisionamento por hash, limites de CPU/disco, limpeza em recuperação e isolamento de uma toolchain real são trabalho futuro. Antes de autorizar a 1E-B, repetir numa VM Windows limpa com usuário padrão, endpoint controlado local e em rede, fixture de reparse e verificação de acessos do SO, testar hard links e substituição por handle, e provar quotas e execução offline da toolchain selecionada. Se AppContainer não atender à matriz, revisar a arquitetura com uma fronteira mais forte, como VM descartável, e medir o custo antes de escolher.
