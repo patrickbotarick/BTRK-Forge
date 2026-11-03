@@ -68,3 +68,24 @@ IA/atualizações podem receber implementações somente depois dessas bases: ar
 - Instalação em máquina limpa e pacote assinado ainda não verificados.
 - Regras para edição de código livre e representação visual precisam ser aprovadas antes de prometer round trip.
 - Escala de grafo, consumo, acessibilidade e versões mínimas suportadas de Windows/WebView2 ainda precisam de matriz formal.
+
+## Roadmap até a v1.0 — proposta consolidada para aprovação
+
+A sequência recomendada é **1E → 1F → 1G → 1H**, com CI e validação de distribuição iniciados em paralelo quando houver artefatos verificáveis. A ordem coloca o isolamento antes da exportação e permite testar a primeira cadeia de ponta a ponta com o catálogo existente. Se o piloto da 1F revelar uma lacuna indispensável de modelagem, antecipar apenas esse requisito da 1G mediante aprovação. O [registro Windows da retomada](qa/HOMOLOGACAO_WINDOWS_01D_RETOMADA.md) mantém a homologação integral da 1D aberta.
+
+| Etapa | Escopo e dependências | Evidência para aceite |
+|---|---|---|
+| **1E — Infraestrutura Segura de Build** | Broker Windows, tarefas fixas, ambiente descartável, isolamento, quotas, cancelamento e logs no Studio. [Plano técnico](phases/PLANO_FASE_01E.md). | Testes adversariais do runner e demonstração controlada na janela real. |
+| **1F — Exportação de Aplicativos** | Após 1E, generalizar o exportador experimental para documentos visuais válidos. Empacotar UI, runtime versionado, assets locais validados e dependências fixadas. Publicar saída web estática e instalador Windows independente. | Dois projetos criados no Designer, com eventos, bindings e ramos, exportados nos dois destinos. Comparar comportamento com o Preview, testar caminhos Unicode e executar com Studio fechado e sem servidor de desenvolvimento. |
+| **1G — Evolução do Designer e Blueprint** | Usar os resultados da 1F para priorizar catálogo, propriedades, estilos, múltiplas telas, responsividade, novos nodes, comportamentos reutilizáveis e organização do grafo. Preservar a experiência inspirada nos Blueprints da Unreal Engine. | Montar, salvar, reabrir e exportar um projeto representativo sem edição manual de JSON. Cobrir migração e validar regressões semânticas de cada node novo. |
+| **1H — Qualidade e Distribuição** | CI Windows, RustSec e SBOM, assinatura, cadeia de distribuição, matriz WebView2/DPI/acessibilidade, instalação limpa e recuperação. Convergência dos gates de 1E–1G. | Pipeline rastreável por SHA, pacotes assinados e verificados, resultados publicados por ambiente e incidentes de segurança/recovery classificados antes do aceite. |
+
+### Critérios preliminares de aceite da v1.0
+
+- **Obrigatório.** Criar projeto → montar interface → criar Blueprint → visualizar TypeScript → executar e depurar → exportar → executar aplicativo independente. QA repete o fluxo em dois projetos autorados na interface, cobrindo click/change, binding, dois ramos, erro e rollback. Reabrir após novo processo com IDs e conexões preservados e histórico de depuração ausente. Conferir equivalência observável no navegador e no Windows.
+- **Obrigatório.** Passar pelo CI com typecheck, lint, suítes TS/Rust, E2E, build e auditorias. Publicar matriz de Windows/WebView2 suportados e testar com usuário sem admin, WebView2 presente/ausente, DPI 100/125/150%, navegação por teclado e leitor de tela no fluxo principal. Validar instalação, execução e desinstalação em VM limpa. Verificar assinatura e SHA-256 do pacote.
+- **Obrigatório.** Demonstrar limites e contenção do build, validar recuperação diante de interrupção e conflito externo e registrar garantias efetivamente medidas. Definir máquina de referência, tamanho de projeto suportado e orçamento de latência antes da homologação de escala. Exigir zero defeitos críticos ou altos abertos em segurança e no fluxo principal.
+- **Desejável.** Mais componentes e layouts, múltiplas telas além do mínimo validado, reutilização avançada de comportamentos, melhorias de ergonomia e depuração.
+- **Pós-1.0.** IA, marketplace, nuvem, colaboração, macOS/Linux e edição bidirecional irrestrita. Execução de código de terceiros depende de sandbox e homologação próprios.
+
+Continuam abertas a durabilidade física sob falha de energia, corrida externa sem CAS, RustSec, instalação/desinstalação limpa, mensagem histórica WebView2, sandbox de terceiros, exportação generalizada, edição bidirecional e limites de escala, desempenho, DPI e acessibilidade. A classificação só muda com evidência específica. O plano não autoriza distribuição comercial ou início de implementação.
