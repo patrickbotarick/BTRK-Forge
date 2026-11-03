@@ -30,6 +30,15 @@ static V2_SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
         .build(&schema)
         .expect("schema v2 válido")
 });
+static V4_SCHEMA: LazyLock<jsonschema::Validator> = LazyLock::new(|| {
+    let schema: Value =
+        serde_json::from_str(include_str!("../../project-schema/project-v4.schema.json"))
+            .expect("schema v4");
+    jsonschema::options()
+        .should_validate_formats(true)
+        .build(&schema)
+        .expect("schema v4 válido")
+});
 
 pub fn parse(bytes: &[u8]) -> Result<Value> {
     if bytes.len() > MAX_BYTES {
@@ -50,7 +59,7 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
             document["functions"] = Value::Array(vec![]);
         }
     }
-    if document["schemaVersion"].as_f64().is_some_and(|v| v > 3.0)
+    if document["schemaVersion"].as_f64().is_some_and(|v| v > 4.0)
         || document["metadata"]["documentVersion"]
             .as_f64()
             .is_some_and(|v| v > 1.0)
@@ -60,7 +69,7 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
             "Este projeto usa uma versão futura do schema. Atualize o Studio antes de abri-lo.",
         ));
     }
-    if document["schemaVersion"] == 1 {
+    if document["schemaVersion"].as_f64() == Some(1.0) {
         LEGACY_SCHEMA
             .validate(&document)
             .map_err(|_| err("invalid_schema", "Documento legado inválido."))?;
@@ -82,7 +91,7 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
         }
         document["schemaVersion"] = 2.into();
     }
-    if document["schemaVersion"] == 2 {
+    if document["schemaVersion"].as_f64() == Some(2.0) {
         V2_SCHEMA
             .validate(&document)
             .map_err(|_| err("invalid_schema", "Documento v2 inválido."))?;
@@ -109,7 +118,13 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
         }
         document["schemaVersion"] = 3.into();
     }
-    SCHEMA.validate(&document).map_err(|_| {
+    if document["schemaVersion"].as_f64() == Some(3.0) {
+        SCHEMA
+            .validate(&document)
+            .map_err(|_| err("invalid_schema", "Documento v3 inválido."))?;
+        document["schemaVersion"] = 4.into();
+    }
+    V4_SCHEMA.validate(&document).map_err(|_| {
         err(
             "invalid_schema",
             "O projeto não atende ao formato BTRK ou contém campos não suportados.",
@@ -120,7 +135,10 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
 }
 
 pub fn encode(document: &Value) -> Result<Vec<u8>> {
-    let bytes = serde_json::to_vec_pretty(document)
+    let input = serde_json::to_vec(document)
+        .map_err(|_| err("invalid_schema", "Não foi possível serializar o projeto."))?;
+    let normalized = parse(&input)?;
+    let bytes = serde_json::to_vec_pretty(&normalized)
         .map_err(|_| err("invalid_schema", "Não foi possível serializar o projeto."))?;
     parse(&bytes)?;
     Ok(bytes)
@@ -237,12 +255,62 @@ fn validate_graph(p: &Value) -> Result<()> {
         }
     };
     unique(p["id"].as_str().unwrap())?;
+    let mut resources = HashSet::new();
+    let mut content = HashMap::new();
+    let mut declared_bytes = 0.0;
+    for resource in p["resources"].as_array().unwrap() {
+        let id = resource["id"].as_str().unwrap();
+        unique(id)?;
+        resources.insert(id);
+        let metadata = (
+            resource["byteLength"].as_f64().unwrap(),
+            resource["width"].as_f64().unwrap(),
+            resource["height"].as_f64().unwrap(),
+        );
+        if content
+            .insert(resource["sha256"].as_str().unwrap(), metadata)
+            .is_some_and(|previous| previous != metadata)
+        {
+            return Err(err(
+                "invalid_schema",
+                "Metadados inconsistentes para o mesmo hash.",
+            ));
+        }
+        declared_bytes += metadata.0;
+        if resource["width"].as_f64().unwrap() * resource["height"].as_f64().unwrap() > 8_000_000.0
+        {
+            return Err(err("limit", "Recurso excede 8 milhões de pixels."));
+        }
+    }
+    if declared_bytes > 64.0 * 1024.0 * 1024.0 {
+        return Err(err("limit", "Recursos excedem 64 MiB declarados."));
+    }
     for screen in p["screens"].as_array().unwrap() {
         unique(screen["id"].as_str().unwrap())?;
         let components = screen["components"].as_array().unwrap();
         for c in components {
             let id = c["id"].as_str().unwrap();
             unique(id)?;
+            if c["type"] == "Image" || c["type"] == "Icon" {
+                let label_key = if c["type"] == "Image" { "alt" } else { "label" };
+                let label = c["props"][label_key].as_str().unwrap();
+                let decorative = c["props"]["decorative"].as_bool().unwrap();
+                let valid_label = if decorative {
+                    label.is_empty()
+                } else {
+                    label
+                        .chars()
+                        .any(|ch| !matches!(ch, ' ' | '\t' | '\r' | '\n'))
+                };
+                if !valid_label || label.encode_utf16().count() > 1000 {
+                    return Err(err("invalid_schema", "Texto acessível inválido."));
+                }
+                if c["type"] == "Image"
+                    && !resources.contains(c["props"]["assetId"].as_str().unwrap())
+                {
+                    return Err(err("invalid_reference", "Referência de recurso ausente."));
+                }
+            }
             let mut visited = HashSet::from([id]);
             let mut parent = c["parentId"].as_str();
             let mut depth = 1;

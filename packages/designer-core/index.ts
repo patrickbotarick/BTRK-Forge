@@ -1,4 +1,4 @@
-import { component, type Component, type Project } from '../project-schema';
+import { component, type Component, type ComponentV3, type Project } from '../project-schema';
 import { validateProject } from '../blueprint-core';
 export type BatchEdit =
   | {kind:'batch-remove'|'batch-duplicate';ids:readonly string[]}
@@ -7,7 +7,7 @@ export type BatchEdit =
   | {kind:'batch-dimension';ids:readonly string[];axis:'width'|'height';value:Component['style']['width']}
   | {kind:'batch-alignment';ids:readonly string[];value:Component['style']['textAlign']};
 export type Edit =
-  | {kind:'add';type:Component['type'];parentId:string|null}
+  | {kind:'add';type:ComponentV3['type'];parentId:string|null}
   | {kind:'update';id:string;component:Component}
   | {kind:'move';id:string;parentId:string|null;index:number}
   | {kind:'duplicate'|'remove';id:string}
@@ -79,7 +79,7 @@ export function editProject(project:Project, edit:Edit):EditResult {
   if(!('id' in edit)&&edit.kind!=='add')return editBatch(project,edit);
   const next=structuredClone(project);const list=next.screens[0].components;
   const find=(id:string)=>{const c=list.find(c=>c.id===id);if(!c)throw new Error('Componente não encontrado');return c;};
-  const ids=new Set([next.id,...next.screens.map(s=>s.id),...next.variables.map(v=>v.id),...next.graph.nodes.map(n=>n.id),...next.graph.connections.map(e=>e.id),...list.map(c=>c.id)]);
+  const ids=new Set([next.id,...next.screens.map(s=>s.id),...next.variables.map(v=>v.id),...next.graph.nodes.map(n=>n.id),...next.graph.connections.map(e=>e.id),...next.resources.map(r=>r.id),...list.map(c=>c.id)]);
   const fresh=()=>{let id;do{id=`component-${crypto.randomUUID()}`;}while(ids.has(id));ids.add(id);return id;};
   let selectedId:string|null=null;
   if(edit.kind==='add'){const c=component(edit.type,fresh(),edit.parentId);list.push(c);selectedId=c.id;}

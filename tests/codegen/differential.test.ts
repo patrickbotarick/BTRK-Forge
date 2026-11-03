@@ -3,6 +3,8 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { exampleProject } from '../../packages/forge-core/example';
 import { handleRuntimeRequest, initialRuntime, type RuntimeState } from '../../packages/blueprint-core';
+import { validateProject } from '../../packages/blueprint-core';
+import visualCases from '../fixtures/projects/schema-v4-cases.json';
 import { lowerBlueprint } from '../../packages/blueprint-ir';
 import { generateTypeScript } from '../../packages/typescript-codegen';
 import { logicFixture } from '../logic-fixture';
@@ -21,6 +23,11 @@ const seeds = [1, 2, 42, 4096, 65535, 1793047, 0xdeadbeef, 0xffffffff];
 projects.push(...seeds.map(seededFixture));
 const mutationStart = projects.length;
 projects.push(readAfterWriteFixture(), readAfterWriteFixture(), readAfterWriteFixture(), budgetFixture());
+const visuals=validateProject(visualCases.find(c=>c.name==='visuals')!.document);
+const rollbackWithVisuals=ingestionRollbackFixture();
+rollbackWithVisuals.resources=visuals.resources;
+rollbackWithVisuals.screens[0].components.push(...visuals.screens[0].components.filter(c=>c.type==='Image'||c.type==='Icon'));
+const visualIndex=projects.push(visuals,rollbackWithVisuals)-2;
 let compiled: Awaited<ReturnType<typeof compileCases>>;
 
 beforeAll(async () => {
@@ -42,6 +49,14 @@ async function compare(index: number, events: unknown[], starting?: RuntimeState
 }
 
 describe('Generated TypeScript: real typecheck, compile and child-process execution', () => {
+  it('v4 com mídia declarada mantém eventos, bindings e rollback no código executado',async()=>{
+    const replies=await compare(visualIndex,expected.greetingBranches.map(step=>step.event));
+    for(const [index,step] of expected.greetingBranches.entries()){
+      expect(replies[index]).toMatchObject({ok:true,trace:step.trace,runtime:{properties:{'result-text':step.text}}});
+    }
+    const {event,...result}=expected.ingestionRollback;
+    expect((await compare(visualIndex+1,[event]))[0]).toEqual({ok:false,requestId:1,...result});
+  });
   it('compares legacy events, all scalar types and sequential events', async () => {
     await compare(0, [click, click, click]);
     expect((await compare(4, [click, click]))[0].runtime?.variables).toEqual({ count: 1, text: literalText, flag: true });

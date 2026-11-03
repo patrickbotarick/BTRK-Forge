@@ -19,11 +19,24 @@ export const componentSchema = z.discriminatedUnion('type', [
   componentSchemaV2.options[2].extend({ props: componentSchemaV2.options[2].shape.props.extend({binding:componentId.nullable()}), events:z.object({change:componentId.nullable()}).strict() }),
   componentSchemaV2.options[3]
 ]);
-export type Component = z.infer<typeof componentSchema>;
+export const componentSchemaV4 = z.discriminatedUnion('type', [
+  ...componentSchema.options,
+  z.object({ ...base, type:z.literal('Image'), props:z.object({
+    assetId:componentId, fit:z.enum(['contain','cover','fill']), alt:z.string().max(1000), decorative:z.boolean()
+  }).strict(), events:z.object({}).strict() }).strict(),
+  z.object({ ...base, type:z.literal('Icon'), props:z.object({
+    iconKey:z.enum(['check','info','warning','close']), label:z.string().max(1000), decorative:z.boolean()
+  }).strict(), events:z.object({}).strict() }).strict()
+]);
+export type ComponentV3 = z.infer<typeof componentSchema>;
+export type Component = z.infer<typeof componentSchemaV4>;
+export function isLegacyComponent(c:Component):c is ComponentV3 {
+  return c.type!=='Image'&&c.type!=='Icon';
+}
 export type ComponentStyle = z.infer<typeof styleSchema>;
 export const MAX_COMPONENTS = 200;
 export const MAX_DEPTH = 12;
-export function component(type: Component['type'], id: string, parentId: string | null = null): Component {
+export function component(type: ComponentV3['type'], id: string, parentId: string | null = null): ComponentV3 {
   const style: ComponentStyle = { width:'auto', height:'auto', background:'transparent', color:'#F0F4F6', borderColor:'#344454', borderWidth:0, borderRadius:4, fontSize:16, fontWeight:'400', textAlign:'left' };
   switch(type) {
     case 'Text': return {id,parentId,type,style,props:{text:'Texto'},events:{}};

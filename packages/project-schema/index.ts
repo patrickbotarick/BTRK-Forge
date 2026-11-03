@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { component, componentSchema, componentSchemaV2, MAX_COMPONENTS } from './components';
-export { component, componentSchema, MAX_COMPONENTS, MAX_DEPTH } from './components';
-export type { Component, ComponentStyle } from './components';
+import { component, componentSchema, componentSchemaV2, componentSchemaV4, MAX_COMPONENTS } from './components';
+export { component, componentSchema, isLegacyComponent, MAX_COMPONENTS, MAX_DEPTH } from './components';
+export type { Component, ComponentV3, ComponentStyle } from './components';
 
-export const CURRENT_SCHEMA = 3;
+export const CURRENT_SCHEMA = 4;
 const id = z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/);
 const scalar = z.union([z.number().finite(), z.string().max(1000), z.boolean()]);
 export const variableSchema = z.object({ id, name: z.string().min(1).max(80), type: z.enum(['number', 'string', 'boolean']), initial: scalar }).strict();
@@ -45,7 +45,19 @@ export const projectSchema = projectSchemaV2.extend({
   screens:z.array(z.object({id,title:z.string().max(100),components:z.array(componentSchema).max(MAX_COMPONENTS)}).strict()).length(1),
   graph:projectSchemaV2.shape.graph.extend({nodes:z.array(nodeSchema).max(200)})
 });
-export type Project = z.infer<typeof projectSchema>;
+const MiB=1024*1024;
+const resourceSchema=z.object({
+  id,kind:z.literal('image'),mediaType:z.literal('image/png'),
+  sha256:z.string().length(64).regex(/^[0-9a-f]{64}$/),
+  byteLength:z.number().int().min(1).max(8*MiB),
+  width:z.number().int().min(1).max(4096),height:z.number().int().min(1).max(4096)
+}).strict();
+export const projectSchemaV4=projectSchema.extend({
+  schemaVersion:z.literal(CURRENT_SCHEMA),
+  screens:z.array(projectSchema.shape.screens.element.extend({components:z.array(componentSchemaV4).max(MAX_COMPONENTS)})).length(1),
+  resources:z.array(resourceSchema).max(64)
+});
+export type Project = z.infer<typeof projectSchemaV4>;
 export type GraphNode = Project['graph']['nodes'][number];
 export type Connection = Project['graph']['connections'][number];
 export type Scalar = z.infer<typeof scalar>;
@@ -65,7 +77,30 @@ export function parseProject(input: unknown): Project {
     }) };
   }
   if(copy.schemaVersion===2){const legacy=projectSchemaV2.parse(copy);if(legacy.graph.nodes.filter(n=>n.kind==='event').length!==1)throw new Error('Formato legado exige exatamente um evento');copy={...legacy,schemaVersion:3,screens:legacy.screens.map(s=>({...s,components:s.components.map(c=>c.type==='Input'?{...c,props:{...c.props,binding:null},events:{change:null}}:c)}))};}
-  return projectSchema.parse(copy);
+  if(copy.schemaVersion===3)copy={...projectSchema.parse(copy),schemaVersion:CURRENT_SCHEMA};
+  if(typeof copy.schemaVersion==='number'&&copy.schemaVersion>CURRENT_SCHEMA)throw new Error('Versão futura do schema BTRK');
+  const project=projectSchemaV4.parse(copy);
+  const resources=new Set<string>();
+  const content=new Map<string,string>();
+  let bytes=0;
+  for(const resource of project.resources){
+    if(resources.has(resource.id))throw new Error('ID de recurso duplicado: '+resource.id);
+    resources.add(resource.id);
+    const metadata=[resource.byteLength,resource.width,resource.height].join(':');
+    if(content.has(resource.sha256)&&content.get(resource.sha256)!==metadata)throw new Error('Metadados inconsistentes para o mesmo hash');
+    content.set(resource.sha256,metadata);
+    bytes+=resource.byteLength;
+    if(resource.width*resource.height>8_000_000)throw new Error('Recurso excede 8 milhões de pixels');
+  }
+  if(bytes>64*MiB)throw new Error('Recursos excedem 64 MiB declarados');
+  for(const component of project.screens[0].components){
+    if(component.type==='Image'&&!resources.has(component.props.assetId))throw new Error('Referência de recurso ausente: '+component.id);
+    if(component.type==='Image'||component.type==='Icon'){
+      const label=component.type==='Image'?component.props.alt:component.props.label;
+      if(label.length>1000||(component.props.decorative?label!=='':!/[^ \t\r\n]/.test(label)))throw new Error('Texto acessível inválido: '+component.id);
+    }
+  }
+  return project;
 }
 export function deserialize(text: string): Project {
   if (text.length > 2_000_000) throw new Error('Projeto excede 2 MB');

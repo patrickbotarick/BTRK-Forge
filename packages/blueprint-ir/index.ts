@@ -1,5 +1,5 @@
 import { ports, validateProject } from '../blueprint-core';
-import { parseProject, type Project } from '../project-schema';
+import { isLegacyComponent, parseProject, type Project } from '../project-schema';
 import { graphDiagnostic, schemaDiagnostics } from './diagnostics';
 import { IR_VERSION, type BlueprintIR, type DataRef, type DeepReadonly, type IRDiagnostic, type IRNode, type IRResult, type ScalarType } from './types';
 export * from './types';
@@ -76,7 +76,7 @@ export function lowerBlueprint(input: unknown, options: { mode?: 'editable' | 'e
     irVersion: IR_VERSION, source: { projectId: project.id, schemaVersion: 3 }, executable: diagnostics.length === 0,
     variables: project.variables.map(v => ({ ...v })), nodes,
     connections: project.graph.connections.map(c => ({ ...c })),
-    components: project.screens[0].components.map(c => ({ id: c.id, type: c.type, disabled: 'disabled' in c.props ? c.props.disabled : null,
+    components: project.screens[0].components.filter(isLegacyComponent).map(c => ({ id: c.id, type: c.type, disabled: 'disabled' in c.props ? c.props.disabled : null,
       initialProperty: c.type === 'Text' ? { property: 'text', value: c.props.text } : c.type === 'Input' ? { property: 'value', value: c.props.binding ? String(project.variables.find(v => v.id === c.props.binding)!.initial) : c.props.initialValue } : null })),
     bindings: project.screens[0].components.flatMap(c => c.type === 'Input' && c.props.binding ? [{ variableId: c.props.binding, componentId: c.id, property: 'value' as const }] : []),
     entrypoints: project.screens[0].components.flatMap(c => {

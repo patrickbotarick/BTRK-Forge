@@ -19,12 +19,12 @@ fn visual_v2_matches_typescript_migration_and_preserves_legacy_on_disk() {
     let path = root.path().join(MANIFEST);
     fs::write(&path, legacy).unwrap();
     let mut session = Session::open(&path).unwrap();
-    assert_eq!(session.receipt().document["schemaVersion"], 3);
+    assert_eq!(session.receipt().document["schemaVersion"], 4);
     assert_eq!(fs::read(&path).unwrap(), legacy);
     session.save(&modern).unwrap();
     assert_eq!(
         serde_json::from_slice::<Value>(&fs::read(&path).unwrap()).unwrap()["schemaVersion"],
-        3
+        4
     );
     assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), legacy);
 }
@@ -534,7 +534,7 @@ fn logic_v3_rejects_bad_types_events_references_bindings_and_scripts() {
     p["graph"]["nodes"][0]["script"] = "eval('bad')".into();
     assert!(model::encode(&p).is_err());
     let mut p = base;
-    p["schemaVersion"] = 4.into();
+    p["schemaVersion"] = 5.into();
     assert!(model::encode(&p).is_err());
 }
 #[test]
@@ -562,8 +562,44 @@ fn input_v2_migrates_without_writing_and_backup_keeps_original() {
     let mut session = Session::open(&path).unwrap();
     assert_eq!(fs::read(&path).unwrap(), bytes);
     let modern = session.receipt().document;
-    assert_eq!(modern["schemaVersion"], 3);
+    assert_eq!(modern["schemaVersion"], 4);
     assert!(modern["screens"][0]["components"][1]["props"]["binding"].is_null());
     session.save(&modern).unwrap();
     assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), bytes);
+}
+
+#[test]
+fn shared_v4_matrix_and_unprovisioned_resources() {
+    let cases: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/projects/schema-v4-cases.json"
+    ))
+    .unwrap();
+    for case in cases.as_array().unwrap() {
+        let bytes = serde_json::to_vec(&case["document"]).unwrap();
+        let result = model::parse(&bytes);
+        assert_eq!(result.is_ok(), case["valid"] == true, "{}", case["name"]);
+        if let Ok(document) = result {
+            assert_eq!(document, case["document"]);
+        }
+    }
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join(MANIFEST);
+    let document = &cases[2]["document"];
+    let bytes = serde_json::to_vec(document).unwrap();
+    fs::write(&path, &bytes).unwrap();
+    let mut session = Session::open(&path).unwrap();
+    assert_eq!(session.receipt().unprovisioned_resource_ids, ["asset-demo"]);
+    assert_eq!(fs::read(&path).unwrap(), bytes);
+    let mut invalid = document.clone();
+    invalid["resources"] = serde_json::json!([]);
+    assert!(session.save(&invalid).is_err());
+    assert_eq!(fs::read(&path).unwrap(), bytes);
+    assert!(!root.path().join(BACKUP).exists());
+    session.save(document).unwrap();
+    assert_eq!(fs::read(root.path().join(BACKUP)).unwrap(), bytes);
+    assert!(Session::save_as(root.path(), "asset-copy", document).is_err());
+    assert!(!root.path().join("asset-copy").exists());
+    assert!(Session::save_as(root.path(), "manifest-copy", &cases[0]["document"]).is_ok());
+    drop(session);
+    assert_eq!(Session::open(&path).unwrap().receipt().document, *document);
 }

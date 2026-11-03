@@ -30,7 +30,11 @@ fn main() {
                     let document = validate_document(
                         request["documentJson"].as_str().unwrap_or("").as_bytes(),
                     )?;
-                    Session::create(&root, folder, &document)?
+                    if op == "saveAs" {
+                        Session::save_as(&root, folder, &document)?
+                    } else {
+                        Session::create(&root, folder, &document)?
+                    }
                 };
                 let receipt = session.receipt();
                 registry.insert(receipt.session_id.clone(), session);

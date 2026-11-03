@@ -60,6 +60,7 @@ pub struct Receipt {
     pub recovery_required: bool,
     pub recovery_available: bool,
     pub recovery_label: Option<String>,
+    pub unprovisioned_resource_ids: Vec<String>,
 }
 pub struct Session {
     token: String,
@@ -114,6 +115,18 @@ impl Session {
         session.reload()?;
         Ok(session)
     }
+    pub fn save_as(parent: &Path, folder: &str, document: &Value) -> Result<Self> {
+        if document["resources"]
+            .as_array()
+            .is_some_and(|items| !items.is_empty())
+        {
+            return Err(err(
+                "assets_unprovisioned",
+                "Salvar como com recursos declarados depende do armazenamento de assets.",
+            ));
+        }
+        Self::create(parent, folder, document)
+    }
     pub fn receipt(&self) -> Receipt {
         Receipt {
             session_id: self.token.clone(),
@@ -129,6 +142,12 @@ impl Session {
             recovery_required: self.recovery_required,
             recovery_available: self.recovery.is_some(),
             recovery_label: self.recovery.as_ref().map(|r| r.0.clone()),
+            unprovisioned_resource_ids: self.document["resources"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|resource| resource["id"].as_str().map(str::to_owned))
+                .collect(),
         }
     }
     pub fn save(&mut self, document: &Value) -> Result<Receipt> {

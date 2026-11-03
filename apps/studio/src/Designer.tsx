@@ -1,7 +1,7 @@
 import { DimensionField } from './DimensionField';
 import { viewportWidths, type Viewport } from './viewport';
 import { useEffect, useRef, useState } from 'react';
-import type { Component, ComponentStyle, Project } from '../../../packages/project-schema';
+import type { Component, ComponentV3, ComponentStyle, Project } from '../../../packages/project-schema';
 import { selectionRoots, type BatchEdit, type Edit } from '../../../packages/designer-core';
 import { renderVisual } from '../../../packages/preview-runtime/visual-renderer';
 export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRedo,openBlueprint,viewport,setViewport}:{project:Project;edit:(e:Edit)=>string|void;selectedId:string|null;select:(id:string|null)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;openBlueprint?:(id:string)=>void;viewport:Viewport;setViewport:(value:Viewport)=>void}) {
@@ -114,7 +114,7 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
     choose(element.dataset.componentId,event);
   }
   const parent=selected?.type==='Container'?selected.id:selected?.parentId??null;
-  const add=(type:Component['type'])=>edit({kind:'add',type,parentId:parent});
+  const add=(type:ComponentV3['type'])=>edit({kind:'add',type,parentId:parent});
   const change=(mutate:(c:Component)=>void)=>{if(!selected)return;const c=structuredClone(selected);mutate(c);edit({kind:'update',id:c.id,component:c});};
   const style=(key:keyof ComponentStyle,value:ComponentStyle[keyof ComponentStyle])=>change(c=>{Object.assign(c.style,{[key]:value});});
   const number=(label:string,value:number,update:(n:number)=>void,min=0,max=2000)=>{
@@ -155,7 +155,7 @@ export function Designer({project,edit,selectedId,select,undo,redo,canUndo,canRe
     </li>);
   }
   const siblings=components.filter(c=>c.parentId===selected?.parentId);const position=siblings.findIndex(c=>c.id===selectedId);
-  function drop(event:React.DragEvent) {event.preventDefault();const type=event.dataTransfer.getData('application/btrk-component');if(['Text','Button','Input','Container'].includes(type))add(type as Component['type']);}
+  function drop(event:React.DragEvent) {event.preventDefault();const type=event.dataTransfer.getData('application/btrk-component');if(['Text','Button','Input','Container'].includes(type))add(type as ComponentV3['type']);}
   return <section className="designer" aria-label="Editor visual">
     <aside className="design-library"><p className="eyebrow">COMPONENTES</p><div className="catalog">{(['Text','Button','Input','Container'] as const).map(type=><button key={type} draggable onDragStart={e=>e.dataTransfer.setData('application/btrk-component',type)} onClick={()=>add(type)}>+ {type}</button>)}</div><p className="hint">Insere no container selecionado ou ao lado do elemento. Arraste ao canvas ou use os botões.</p><p className="eyebrow">HIERARQUIA</p><button className="screen-select" ref={treeRoot} aria-pressed={!selected} onClick={()=>choose(null)}>▧ Tela · {project.screens[0].title||'Principal'}</button><ul className="component-tree" aria-label="Hierarquia de componentes">{tree(null)}</ul>{!components.length&&<p className="hint">Adicione o primeiro componente.</p>}</aside>
     <div className="design-center"><div className="design-toolbar"><button disabled={!canUndo} onClick={undo}>Desfazer</button><button disabled={!canRedo} onClick={redo}>Refazer</button><label>Viewport Design<select aria-label="Viewport Design" value={viewport} onChange={e=>setViewport(e.target.value as Viewport)}><option value="desktop">Desktop · fluido</option><option value="web">Web · 768 px</option><option value="mobile">Celular · 375 px</option></select></label></div><p className="design-caption">DESIGN CANVAS · {components.length}/200 componentes · seleção por clique ou Enter · viewport responsivo</p><div className="design-scroll" onDragOver={e=>e.preventDefault()} onDrop={drop}><div className="design-artboard" style={{width:viewportWidths[viewport]}}><h1>{project.screens[0].title}</h1><div ref={canvas} data-testid="design-canvas" className="design-render" onClickCapture={canvasModifiers} onKeyDownCapture={canvasModifiers} /></div></div></div>

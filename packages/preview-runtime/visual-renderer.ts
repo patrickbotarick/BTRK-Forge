@@ -9,6 +9,7 @@ export function renderVisual(host:HTMLElement, screen:Project['screens'][number]
   host.replaceChildren();
   const elements=new Map<string,HTMLElement>();
   for(const c of screen.components) {
+    if(c.type==='Image'||c.type==='Icon')continue;
     const element=document.createElement(c.type==='Text'?'p':c.type==='Button'?'button':c.type==='Input'?'input':'div');
     element.dataset.componentId=c.id;
     const s=c.style;
@@ -26,6 +27,9 @@ export function renderVisual(host:HTMLElement, screen:Project['screens'][number]
     if(options.design){element.tabIndex=0;element.setAttribute('aria-label','Selecionar '+c.type+' '+c.id);element.setAttribute('aria-pressed',String(c.id===options.selected));element.style.cursor='pointer';element.style.outline=c.id===options.selected?'2px solid #FF934F':'1px dashed #536879';element.style.outlineOffset='2px';element.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();options.onSelect?.(c.id);});element.addEventListener('keydown',function(event){if((event as KeyboardEvent).key==='Enter'||(event as KeyboardEvent).key===' '){event.preventDefault();event.stopPropagation();options.onSelect?.(c.id);}});}
     elements.set(c.id,element);
   }
-  for(const c of screen.components)(c.parentId?elements.get(c.parentId)!:host).append(elements.get(c.id)!);
+  for(const c of screen.components){
+    const element=elements.get(c.id);
+    if(element)(c.parentId?elements.get(c.parentId)!:host).append(element);
+  }
   if(focusId){const target=elements.get(focusId);if(target instanceof HTMLInputElement){target.focus({preventScroll:true});if(selection!==null&&selection!==undefined&&target.type==='text')target.setSelectionRange(Math.min(selection,target.value.length),Math.min(selection,target.value.length));}}
 }

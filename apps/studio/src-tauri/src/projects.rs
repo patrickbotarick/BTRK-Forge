@@ -139,7 +139,7 @@ pub async fn project_save_as(
     work(store.inner().clone(), move |registry| {
         register(
             registry,
-            Session::create(parent.path(), &folder_name, &document)?,
+            Session::save_as(parent.path(), &folder_name, &document)?,
         )
     })
     .await

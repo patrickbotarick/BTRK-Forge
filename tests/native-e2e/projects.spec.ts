@@ -111,16 +111,16 @@ test('erro de nome é localizado e o runtime não altera definição persistente
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);expect(basename(disk.path())).toBe('project.btrk.json');
 });
 test('Design v2 preserva árvore, IDs e propriedades no filesystem Rust real',async({page,disk})=>{
-  await page.goto('/');await create(page,'Forge Visual Demo');const initial=await disk.read();await buildVisualDemo(page);await page.keyboard.press('Control+s');await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const saved=await disk.read();expect(saved.schemaVersion).toBe(3);expect(saved.id).toBe(initial.id);expect(saved.screens[0].components).toHaveLength(7);expect(saved.graph).toEqual(initial.graph);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);await page.getByRole('button',{name:'Preview',exact:true}).click();await expect(page.frameLocator('iframe').getByText('Forge Visual Demo',{exact:true})).toBeVisible();await page.screenshot({path:'artifacts/phase01b/designer-rust.png',fullPage:true});
+  await page.goto('/');await create(page,'Forge Visual Demo');const initial=await disk.read();await buildVisualDemo(page);await page.keyboard.press('Control+s');await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const saved=await disk.read();expect(saved.schemaVersion).toBe(4);expect(saved.id).toBe(initial.id);expect(saved.screens[0].components).toHaveLength(7);expect(saved.graph).toEqual(initial.graph);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);await page.getByRole('button',{name:'Preview',exact:true}).click();await expect(page.frameLocator('iframe').getByText('Forge Visual Demo',{exact:true})).toBeVisible();await page.screenshot({path:'artifacts/phase01b/designer-rust.png',fullPage:true});
 });
 test('abrir v1 migra apenas em memória e Salvar mantém backup dos bytes antigos',async({page,disk})=>{
-  await page.goto('/');await create(page);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();const legacy=await readFile('tests/fixtures/projects/phase0-v1.json','utf8');await writeFile(disk.path(),legacy);await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await readFile(disk.path(),'utf8')).toBe(legacy);await page.getByRole('button',{name:'Código',exact:true}).click();await expect(page.getByLabel('Estado da geração')).toHaveAttribute('data-state','ready',{timeout:20000});expect(await readFile(disk.path(),'utf8')).toBe(legacy);await page.getByRole('button',{name:'Design',exact:true}).click();await expect(page.locator('.tree-select')).toHaveCount(1);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect((await disk.read()).schemaVersion).toBe(3);expect(await readFile(disk.path().replace('project.btrk.json','project.btrk.backup.json'),'utf8')).toBe(legacy);
+  await page.goto('/');await create(page);await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();const legacy=await readFile('tests/fixtures/projects/phase0-v1.json','utf8');await writeFile(disk.path(),legacy);await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await readFile(disk.path(),'utf8')).toBe(legacy);await page.getByRole('button',{name:'Código',exact:true}).click();await expect(page.getByLabel('Estado da geração')).toHaveAttribute('data-state','ready',{timeout:20000});expect(await readFile(disk.path(),'utf8')).toBe(legacy);await page.getByRole('button',{name:'Design',exact:true}).click();await expect(page.locator('.tree-select')).toHaveCount(1);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect((await disk.read()).schemaVersion).toBe(4);expect(await readFile(disk.path().replace('project.btrk.json','project.btrk.backup.json'),'utf8')).toBe(legacy);
 });
 test('salvar mantém histórico apesar da ordenação JSON do recibo Rust',async({page,disk})=>{
   await page.goto('/');await create(page);await buildVisualDemo(page);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const saved=await disk.read();await expect(page.getByRole('button',{name:'Desfazer',exact:true})).toBeEnabled();await page.getByRole('button',{name:'Desfazer',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toContainText('Alterações não salvas');await page.getByRole('button',{name:'Refazer',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect(await disk.read()).toEqual(saved);
 });
 import {buildLogicDemo,verifyLogicDemo} from '../logic-flow';
-test('lógica visual v3 salva e reabre pelo serviço Rust mantendo eventos e IDs',async({page,disk})=>{test.setTimeout(120000);await page.goto('/');await create(page,'Forge Logic Demo');await buildLogicDemo(page);await verifyLogicDemo(page);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const before=await disk.read();expect(before.schemaVersion).toBe(3);expect(before.graph.nodes).toHaveLength(21);expect(before.graph.connections).toHaveLength(21);expect(before.variables.find(v=>v.name==='Nome')?.initial).toBe('');await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect((await disk.read()).graph).toEqual(before.graph);await verifyLogicDemo(page);});
+test('lógica visual v3 salva e reabre pelo serviço Rust mantendo eventos e IDs',async({page,disk})=>{test.setTimeout(120000);await page.goto('/');await create(page,'Forge Logic Demo');await buildLogicDemo(page);await verifyLogicDemo(page);await page.getByRole('button',{name:'Salvar',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');const before=await disk.read();expect(before.schemaVersion).toBe(4);expect(before.graph.nodes).toHaveLength(21);expect(before.graph.connections).toHaveLength(21);expect(before.variables.find(v=>v.name==='Nome')?.initial).toBe('');await page.getByRole('button',{name:'Fechar projeto',exact:true}).click();await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');expect((await disk.read()).graph).toEqual(before.graph);await verifyLogicDemo(page);});
 
 test('Code Demo nativo: navegação não suja projeto, JSON pendente é protegido e sessão reabre', async ({ page, disk }) => {
   test.setTimeout(120000);
@@ -183,7 +183,7 @@ test('paleta persiste transação v3 e descarta contexto ao fechar e trocar de p
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
   const saved=await disk.read();
-  expect(saved.schemaVersion).toBe(3);
+  expect(saved.schemaVersion).toBe(4);
   expect(saved.graph.nodes).toHaveLength(original.graph.nodes.length+1);
   expect(saved.graph.connections.at(-1)).toMatchObject({source:'sum',target:saved.graph.nodes.at(-1)?.id,input:'a'});
   await page.getByRole('button',{name:'Fechar projeto'}).click();
@@ -209,7 +209,7 @@ test('lote no Designer salva v3 e reabre com estrutura e seleção transitória'
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
   const saved=await disk.read();
-  expect(saved.schemaVersion).toBe(3);
+  expect(saved.schemaVersion).toBe(4);
   expect(saved.screens[0].components.filter(c=>c.type==='Container')).toHaveLength(2);
   await page.getByRole('button',{name:'Fechar projeto'}).click();
   await page.getByRole('button',{name:'Abrir projeto',exact:true}).click();
@@ -233,7 +233,7 @@ test('largura em pai e filho no v3 salva e reabre pelo driver Rust',async({page,
   await page.getByRole('button',{name:'Salvar',exact:true}).click();
   await expect(page.getByLabel('Estado do projeto')).toHaveText('✓ Salvo no disco');
   const saved=await disk.read();
-  expect(saved.schemaVersion).toBe(3);
+  expect(saved.schemaVersion).toBe(4);
   expect(saved.screens[0].components.filter(c=>c.type==='Input'||c.type==='Container').map(c=>c.style.width))
     .toEqual([300,300]);
   await page.getByRole('button',{name:'Fechar projeto'}).click();

@@ -22,7 +22,7 @@ describe('Modelo independente e runtime', () => {
   });
   it('migra v0 sem modificar a entrada', () => {
     const legacy = JSON.parse(readFileSync('tests/fixtures/projects/phase0-v0.json','utf8'));
-    expect(parseProject(legacy).schemaVersion).toBe(3); expect(legacy.schemaVersion).toBe(0);
+    expect(parseProject(legacy).schemaVersion).toBe(4); expect(legacy.schemaVersion).toBe(0);
   });
   it('recusa esquema futuro, JSON inválido e arquivos excessivos', () => {
     expect(() => parseProject({ ...exampleProject(), schemaVersion: 99 })).toThrow();

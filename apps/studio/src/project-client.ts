@@ -4,6 +4,7 @@ import type { Project } from '../../../packages/project-schema';
 export interface ProjectReceipt {
   sessionId: string; location: string; document: Project; revision: string | null;
   recoveryRequired: boolean; recoveryAvailable: boolean; recoveryLabel: string | null;
+  unprovisionedResourceIds?: string[];
 }
 export interface ProjectClient {
   create(folderName: string, documentJson: string): Promise<ProjectReceipt | null>;

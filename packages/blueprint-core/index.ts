@@ -30,6 +30,7 @@ export function validateProject(input: unknown, options: { allowIncomplete?: boo
   const ids = new Set<string>();
   const unique = (value: string) => { if (ids.has(value)) throw new Error(`ID duplicado: ${value}`); ids.add(value); };
   unique(project.id);
+  for (const resource of project.resources) unique(resource.id);
   for (const screen of project.screens) { unique(screen.id); validateComponents(screen.components, project.graph.nodes, unique,project.variables); }
   for (const variable of project.variables) { unique(variable.id); if (typeof variable.initial !== variable.type) throw new Error(`Tipo inicial inválido: ${variable.id}`); }
   const nodes = new Map(project.graph.nodes.map(node => { unique(node.id); return [node.id, node]; }));

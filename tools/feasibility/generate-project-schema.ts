@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import { writeFile } from 'node:fs/promises';
-import { projectSchema } from '../../packages/project-schema';
-import { exampleProject } from '../../packages/forge-core/example';
-await writeFile('packages/project-schema/project.schema.json', JSON.stringify(z.toJSONSchema(projectSchema), null, 2) + '\n');
-// Historical fixtures and the frozen v1 schema must never be regenerated from the new model.
-await writeFile('tests/fixtures/projects/logic-v3.json', JSON.stringify(exampleProject(), null, 2) + '\n');
+import { projectSchemaV4 } from '../../packages/project-schema';
+// The v1–v3 schemas and historical fixtures remain frozen.
+await writeFile('packages/project-schema/project-v4.schema.json', JSON.stringify(z.toJSONSchema(projectSchemaV4), null, 2) + '\n');

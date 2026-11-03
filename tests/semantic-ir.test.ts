@@ -115,7 +115,7 @@ describe('Blueprint → semantic IR v1 (not TypeScript equivalence)', () => {
     const p = logicFixture();
     const invalid = { ...p, graph: { ...p.graph, nodes: [{ ...p.graph.nodes[0], kind: 'unknown' }] } };
     expect(lowerBlueprint(invalid).diagnostics[0]).toMatchObject({ code: 'SCHEMA_INVALID', nodeId: 'click', path: ['graph', 'nodes', 0, 'kind'] });
-    expect(lowerBlueprint({ ...p, schemaVersion: 4 }).ok).toBe(false);
+    expect(lowerBlueprint({ ...p, schemaVersion: 5 }).ok).toBe(false);
     expect(lowerBlueprint({ ...p, code: 'arbitrary payload' }).ok).toBe(false);
   });
   it('migrates v0/v1/v2 without writing or changing source identities', () => {
