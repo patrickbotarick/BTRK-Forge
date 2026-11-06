@@ -19,3 +19,15 @@ O comando de abertura tenta criar a nova sessão antes de o frontend substituir 
 A prova com o driver Rust em cópia descartável confirmou exclusão concorrente, liberação, salvamento e reabertura. A janela Tauri existente permaneceu aberta no Designer com Workspace UX-A e recusou uma tentativa concorrente do driver. Não houve mudança funcional nem remoção manual de lock. A [validação complementar](../qa/VALIDACAO_FASE_01G_UX_B1.md#diagnóstico-complementar) detalha o que ainda falta na janela nativa.
 
 **NO-GO para integração nesta rodada.** A funcionalidade de workspace mantém o GO COM RESSALVAS. Antes de propor integração, completar no Tauri a sequência de fechar, reabrir, editar e salvar uma cópia descartável e confirmar as duas larguras entre processos.
+
+## Homologação final Tauri — 6 de novembro de 2026
+
+**GO COM RESSALVAS para propor a integração da UX-B1.** Esta decisão atualiza o NO-GO temporário da seção anterior após completar os gates nativos essenciais. A execução começou em 3 de novembro e foi retomada em 6 de novembro depois de uma interrupção. O código funcional testado corresponde a ed34562b02b8c6dc144dada6ff59cf22dd84de85, preservado no commit documental dbb255a3a43aa15851f8ce22df735f703c36ffad.
+
+O ensaio usou uma cópia independente em artifacts/ux-b1-final-70238856/project.btrk.json. O título foi editado na janela Tauri, o indicador mostrou alterações não salvas, e Salvar gravou o título Workspace UX-B1 - homologacao. Fechar projeto e reabrir o mesmo manifesto conservou a alteração. Após reiniciar o processo do Studio, a cópia abriu novamente. Um novo salvamento sem editar o documento reaberto produziu bytes idênticos aos do manifesto anterior, comparados por SHA-256.
+
+O Designer restaurou 260 px à esquerda, 300 px no Inspector e console recolhido após reiniciar. Exibir → Restaurar layout deste modo retornou a 220, 270 e 158 px. Esses padrões também sobreviveram a um segundo reinício nativo. O manifesto permaneceu idêntico durante os testes de layout e o histórico de edição ficou vazio após a reabertura.
+
+Selecionar novamente o manifesto que já estava aberto reproduziu a mensagem de projeto bloqueado no próprio Tauri. A sessão anterior permaneceu disponível e salva. Uma abertura válida após encerrar a sessão substituiu a mensagem pelo status de projeto carregado. O comportamento observado corresponde à última operação e não indica, por si só, que a sessão ativa perdeu o lock.
+
+A [validação final](../qa/VALIDACAO_FASE_01G_UX_B1.md#homologação-final-tauri) registra medições e hashes. A homologação mínima da B1 foi concluída. Acessibilidade, DPI, janela mínima e ciclo de vida completo dos editores permanecem nas ressalvas anteriores. A UX-B2 segue sem início.
